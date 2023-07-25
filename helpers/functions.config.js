@@ -8,7 +8,7 @@ configFallbackValues.set('application.bigLogoURL', '/images/logo.svg');
 configFallbackValues.set('application.smallLogoURL', '/images/logo-small.svg');
 configFallbackValues.set('application.httpPort', 7000);
 configFallbackValues.set('application.maximumProcesses', 4);
-configFallbackValues.set('application.allowTesting', false);
+configFallbackValues.set('application.useTestDatabases', false);
 configFallbackValues.set('tempUsers', []);
 configFallbackValues.set('reverseProxy.disableCompression', false);
 configFallbackValues.set('reverseProxy.disableEtag', false);

@@ -7,7 +7,7 @@ export declare function getConfigProperty(propertyName: 'application.bigLogoURL'
 export declare function getConfigProperty(propertyName: 'application.smallLogoURL'): string;
 export declare function getConfigProperty(propertyName: 'application.httpPort'): number;
 export declare function getConfigProperty(propertyName: 'application.userDomain'): string;
-export declare function getConfigProperty(propertyName: 'application.allowTesting'): boolean;
+export declare function getConfigProperty(propertyName: 'application.useTestDatabases'): boolean;
 export declare function getConfigProperty(propertyName: 'tempUsers'): ConfigTemporaryUserCredentials[];
 export declare function getConfigProperty(propertyName: 'activeDirectory'): ConfigActiveDirectory | undefined;
 export declare function getConfigProperty(propertyName: 'adWebAuthConfig'): ADWebAuthConfig | undefined;

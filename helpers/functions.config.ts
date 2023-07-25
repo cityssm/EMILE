@@ -27,7 +27,7 @@ configFallbackValues.set('application.bigLogoURL', '/images/logo.svg')
 configFallbackValues.set('application.smallLogoURL', '/images/logo-small.svg')
 configFallbackValues.set('application.httpPort', 7000)
 configFallbackValues.set('application.maximumProcesses', 4)
-configFallbackValues.set('application.allowTesting', false)
+configFallbackValues.set('application.useTestDatabases', false)
 
 configFallbackValues.set('tempUsers', [])
 
@@ -64,7 +64,7 @@ export function getConfigProperty(
 ): string
 
 export function getConfigProperty(
-  propertyName: 'application.allowTesting'
+  propertyName: 'application.useTestDatabases'
 ): boolean
 
 export function getConfigProperty(

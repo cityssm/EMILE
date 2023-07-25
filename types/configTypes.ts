@@ -10,7 +10,7 @@ export interface Config {
     httpPort?: number
     userDomain?: string
     maximumProcesses?: number
-    allowTesting?: boolean
+    useTestDatabases?: boolean
   }
   session: {
     cookieName?: string
