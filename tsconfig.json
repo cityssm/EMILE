@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "es2022",
+    "module": "es2022",
+    "moduleResolution": "Node",
+    "isolatedModules": false,
+    "declaration": true,
+    "noImplicitAny": false,
+    "removeComments": true,
+    "allowUnreachableCode": false,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true
+  },
+  "compileOnSave": true,
+  "buildOnSave": true,
+  "exclude": ["node_modules/*", "public-typescript/*"]
+}

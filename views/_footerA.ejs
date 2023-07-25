@@ -1,0 +1,25 @@
+    </main>
+  </div>
+</div>
+<footer class="footer has-background-grey-lighter has-text-dark is-hidden-print">
+  <div class="content has-text-right">
+    <p class="has-text-grey-dark">
+      <strong>
+      <%= configFunctions.getConfigProperty("application.applicationName") %>
+      </strong><br />
+      Build <%= buildNumber %>
+    </p>
+  </div>
+</footer>
+<script>
+  window.exports = window.exports || {};
+</script>
+<script src="<%= urlPrefix %>/lib/cityssm-bulma-js/bulma-js.js"></script>
+<script src="<%= urlPrefix %>/lib/cityssm-bulma-webapp-js/cityssm.min.js"></script>
+<script>
+  cityssm.htmlModalFolder ="<%= urlPrefix %>/html/";
+  bulmaJS.init();
+</script>
+<script src="<%= urlPrefix %>/lib/cityssm-bulma-webapp-js/cityssm-theme.min.js" defer></script>
+<script src="<%= urlPrefix %>/lib/fa/js/all.min.js" defer></script>
+<script src="<%= urlPrefix %>/javascripts/main.min.js"></script>

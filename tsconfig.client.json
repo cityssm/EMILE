@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "isolatedModules": false,
+    "declaration": true,
+    "noImplicitAny": false,
+    "removeComments": false,
+    "allowUnreachableCode": false,
+    "skipLibCheck": true,
+    "strictNullChecks": true
+  },
+  "files": [
+    "public-typescript/main.ts"
+  ],
+  "compileOnSave": true,
+  "buildOnSave": true
+}

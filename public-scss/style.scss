@@ -1,0 +1,190 @@
+@import '@cityssm/bulma-a11y/bulma-a11y';
+@import 'bulma/sass/utilities/derived-variables';
+@import '@cityssm/fa-glow/fa-glow';
+
+$white: #fff;
+$black: #000;
+
+.is-linethrough {
+  text-decoration: line-through;
+}
+
+.has-width-10 {
+  width: 10px;
+}
+
+.has-width-900 {
+  width: 900px;
+}
+
+.has-min-page-height {
+  min-height: 100vh;
+}
+
+/*
+ * Status containers
+ */
+
+.has-status-loaded .is-hidden-status-loaded,
+.has-status-loading .is-hidden-status-loading,
+.has-status-view .is-hidden-status-view,
+fieldset:enabled .is-hidden-enabled {
+  display: none;
+}
+
+.has-status-view .is-noninteractive-status-view {
+  pointer-events: none;
+}
+
+/* to fix page titles inside level components, set on .level-left */
+
+.has-flex-shrink-1 {
+  flex-shrink: 1;
+}
+
+.has-border-radius-3 {
+  border-radius: 3px;
+}
+
+/*
+ * Tabs
+ */
+
+.tab-content {
+  display: none;
+
+  &.is-active {
+    display: block;
+  }
+}
+
+#is-login-page {
+  overflow: auto;
+  background-position: top center;
+  background-size: cover;
+
+  body > .columns {
+    min-height: 100vh;
+  }
+}
+
+.button.is-xsmall {
+  height: 2em;
+  padding-top: 0;
+  padding-bottom: 0;
+  font-size: 0.75rem;
+}
+
+/*
+ * Print
+ */
+
+.container.is-page {
+  width: 8.5in;
+  padding: 10px 20px 20px;
+  margin: 20px auto;
+  background-color: $white;
+  border: 1px solid $black;
+
+  @media print {
+    width: 100%;
+    padding: 0;
+    border: 0;
+  }
+}
+
+/*
+ * "Readonly" selects
+ */
+
+.select option:disabled {
+  display: none;
+}
+
+/*
+  * Modal Size Fix
+  */
+
+.modal-card {
+  max-width: 100%;
+}
+
+/*
+ * Accessibility
+ */
+
+$black-ter: hsl(0, 0%, 14%);
+
+.control .button.is-static,
+.menu .menu-label {
+  color: $black-ter;
+}
+
+/*
+ * Static button pointer events
+ */
+
+span.button.is-static {
+  pointer-events: all;
+  cursor: default;
+}
+
+/*
+ * Fixed Level
+ */
+
+.level {
+  &.is-fixed-bottom {
+    z-index: 1100;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 15px;
+    margin: 0;
+
+    &.has-shadow {
+      box-shadow: 0 -2px 0 0 #f5f5f5;
+    }
+  }
+}
+
+.is-hover-container:hover,
+.is-hover-container:focus,
+.is-hover-container:focus-within {
+  .is-visible-hover,
+  &.is-visible-hover {
+    visibility: visible !important;
+  }
+}
+
+/*
+ * data-fa-glow in menus
+ */
+
+.menu-list a.is-active [data-fa-glow] {
+  stroke: $link;
+}
+
+/*
+ * .table.is-fade-hoverable
+ * Fade rows not under mouse
+*/
+
+.table.is-fade-hoverable {
+  &:hover,
+  &:focus,
+  &:focus-within {
+    tbody tr {
+      opacity: 0.4;
+    }
+  }
+
+  tbody tr {
+    &:hover,
+    &:focus,
+    &:focus-within {
+      opacity: 1;
+    }
+  }
+}

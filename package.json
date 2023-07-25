@@ -1,0 +1,84 @@
+{
+  "name": "@cityssm/emile",
+  "version": "1.0.0-dev",
+  "type": "module",
+  "description": "EMILE (Energy Monitoring in Less Effort) - A tool to aggregate energy consumption data across several municipal assets and report usage to monitor and manage emissions.",
+  "exports": "./app.js",
+  "engines": {
+    "node": "^14.13.1 || >=16.0.0"
+  },
+  "scripts": {
+    "start": "cross-env NODE_ENV=production node ./bin/www.js",
+    "dev:live": "cross-env NODE_ENV=dev DEBUG=emile:* nodemon --inspect ./bin/www.js",
+    "dev:test": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true nodemon --inspect ./bin/www.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cityssm/EMILE.git"
+  },
+  "keywords": [
+    "green-button"
+  ],
+  "author": "The Corporation of the City of Sault Ste. Marie",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cityssm/EMILE/issues"
+  },
+  "homepage": "https://github.com/cityssm/EMILE#readme",
+  "private": true,
+  "dependencies": {
+    "@cityssm/ad-web-auth-connector": "^0.4.0",
+    "@cityssm/bulma-js": "^0.4.0",
+    "@cityssm/bulma-webapp-js": "^1.5.0",
+    "@cityssm/express-abuse-points": "^1.1.0",
+    "@cityssm/expressjs-server-js": "^2.3.3",
+    "@cityssm/utils-datetime": "^0.1.1",
+    "@fortawesome/fontawesome-free": "^5.15.4",
+    "activedirectory2": "^2.2.0",
+    "better-sqlite3": "^8.5.0",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.6",
+    "core-js": "^3.31.1",
+    "cross-env": "^7.0.3",
+    "csurf": "^1.11.0",
+    "debug": "^4.3.4",
+    "ejs": "^3.1.9",
+    "exit-hook": "^3.2.0",
+    "express": "^4.18.2",
+    "express-rate-limit": "^6.8.0",
+    "express-session": "^1.17.3",
+    "http-errors": "^2.0.0",
+    "session-file-store": "^1.5.0"
+  },
+  "devDependencies": {
+    "@cityssm/bulma-a11y": "^0.4.0",
+    "@cityssm/bulma-sticky-table": "^2.1.0",
+    "@cityssm/fa-glow": "^0.1.0",
+    "@types/activedirectory2": "^1.2.3",
+    "@types/better-sqlite3": "^7.6.4",
+    "@types/compression": "^1.7.2",
+    "@types/cookie-parser": "^1.4.3",
+    "@types/csurf": "^1.11.2",
+    "@types/debug": "^4.1.8",
+    "@types/ejs": "^3.1.2",
+    "@types/express": "^4.17.17",
+    "@types/express-session": "^1.17.7",
+    "@types/gulp": "^4.0.13",
+    "@types/gulp-changed": "^0.0.36",
+    "@types/gulp-minify": "^3.1.2",
+    "@types/gulp-sass": "^5.0.1",
+    "@types/http-errors": "^2.0.1",
+    "@types/node-windows": "^0.1.2",
+    "@types/session-file-store": "^1.2.2",
+    "bulma": "^0.9.4",
+    "bulma-tooltip": "^3.0.2",
+    "eslint": "^8.45.0",
+    "eslint-config-cityssm": "^0.4.0",
+    "gulp": "^4.0.2",
+    "gulp-changed": "^4.0.3",
+    "gulp-minify": "^3.1.0",
+    "gulp-sass": "^5.1.0",
+    "nodemon": "^3.0.1",
+    "sass": "^1.64.1"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": ["./tsconfig.json", "./tsconfig.client.json"],
+    "ecmaVersion": 2022,
+    "sourceType": "module"
+  },
+  "extends": ["eslint-config-cityssm"]
+}

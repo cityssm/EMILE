@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html class="has-background-grey" id="is-login-page" lang="en" style="background-image:url('<%= urlPrefix + configFunctions.getConfigProperty("application.backgroundURL") %>')">
+
+<head>
+  <title>
+    Login:
+    <%= configFunctions.getConfigProperty("application.applicationName") %>
+  </title>
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <link rel="apple-touch-icon" sizes="180x180" href="<%= urlPrefix %>/images/favicon/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="<%= urlPrefix %>/images/favicon/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="<%= urlPrefix %>/images/favicon/favicon-16x16.png" />
+  <link rel="icon" type="image/svg+xml" href="<%= urlPrefix %>/images/favicon/favicon.svg" />
+  <link rel="mask-icon" href="<%= urlPrefix %>/images/favicon/safari-pinned-tab.svg" color="#5bbad5" />
+  <link rel="shortcut icon" href="<%= urlPrefix %>/images/favicon/favicon.ico" />
+
+  <link rel="stylesheet" href="<%= urlPrefix %>/stylesheets/style.css" />
+</head>
+
+<body>
+  <div class="columns is-vcentered is-centered has-min-page-height is-marginless">
+    <div class="column is-half-widescreen is-two-thirds-desktop is-three-quarters-tablet">
+      <main class="box mx-3 my-3">
+        <div class="columns is-vcentered">
+          <div class="column has-text-centered">
+            <img src="<%= urlPrefix + configFunctions.getConfigProperty('application.bigLogoURL') %>" alt="" style="max-height:400px" />
+          </div>
+          <div class="column">
+            <h1 class="title is-3 has-text-centered">
+              <%= configFunctions.getConfigProperty("application.applicationName") %>
+            </h1>
+            <% if (configFunctions.getConfigProperty('application.allowTesting')) { %>
+              <div class="message is-warning is-small" data-cy="allowTesting">
+                <p class="message-body">Application is testing mode.</p>
+              </div>
+            <% } %>
+            <form id="form--login" method="post" action="<%= urlPrefix %>/login">
+              <input name="_csrf" type="hidden" value="<%= csrfToken %>" />
+              <input name="redirect" type="hidden" value="<%= redirect %>" />
+
+              <div class="field has-addons">
+                <div class="control">
+                  <span class="button is-static"><%= configFunctions.getConfigProperty("application.userDomain") %>\</span>
+                </div>
+                <div class="control is-expanded">
+                  <input class="input" id="login--userName" name="userName" type="text" placeholder="User Name" value="<%= userName %>" aria-label="User Name" autofocus required />
+                </div>
+              </div>
+              <div class="field">
+                <label class="sr-only" for="login--password">Password</label>
+                <div class="control has-icons-left has-tooltip-right" data-tooltip="Password" >
+                  <input class="input" id="login--password" name="password" type="password" placeholder="Password" required />
+                  <span class="icon is-small is-left">
+                    <i class="fas fa-key" aria-hidden="true"></i>
+                  </span>
+                </div>
+              </div>
+              <div class="level is-mobile">
+                <div class="level-left has-text-danger">
+                  <% if (message !== "") { %>
+                    <span class="icon">
+                      <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+                    </span>
+                    <span><%= message %></span>
+                  <% } %>
+                </div>
+                <div class="level-right has-text-right">
+                  <button class="button is-link" type="submit">
+                    <span class="icon">
+                      <i class="fas fa-sign-in-alt" aria-hidden="true"></i>
+                    </span>
+                    <span>Log In</span>
+                  </button>
+                </div>
+              </div>
+            </form>
+            <hr />
+            <div class="has-text-right has-text-grey-dark is-size-7">
+              Build <%= buildNumber %><br />
+              <a class="has-text-grey-dark" href="https://cityssm.github.io/EMILE/docs" target="_blank" rel="nofollow noreferrer" accesskey="h">
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+                Help
+              </a>
+              <a class="has-text-grey-dark ml-4" href="https://github.com/cityssm/EMILE" target="_blank" rel="noreferrer">
+                <i class="fab fa-github" aria-hidden="true"></i>
+                GitHub
+              </a>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="<%= urlPrefix %>/lib/fa/js/all.min.js" defer></script>
+
+  <% if (isAbuser) { %>
+    <script defer>
+      window.location.reload();
+    </script>
+  <% } %>
+</body>
+
+</html>
