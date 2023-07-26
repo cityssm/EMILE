@@ -6,7 +6,7 @@ import {
   type Response
 } from 'express'
 
-// import { getUser } from '../database/getUser.js'
+import { getUser } from '../database/getUser.js'
 import * as authenticationFunctions from '../helpers/functions.authentication.js'
 import { getConfigProperty } from '../helpers/functions.config.js'
 import type { ConfigTemporaryUserCredentials } from '../types/configTypes.js'
@@ -84,7 +84,7 @@ async function postHandler(
 
   if (isAuthenticated && !isTemporaryUser) {
     const userNameLowerCase = userName.toLowerCase()
-    userObject = undefined // await getUser(userNameLowerCase)
+    userObject = getUser(userNameLowerCase)
   }
 
   if (isAuthenticated && (userObject?.canLogin ?? false)) {

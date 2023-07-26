@@ -1,5 +1,6 @@
 import { isAbuser, recordAbuse } from '@cityssm/express-abuse-points';
 import { Router } from 'express';
+import { getUser } from '../database/getUser.js';
 import * as authenticationFunctions from '../helpers/functions.authentication.js';
 import { getConfigProperty } from '../helpers/functions.config.js';
 export const router = Router();
@@ -45,7 +46,7 @@ async function postHandler(request, response) {
     }
     if (isAuthenticated && !isTemporaryUser) {
         const userNameLowerCase = userName.toLowerCase();
-        userObject = undefined;
+        userObject = getUser(userNameLowerCase);
     }
     if (isAuthenticated && (userObject?.canLogin ?? false)) {
         request.session.user = userObject;

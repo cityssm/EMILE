@@ -180,7 +180,7 @@ export function initializeDatabase() {
         groupId integer primary key autoincrement,
         groupName varchar(100) not null,
         groupDescription text,
-        isShared boolean not null default 0,
+        isShared bit not null default 0,
         ${recordColumns}
       )`)
         .run();
