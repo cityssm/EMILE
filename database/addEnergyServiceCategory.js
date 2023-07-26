@@ -7,7 +7,7 @@ export function addEnergyServiceCategory(serviceCategory, sessionUser, connected
         .prepare(`insert into EnergyServiceCategories (
         serviceCategory, greenButtonId,
         recordCreate_userName, recordCreate_timeMillis,
-        recordUpdate_userName, recordUpdate_millis)
+        recordUpdate_userName, recordUpdate_timeMillis)
         values (?, ?, ?, ?, ?, ?)`)
         .run(serviceCategory.serviceCategory, serviceCategory.greenButtonId, sessionUser.userName, rightNowMillis, sessionUser.userName, rightNowMillis);
     if (connectedEmileDB === undefined) {

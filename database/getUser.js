@@ -3,7 +3,7 @@ import { databasePath } from '../helpers/functions.database.js';
 export function getUser(userName) {
     const emileDB = sqlite(databasePath);
     const user = emileDB
-        .prepare(`select userName, canLogin, isAdmin
+        .prepare(`select userName, canLogin, canUpdate, isAdmin
         from Users
         where recordDelete_timeMillis is null
         and userName = ?`)

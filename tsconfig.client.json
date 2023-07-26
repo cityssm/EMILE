@@ -12,7 +12,8 @@
     "strictNullChecks": true
   },
   "files": [
-    "public-typescript/main.ts"
+    "public-typescript/main.ts",
+    "public-typescript/assets.ts"
   ],
   "compileOnSave": true,
   "buildOnSave": true

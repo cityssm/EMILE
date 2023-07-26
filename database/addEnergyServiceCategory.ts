@@ -18,7 +18,7 @@ export function addEnergyServiceCategory(
       `insert into EnergyServiceCategories (
         serviceCategory, greenButtonId,
         recordCreate_userName, recordCreate_timeMillis,
-        recordUpdate_userName, recordUpdate_millis)
+        recordUpdate_userName, recordUpdate_timeMillis)
         values (?, ?, ?, ?, ?, ?)`
     )
     .run(

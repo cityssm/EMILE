@@ -1,6 +1,7 @@
 @import '@cityssm/bulma-a11y/bulma-a11y';
 @import 'bulma/sass/utilities/derived-variables';
 @import '@cityssm/fa-glow/fa-glow';
+@import 'bulma-tooltip/src/sass';
 
 $white: #fff;
 $black: #000;
@@ -19,43 +20,6 @@ $black: #000;
 
 .has-min-page-height {
   min-height: 100vh;
-}
-
-/*
- * Status containers
- */
-
-.has-status-loaded .is-hidden-status-loaded,
-.has-status-loading .is-hidden-status-loading,
-.has-status-view .is-hidden-status-view,
-fieldset:enabled .is-hidden-enabled {
-  display: none;
-}
-
-.has-status-view .is-noninteractive-status-view {
-  pointer-events: none;
-}
-
-/* to fix page titles inside level components, set on .level-left */
-
-.has-flex-shrink-1 {
-  flex-shrink: 1;
-}
-
-.has-border-radius-3 {
-  border-radius: 3px;
-}
-
-/*
- * Tabs
- */
-
-.tab-content {
-  display: none;
-
-  &.is-active {
-    display: block;
-  }
 }
 
 #is-login-page {

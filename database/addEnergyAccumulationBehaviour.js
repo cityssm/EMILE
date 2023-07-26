@@ -7,7 +7,7 @@ export function addEnergyAccumulationBehaviour(accumulationBehaviour, sessionUse
         .prepare(`insert into EnergyAccumulationBehaviours (
         accumulationBehaviour, greenButtonId,
         recordCreate_userName, recordCreate_timeMillis,
-        recordUpdate_userName, recordUpdate_millis)
+        recordUpdate_userName, recordUpdate_timeMillis)
         values (?, ?, ?, ?, ?, ?)`)
         .run(accumulationBehaviour.accumulationBehaviour, accumulationBehaviour.greenButtonId, sessionUser.userName, rightNowMillis, sessionUser.userName, rightNowMillis);
     if (connectedEmileDB === undefined) {

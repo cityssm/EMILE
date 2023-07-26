@@ -7,7 +7,7 @@ export function addEnergyUnit(unit, sessionUser, connectedEmileDB) {
         .prepare(`insert into EnergyUnits (
         unit, unitLong, greenButtonId,
         recordCreate_userName, recordCreate_timeMillis,
-        recordUpdate_userName, recordUpdate_millis)
+        recordUpdate_userName, recordUpdate_timeMillis)
         values (?, ?, ?, ?, ?, ?, ?)`)
         .run(unit.unit, unit.unitLong ?? unit.unit, unit.greenButtonId, sessionUser.userName, rightNowMillis, sessionUser.userName, rightNowMillis);
     if (connectedEmileDB === undefined) {

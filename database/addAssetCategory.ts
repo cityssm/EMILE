@@ -18,7 +18,7 @@ export function addAssetCategory(
       `insert into AssetCategories (
         category, fontAwesomeIconClasses,
         recordCreate_userName, recordCreate_timeMillis,
-        recordUpdate_userName, recordUpdate_millis)
+        recordUpdate_userName, recordUpdate_timeMillis)
         values (?, ?, ?, ?, ?, ?)`
     )
     .run(

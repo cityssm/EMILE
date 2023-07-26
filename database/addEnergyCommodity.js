@@ -7,7 +7,7 @@ export function addEnergyCommodity(commodity, sessionUser, connectedEmileDB) {
         .prepare(`insert into EnergyCommodities (
         commodity, greenButtonId,
         recordCreate_userName, recordCreate_timeMillis,
-        recordUpdate_userName, recordUpdate_millis)
+        recordUpdate_userName, recordUpdate_timeMillis)
         values (?, ?, ?, ?, ?, ?)`)
         .run(commodity.commodity, commodity.greenButtonId, sessionUser.userName, rightNowMillis, sessionUser.userName, rightNowMillis);
     if (connectedEmileDB === undefined) {

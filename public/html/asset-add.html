@@ -1,0 +1,55 @@
+<div class="modal" role="dialog" aria-label="Add a New Asset">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <div class="modal-card-head">
+      <h2 class="modal-card-title">Add a New Asset</h2>
+      <button
+        class="delete is-close-modal-button"
+        aria-label="close"
+        type="button"
+      ></button>
+    </div>
+    <section class="modal-card-body">
+      <form id="form--assetAdd">
+        <div class="field">
+          <label class="label" for="assetAdd--categoryId">Asset Category</label>
+          <div class="control">
+            <div class="select is-fullwidth">
+              <select
+                id="assetAdd--categoryId"
+                name="categoryId"
+                required
+              >
+                <option value="">(Select a Category)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label" for="assetAdd--assetName">Asset Name</label>
+          <div class="control has-icons-right">
+            <input
+              class="input"
+              id="assetAdd--assetName"
+              name="assetName"
+              type="text"
+              maxlength="100"
+              autocomplete="off"
+              required
+            />
+            <span class="icon is-small is-right">
+              <i class="fas fa-asterisk" aria-hidden="true"></i>
+            </span>
+          </div>
+        </div>
+      </form>
+    </section>
+    <div class="modal-card-foot is-justify-content-right">
+      <button class="button is-success" type="submit" form="form--assetAdd">
+        <span class="icon"><i class="fas fa-plus" aria-hidden="true"></i></span>
+        <span>Add Asset</span>
+      </button>
+      <button class="button is-close-modal-button" type="button">Cancel</button>
+    </div>
+  </div>
+</div>

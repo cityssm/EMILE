@@ -23,8 +23,10 @@ import { getSafeRedirectURL } from './helpers/functions.authentication.js'
 import configFunctions, {
   getConfigProperty
 } from './helpers/functions.config.js'
+import routerAssets from './routes/assets.js'
 import routerDashboard from './routes/dashboard.js'
 import routerLogin from './routes/login.js'
+import routerReports from './routes/reports.js'
 import { version } from './version.js'
 
 const debug = Debug(`emile:app:${process.pid}`)
@@ -144,7 +146,7 @@ app.use(
   session({
     store: new FileStoreSession({
       path: './data/sessions',
-      logFn: Debug(`monty:session:${process.pid}`),
+      logFn: Debug(`emile:session:${process.pid}`),
       retries: 20
     }),
     name: sessionCookieName,
@@ -219,6 +221,8 @@ app.get(urlPrefix + '/', sessionChecker, (_request, response) => {
 })
 
 app.use(`${urlPrefix}/dashboard`, sessionChecker, routerDashboard)
+app.use(`${urlPrefix}/assets`, sessionChecker, routerAssets)
+app.use(`${urlPrefix}/reports`, sessionChecker, routerReports)
 
 if (getConfigProperty('session.doKeepAlive')) {
   app.all(`${urlPrefix}/keepAlive`, (_request, response) => {

@@ -10,12 +10,14 @@ import { addEnergyCommodity } from './addEnergyCommodity.js'
 import { addEnergyReadingType } from './addEnergyReadingType.js'
 import { addEnergyServiceCategory } from './addEnergyServiceCategory.js'
 import { addEnergyUnit } from './addEnergyUnit.js'
+import { addUser } from './addUser.js'
 
 const debug = Debug('emile:database:initializeDatabase')
 
 const initializeDatabaseUser: EmileUser = {
   userName: 'system.initialize',
   canLogin: false,
+  canUpdate: true,
   isAdmin: true
 }
 
@@ -50,7 +52,7 @@ export function initializeDatabase(): void {
    * Service Categories
    */
 
-  let runResult = emileDB
+  emileDB
     .prepare(
       `create table if not exists EnergyServiceCategories (
         serviceCategoryId integer primary key autoincrement,
@@ -61,7 +63,11 @@ export function initializeDatabase(): void {
     )
     .run()
 
-  if (runResult.changes > 0) {
+  let result = emileDB
+    .prepare('select serviceCategoryId from EnergyServiceCategories limit 1')
+    .get()
+
+  if (result === undefined) {
     for (const [greenButtonId, serviceCategory] of Object.entries(
       greenButtonLookups.serviceCategoryKinds
     )) {
@@ -80,7 +86,7 @@ export function initializeDatabase(): void {
    * Units
    */
 
-  runResult = emileDB
+  emileDB
     .prepare(
       `create table if not exists EnergyUnits (
         unitId integer primary key autoincrement,
@@ -92,7 +98,9 @@ export function initializeDatabase(): void {
     )
     .run()
 
-  if (runResult.changes > 0) {
+  result = emileDB.prepare('select unitId from EnergyUnits limit 1').get()
+
+  if (result === undefined) {
     for (const [greenButtonId, unit] of Object.entries(
       greenButtonLookups.unitsOfMeasurement
     )) {
@@ -112,7 +120,7 @@ export function initializeDatabase(): void {
    * Reading Type
    */
 
-  runResult = emileDB
+  emileDB
     .prepare(
       `create table if not exists EnergyReadingTypes (
         readingTypeId integer primary key autoincrement,
@@ -123,7 +131,11 @@ export function initializeDatabase(): void {
     )
     .run()
 
-  if (runResult.changes > 0) {
+  result = emileDB
+    .prepare('select readingTypeId from EnergyReadingTypes limit 1')
+    .get()
+
+  if (result === undefined) {
     for (const [greenButtonId, readingType] of Object.entries(
       greenButtonLookups.readingTypeKinds
     )) {
@@ -142,18 +154,22 @@ export function initializeDatabase(): void {
    * Commodities
    */
 
-  runResult = emileDB
+  emileDB
     .prepare(
       `create table if not exists EnergyCommodities (
-      commodityId integer primary key autoincrement,
-      commodity varchar(100) not null,
-      ${greenButtonColumns},
-      ${recordColumns}
-    )`
+        commodityId integer primary key autoincrement,
+        commodity varchar(100) not null,
+        ${greenButtonColumns},
+        ${recordColumns}
+      )`
     )
     .run()
 
-  if (runResult.changes > 0) {
+  result = emileDB
+    .prepare('select commodityId from EnergyCommodities limit 1')
+    .get()
+
+  if (result === undefined) {
     for (const [greenButtonId, commodity] of Object.entries(
       greenButtonLookups.commodities
     )) {
@@ -172,7 +188,7 @@ export function initializeDatabase(): void {
    * Accumulation Behaviours
    */
 
-  runResult = emileDB
+  emileDB
     .prepare(
       `create table if not exists EnergyAccumulationBehaviours (
         accumulationBehaviourId integer primary key autoincrement,
@@ -183,7 +199,13 @@ export function initializeDatabase(): void {
     )
     .run()
 
-  if (runResult.changes > 0) {
+  result = emileDB
+    .prepare(
+      'select accumulationBehaviourId from EnergyAccumulationBehaviours limit 1'
+    )
+    .get()
+
+  if (result === undefined) {
     for (const [greenButtonId, accumulationBehaviour] of Object.entries(
       greenButtonLookups.accumulationBehaviours
     )) {
@@ -221,7 +243,7 @@ export function initializeDatabase(): void {
    * Asset Categories
    */
 
-  runResult = emileDB
+  emileDB
     .prepare(
       `create table if not exists AssetCategories (
         categoryId integer primary key autoincrement,
@@ -232,7 +254,11 @@ export function initializeDatabase(): void {
     )
     .run()
 
-  if (runResult.changes > 0) {
+  result = emileDB
+    .prepare('select categoryId from AssetCategories limit 1')
+    .get()
+
+  if (result === undefined) {
     addAssetCategory(
       {
         category: 'Building',
@@ -360,11 +386,13 @@ export function initializeDatabase(): void {
     )
     .run()
 
-  emileDB.prepare(
-    `create index if not exists idx_EnergyData on EnergyData
-      (assetId, dataTypeId, timeSeconds)
-      where recordDelete_timeMillis is null`
-  ).run()
+  emileDB
+    .prepare(
+      `create index if not exists idx_EnergyData on EnergyData
+        (assetId, dataTypeId, timeSeconds)
+        where recordDelete_timeMillis is null`
+    )
+    .run()
 
   /*
    * Users
@@ -375,11 +403,27 @@ export function initializeDatabase(): void {
       `create table if not exists Users (
         userName varchar(30) primary key,
         canLogin bit not null default 0,
+        canUpdate bit not null default 0,
         isAdmin bit not null default 0,
         ${recordColumns}
       )`
     )
     .run()
+
+  result = emileDB.prepare('select userName from Users limit 1').get()
+
+  if (result === undefined) {
+    addUser(
+      {
+        userName: 'd.gowans',
+        canLogin: true,
+        canUpdate: true,
+        isAdmin: true
+      },
+      initializeDatabaseUser,
+      emileDB
+    )
+  }
 
   /*
    * Close Database

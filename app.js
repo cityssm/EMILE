@@ -15,8 +15,10 @@ import createError from 'http-errors';
 import FileStore from 'session-file-store';
 import { getSafeRedirectURL } from './helpers/functions.authentication.js';
 import configFunctions, { getConfigProperty } from './helpers/functions.config.js';
+import routerAssets from './routes/assets.js';
 import routerDashboard from './routes/dashboard.js';
 import routerLogin from './routes/login.js';
+import routerReports from './routes/reports.js';
 import { version } from './version.js';
 const debug = Debug(`emile:app:${process.pid}`);
 if (getConfigProperty('tempUsers').length > 0) {
@@ -64,7 +66,7 @@ const FileStoreSession = FileStore(session);
 app.use(session({
     store: new FileStoreSession({
         path: './data/sessions',
-        logFn: Debug(`monty:session:${process.pid}`),
+        logFn: Debug(`emile:session:${process.pid}`),
         retries: 20
     }),
     name: sessionCookieName,
@@ -108,6 +110,8 @@ app.get(urlPrefix + '/', sessionChecker, (_request, response) => {
     response.redirect(`${urlPrefix}/dashboard`);
 });
 app.use(`${urlPrefix}/dashboard`, sessionChecker, routerDashboard);
+app.use(`${urlPrefix}/assets`, sessionChecker, routerAssets);
+app.use(`${urlPrefix}/reports`, sessionChecker, routerReports);
 if (getConfigProperty('session.doKeepAlive')) {
     app.all(`${urlPrefix}/keepAlive`, (_request, response) => {
         response.json(true);

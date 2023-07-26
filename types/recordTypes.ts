@@ -66,6 +66,24 @@ export interface AssetCategory extends Partial<RecordUserNameDateTime> {
   fontAwesomeIconClasses?: `fas fa-${string}` | `far fa-${string}`
 }
 
+export interface Asset
+  extends Partial<RecordUserNameDateTime>,
+    Partial<AssetCategory> {
+  assetId?: number
+  assetName: string
+}
+
+export interface AssetGroup extends Partial<RecordUserNameDateTime> {
+  groupId?: number
+  groupName: string
+  groupDescription: string
+  isShared: boolean
+  recordCreate_userName: string
+
+  groupMembers?: Asset[]
+  groupMemberCount?: number
+}
+
 /*
  * USER TYPES
  */
@@ -74,6 +92,7 @@ declare global {
   interface EmileUser extends Partial<RecordUserNameDateTime> {
     userName: string
     canLogin: boolean
+    canUpdate: boolean
     isAdmin: boolean
   }
 }

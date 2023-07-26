@@ -32,19 +32,25 @@
         <aside class="menu">
           <ul class="menu-list">
             <li>
-              <a class="is-active" href="<%= urlPrefix %>/dashboard">
+              <a
+                class="<%= (headTitle === 'Dashboard' ? 'is-active' : '') %>"
+                href="<%= urlPrefix %>/dashboard">
                 <span class="icon"><i class="fas fa-chart-area" aria-hidden="true"></i></span>
                 <span>Dashboard</span>
               </a>
             </li>
             <li>
-              <a href="<%= urlPrefix %>/assets">
+              <a
+                class="<%= (headTitle === 'Assets' ? 'is-active' : '') %>"
+                href="<%= urlPrefix %>/assets">
                 <span class="icon"><i class="fas fa-city" aria-hidden="true"></i></span>
                 <span>Assets</span>
               </a>
             </li>
             <li>
-              <a href="<%= urlPrefix %>/reports">
+              <a
+                class="<%= (headTitle === 'Reports' ? 'is-active' : '') %>"
+                href="<%= urlPrefix %>/reports">
                 <span class="icon"><i class="fas fa-file" aria-hidden="true"></i></span>
                 <span>Reports</span>
               </a>
@@ -56,7 +62,9 @@
           <ul class="menu-list">
             <% if (user.isAdmin) { %>
               <li>
-                <a href="<%= urlPrefix %>/admin">
+                <a
+                  class="<%= (headTitle === 'Settings' ? 'is-active' : '') %>"
+                  href="<%= urlPrefix %>/admin">
                   <span class="icon"><i class="fas fa-cog" aria-hidden="true"></i></span>
                   <span>Settings</span>
                 </a>

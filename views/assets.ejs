@@ -1,0 +1,75 @@
+<%- include('_header'); -%>
+
+<h1 class="title is-1">
+  Assets
+</h1>
+
+<div class="tabs is-boxed">
+  <ul>
+    <li class="is-active">
+      <a href="#tab--assets">
+        <span>Assets</span>
+        <span class="tag ml-2" id="count--assets">-</span>
+      </a>
+    </li>
+    <li>
+      <a href="#tab--assetGroups">
+        <span>Asset Groups</span>
+        <span class="tag ml-2" id="count--assetGroups">-</span>
+      </a>
+    </li>
+  </ul>
+</div>
+<div class="tab-container">
+  <div class="tab-content" id="tab--assets">
+    <div class="box has-background-white-ter">
+      <div class="level is-mobile">
+        <div class="level-left">
+          <div class="level-item">
+            <div class="control has-icons-left">
+              <input class="input" id="filter--assets" type="text" placeholder="Filter assets" />
+              <span class="icon is-small is-left">
+                <i class="fas fa-search" aria-hidden="true"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="level-right">
+          <div class="level-item">
+            <a class="button" href="<%= urlPrefix %>/reports/assets-formatted" download>
+              <span class="icon">
+                <i class="fas fa-file-csv" aria-hidden="true"></i>
+              </span>
+              <span>Export Assets</span>
+            </a>
+          </div>
+          <% if (user.canUpdate) { %>
+            <div class="level-item">
+              <button class="button is-success" id="button--addAsset" type="button">
+                <span class="icon">
+                  <i class="fas fa-plus" aria-hidden="true"></i>
+                </span>
+                <span>Create Asset</span>
+              </button>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+    <div id="container--assets"></div>
+  </div>
+  <div class="tab-content is-hidden" id="tab--assetGroups">
+    <div id="container--assetGroups"></div>
+  </div>
+</div>
+
+<%- include('_footerA'); -%>
+
+<script>
+  exports.assets = <%- JSON.stringify(assets) %>;
+  exports.assetGroups = <%- JSON.stringify(assetGroups) %>;
+  exports.assetCategories = <%- JSON.stringify(assetCategories) %>;
+</script>
+<script src="<%= urlPrefix %>/javascripts/assets.min.js"></script>
+
+<%- include('_footerB'); -%>
