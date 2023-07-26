@@ -12,6 +12,10 @@ interface RecordUserNameDateTime {
   recordDelete_dateTime?: Date
 }
 
+/*
+ * Energy Interfaces
+ */
+
 interface RecordGreenButton {
   greenButtonId: string
 }
@@ -52,6 +56,15 @@ export interface EnergyCommodity
   commodity: string
 }
 
+/*
+ * Asset Interfaces
+ */
+
+export interface AssetCategory extends Partial<RecordUserNameDateTime> {
+  categoryId?: number
+  category: string
+  fontAwesomeIconClasses?: `fas fa-${string}` | `far fa-${string}`
+}
 
 /*
  * USER TYPES

@@ -1,6 +1,6 @@
 import sqlite from 'better-sqlite3'
 
-import { emileDB as databasePath } from '../helpers/functions.database.js'
+import { databasePath } from '../helpers/functions.database.js'
 import type { EnergyReadingType } from '../types/recordTypes.js'
 
 export function addEnergyReadingType(

@@ -1,10 +1,10 @@
 import sqlite from 'better-sqlite3'
 
 import { databasePath } from '../helpers/functions.database.js'
-import type { EnergyAccumulationBehaviour } from '../types/recordTypes.js'
+import type { AssetCategory } from '../types/recordTypes.js'
 
-export function addEnergyAccumulationBehaviour(
-  accumulationBehaviour: EnergyAccumulationBehaviour,
+export function addAssetCategory(
+  category: AssetCategory,
   sessionUser: EmileUser,
   connectedEmileDB?: sqlite.Database
 ): number {
@@ -15,15 +15,15 @@ export function addEnergyAccumulationBehaviour(
 
   const result = emileDB
     .prepare(
-      `insert into EnergyAccumulationBehaviours (
-        accumulationBehaviour, greenButtonId,
+      `insert into AssetCategories (
+        category, fontAwesomeIconClasses,
         recordCreate_userName, recordCreate_timeMillis,
         recordUpdate_userName, recordUpdate_millis)
         values (?, ?, ?, ?, ?, ?)`
     )
     .run(
-      accumulationBehaviour.accumulationBehaviour,
-      accumulationBehaviour.greenButtonId,
+      category.category,
+      category.fontAwesomeIconClasses ?? 'fas fa-bolt',
       sessionUser.userName,
       rightNowMillis,
       sessionUser.userName,

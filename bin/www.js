@@ -4,14 +4,16 @@ import os from 'node:os';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Debug from 'debug';
+import { initializeDatabase } from '../database/initializeDatabase.js';
 import { getConfigProperty } from '../helpers/functions.config.js';
 const debug = Debug(`emile:www:${process.pid}`);
-const directoryName = dirname(fileURLToPath(import.meta.url));
-const processCount = Math.min(getConfigProperty('application.maximumProcesses'), os.cpus().length);
 process.title = `${getConfigProperty('application.applicationName')} (Primary)`;
 debug(`Primary pid:   ${process.pid}`);
 debug(`Primary title: ${process.title}`);
+initializeDatabase();
+const processCount = Math.min(getConfigProperty('application.maximumProcesses'), os.cpus().length);
 debug(`Launching ${processCount} processes`);
+const directoryName = dirname(fileURLToPath(import.meta.url));
 const clusterSettings = {
     exec: `${directoryName}/wwwProcess.js`
 };

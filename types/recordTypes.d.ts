@@ -30,6 +30,11 @@ export interface EnergyCommodity extends Partial<RecordUserNameDateTime>, Partia
     commodityId?: number;
     commodity: string;
 }
+export interface AssetCategory extends Partial<RecordUserNameDateTime> {
+    categoryId?: number;
+    category: string;
+    fontAwesomeIconClasses?: `fas fa-${string}` | `far fa-${string}`;
+}
 declare global {
     interface EmileUser extends Partial<RecordUserNameDateTime> {
         userName: string;

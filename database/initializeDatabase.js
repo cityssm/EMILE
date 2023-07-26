@@ -1,7 +1,8 @@
 import { lookups as greenButtonLookups } from '@cityssm/green-button-parser';
 import sqlite from 'better-sqlite3';
 import Debug from 'debug';
-import { emileDB as databasePath } from '../helpers/functions.database.js';
+import { databasePath } from '../helpers/functions.database.js';
+import { addAssetCategory } from './addAssetCategory.js';
 import { addEnergyAccumulationBehaviour } from './addEnergyAccumulationBehaviour.js';
 import { addEnergyCommodity } from './addEnergyCommodity.js';
 import { addEnergyReadingType } from './addEnergyReadingType.js';
@@ -117,20 +118,95 @@ export function initializeDatabase() {
     emileDB
         .prepare(`create table if not exists EnergyDataTypes (
         dataTypeId integer primary key autoincrement,
-        serviceCategoryId integer not null,
-        unitId integer not null,
-        readingTypeId integer not null,
-        commodityId integer not null,
-        accumulationBehaviourId integer not null,
+        serviceCategoryId integer not null references EnergyServiceCategories (serviceCategoryId),
+        unitId integer not null references EnergyUnits (unitId),
+        readingTypeId integer not null references EnergyReadingTypes (readingTypeId),
+        commodityId integer not null references EnergyCommodities (commodityId),
+        accumulationBehaviourId integer not null references EnergyAccumulationBehaviours (accumulationBehaviourId),
         ${greenButtonColumns},
-        ${recordColumns},
-        foreign key (serviceCategoryId) references EnergyServiceCategories (serviceCategoryId),
-        foreign key (unitId) references EnergyUnits (unitId),
-        foreign key (readingTypeId) references EnergyReadingTypes (readingTypeId),
-        foreign key (commodityId) references EnergyCommodities (commodityId),
-        foreign key (accumulationBehaviourId) references EnergyAccumulationBehaviours (accumulationBehaviourId),
+        ${recordColumns}
       )`)
         .run();
+    runResult = emileDB
+        .prepare(`create table if not exists AssetCategories (
+        categoryId integer primary key autoincrement,
+        category varchar(100) not null,
+        fontAwesomeIconClasses varchar(50),
+        ${recordColumns}
+      )`)
+        .run();
+    if (runResult.changes > 0) {
+        addAssetCategory({
+            category: 'Building',
+            fontAwesomeIconClasses: 'far fa-building'
+        }, initializeDatabaseUser, emileDB);
+        addAssetCategory({
+            category: 'Streetlight',
+            fontAwesomeIconClasses: 'far fa-lightbulb'
+        }, initializeDatabaseUser, emileDB);
+        addAssetCategory({
+            category: 'Vehicle',
+            fontAwesomeIconClasses: 'fas fa-car-side'
+        }, initializeDatabaseUser, emileDB);
+    }
+    emileDB
+        .prepare(`create table if not exists Assets (
+        assetId integer primary key autoincrement,
+        assetName varchar(100) not null,
+        categoryId integer not null references AssetCategories (categoryId),
+        ${recordColumns}
+      )`)
+        .run();
+    emileDB
+        .prepare(`create table if not exists AssetAliasTypes (
+        aliasTypeId integer primary key autoincrement,
+        aliasType varchar(100) not null,
+        regularExpression varchar(500),
+        aliasPropertiesJson text,
+        ${recordColumns}
+      )`)
+        .run();
+    emileDB
+        .prepare(`create table if not exists AssetAliases (
+        aliasId integer primary key autoincrement,
+        assetId integer not null references Assets (assetId),
+        aliasTypeId integer not null references AssetAliasTypes (aliasTypeId),
+        assetAlias varchar(500) not null,
+        ${recordColumns}
+      )`)
+        .run();
+    emileDB
+        .prepare(`create table if not exists AssetGroups (
+        groupId integer primary key autoincrement,
+        groupName varchar(100) not null,
+        groupDescription text,
+        isShared boolean not null default 0,
+        ${recordColumns}
+      )`)
+        .run();
+    emileDB
+        .prepare(`create table if not exists AssetGroupMembers (
+        groupId integer not null references AssetGroups (groupId),
+        assetId integer not null references Assets (assetId),
+        ${recordColumns},
+        primary key (groupId, assetId)
+      )`)
+        .run();
+    emileDB
+        .prepare(`create table if not exists EnergyData (
+        dataId integer primary key autoincrement,
+        assetId integer not null references Assets (assetId),
+        dataTypeId integer not null references EnergyDataTypes (dataTypeId),
+        timeSeconds integer not null check (timeSeconds > 0),
+        durationSeconds integer not null check (durationSeconds > 0),
+        endTimeSeconds integer not null generated always as (timeSeconds + durationSeconds) virtual,
+        dataValue decimal(10, 2) not null,
+        ${recordColumns}
+      )`)
+        .run();
+    emileDB.prepare(`create index if not exists idx_EnergyData on EnergyData
+      (assetId, dataTypeId, timeSeconds)
+      where recordDelete_timeMillis is null`).run();
     emileDB
         .prepare(`create table if not exists Users (
         userName varchar(30) primary key,

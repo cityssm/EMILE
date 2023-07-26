@@ -1,15 +1,15 @@
 import sqlite from 'better-sqlite3';
 import { databasePath } from '../helpers/functions.database.js';
-export function addEnergyServiceCategory(serviceCategory, sessionUser, connectedEmileDB) {
+export function addAssetCategory(category, sessionUser, connectedEmileDB) {
     const emileDB = connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB;
     const rightNowMillis = Date.now();
     const result = emileDB
-        .prepare(`insert into EnergyServiceCategories (
-        serviceCategory, greenButtonId,
+        .prepare(`insert into AssetCategories (
+        category, fontAwesomeIconClasses,
         recordCreate_userName, recordCreate_timeMillis,
         recordUpdate_userName, recordUpdate_millis)
         values (?, ?, ?, ?, ?, ?)`)
-        .run(serviceCategory.serviceCategory, serviceCategory.greenButtonId, sessionUser.userName, rightNowMillis, sessionUser.userName, rightNowMillis);
+        .run(category.category, category.fontAwesomeIconClasses ?? 'fas fa-bolt', sessionUser.userName, rightNowMillis, sessionUser.userName, rightNowMillis);
     if (connectedEmileDB === undefined) {
         emileDB.close();
     }
