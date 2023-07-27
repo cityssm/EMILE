@@ -6,10 +6,11 @@ export function addAsset(asset, sessionUser, connectedEmileDB) {
     const result = emileDB
         .prepare(`insert into Assets (
         assetName, categoryId,
+        latitude, longitude,
         recordCreate_userName, recordCreate_timeMillis,
         recordUpdate_userName, recordUpdate_timeMillis)
-        values (?, ?, ?, ?, ?, ?)`)
-        .run(asset.assetName, asset.categoryId, sessionUser.userName, rightNowMillis, sessionUser.userName, rightNowMillis);
+        values (?, ?, ?, ?, ?, ?, ?, ?)`)
+        .run(asset.assetName, asset.categoryId, (asset.latitude ?? '') === '' ? undefined : asset.latitude, (asset.longitude ?? '') === '' ? undefined : asset.longitude, sessionUser.userName, rightNowMillis, sessionUser.userName, rightNowMillis);
     if (connectedEmileDB === undefined) {
         emileDB.close();
     }

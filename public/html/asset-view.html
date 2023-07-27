@@ -1,0 +1,120 @@
+<div class="modal" role="dialog" aria-label="Asset View">
+  <div class="modal-background"></div>
+  <div class="modal-card" style="width: 900px">
+    <div class="modal-card-head">
+      <h2 class="modal-card-title">
+        Asset View:
+        <span data-field="assetName"></span>
+      </h2>
+      <button
+        class="delete is-close-modal-button"
+        aria-label="close"
+        type="button"
+      ></button>
+    </div>
+    <section class="modal-card-body">
+      <div class="tabs is-boxed">
+        <ul>
+          <li class="is-active">
+            <a href="#tab--assetDetails">
+              <span class="icon is-small"
+                ><i class="fas fa-info-circle" aria-hidden="true"></i
+              ></span>
+              <span>Asset Details</span>
+            </a>
+          </li>
+          <li>
+            <a href="#tab--assetAliases">
+              <span class="icon is-small"
+                ><i class="fas fa-list" aria-hidden="true"></i
+              ></span>
+              <span>Aliases</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="tabs-container">
+        <div id="tab--assetDetails">
+          <form id="form--assetView">
+            <input id="assetView--assetId" name="assetId" type="hidden" />
+            <fieldset disabled>
+              <div class="columns">
+                <div class="column">
+                  <div class="field">
+                    <label class="label" for="assetView--categoryId"
+                      >Asset Category</label
+                    >
+                    <div class="control">
+                      <div class="select is-fullwidth">
+                        <select
+                          id="assetView--categoryId"
+                          name="categoryId"
+                          required
+                        ></select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+                  <div class="field">
+                    <label class="label" for="assetView--assetName"
+                      >Asset Name</label
+                    >
+                    <div class="control has-icons-right">
+                      <input
+                        class="input"
+                        id="assetView--assetName"
+                        name="assetName"
+                        type="text"
+                        maxlength="100"
+                        autocomplete="off"
+                        required
+                      />
+                      <span class="icon is-small is-right">
+                        <i class="fas fa-asterisk" aria-hidden="true"></i>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="field is-grouped is-justify-content-right is-hidden-disabled">
+                <div class="control">
+                  <button class="button is-success" type="submit">
+                    <span class="icon"><i class="fas fa-save" aria-hidden="true"></i></span>
+                    <span>Update Asset</span>
+                  </button>
+                </div>
+                <div class="control">
+                  <div class="dropdown is-up is-right">
+                    <div class="dropdown-trigger">
+                      <button class="button" type="button">
+                        <span>More Options</span>
+                        <span class="icon is-small">
+                          <i class="fas fa-angle-up" aria-hidden="true"></i>
+                        </span>
+                      </button>
+                    </div>
+                    <div class="dropdown-menu">
+                      <div class="dropdown-content">
+                        <a class="dropdown-item is-delete-button" href="#">
+                          <span class="icon is-small">
+                            <i class="fas fa-trash-alt has-text-danger" aria-hidden="true"></i>
+                          </span>
+                          <span>Delete Asset</span>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+        <div class="is-hidden" id="tab--assetAliases"></div>
+      </div>
+    </section>
+    <div class="modal-card-foot is-justify-content-right">
+      <button class="button is-close-modal-button" type="button">Close</button>
+    </div>
+  </div>
+</div>

@@ -5,11 +5,11 @@ export function addAssetCategory(category, sessionUser, connectedEmileDB) {
     const rightNowMillis = Date.now();
     const result = emileDB
         .prepare(`insert into AssetCategories (
-        category, fontAwesomeIconClasses,
+        category, fontAwesomeIconClasses, orderNumber,
         recordCreate_userName, recordCreate_timeMillis,
         recordUpdate_userName, recordUpdate_timeMillis)
-        values (?, ?, ?, ?, ?, ?)`)
-        .run(category.category, category.fontAwesomeIconClasses ?? 'fas fa-bolt', sessionUser.userName, rightNowMillis, sessionUser.userName, rightNowMillis);
+        values (?, ?, ?, ?, ?, ?, ?)`)
+        .run(category.category, category.fontAwesomeIconClasses ?? 'fas fa-bolt', category.orderNumber ?? 0, sessionUser.userName, rightNowMillis, sessionUser.userName, rightNowMillis);
     if (connectedEmileDB === undefined) {
         emileDB.close();
     }

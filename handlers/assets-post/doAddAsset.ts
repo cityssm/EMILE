@@ -9,6 +9,7 @@ export function handler(request: Request, response: Response): void {
   const assets = getAssets()
 
   response.json({
+    success: true,
     assetId,
     assets
   })

@@ -5,11 +5,11 @@ export function addEnergyReadingType(readingType, sessionUser, connectedEmileDB)
     const rightNowMillis = Date.now();
     const result = emileDB
         .prepare(`insert into EnergyReadingTypes (
-        readingType, greenButtonId,
+        readingType, greenButtonId, orderNumber,
         recordCreate_userName, recordCreate_timeMillis,
         recordUpdate_userName, recordUpdate_timeMillis)
-        values (?, ?, ?, ?, ?, ?)`)
-        .run(readingType.readingType, readingType.greenButtonId, sessionUser.userName, rightNowMillis, sessionUser.userName, rightNowMillis);
+        values (?, ?, ?, ?, ?, ?, ?)`)
+        .run(readingType.readingType, readingType.greenButtonId, readingType.orderNumber ?? 0, sessionUser.userName, rightNowMillis, sessionUser.userName, rightNowMillis);
     if (connectedEmileDB === undefined) {
         emileDB.close();
     }

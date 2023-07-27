@@ -6,7 +6,7 @@ export function getAssetCategories() {
         .prepare(`select categoryId, category, fontAwesomeIconClasses
         from AssetCategories
         where recordDelete_timeMillis is null
-        order by category`)
+        order by orderNumber, category`)
         .all();
     emileDB.close();
     return assetCategories;

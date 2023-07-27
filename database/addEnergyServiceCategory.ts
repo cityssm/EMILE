@@ -16,14 +16,15 @@ export function addEnergyServiceCategory(
   const result = emileDB
     .prepare(
       `insert into EnergyServiceCategories (
-        serviceCategory, greenButtonId,
+        serviceCategory, greenButtonId, orderNumber,
         recordCreate_userName, recordCreate_timeMillis,
         recordUpdate_userName, recordUpdate_timeMillis)
-        values (?, ?, ?, ?, ?, ?)`
+        values (?, ?, ?, ?, ?, ?, ?)`
     )
     .run(
       serviceCategory.serviceCategory,
       serviceCategory.greenButtonId,
+      serviceCategory.orderNumber ?? 0,
       sessionUser.userName,
       rightNowMillis,
       sessionUser.userName,

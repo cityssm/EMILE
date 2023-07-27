@@ -17,13 +17,16 @@ export function addAsset(
     .prepare(
       `insert into Assets (
         assetName, categoryId,
+        latitude, longitude,
         recordCreate_userName, recordCreate_timeMillis,
         recordUpdate_userName, recordUpdate_timeMillis)
-        values (?, ?, ?, ?, ?, ?)`
+        values (?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .run(
       asset.assetName,
       asset.categoryId,
+      (asset.latitude ?? '') === '' ? undefined : asset.latitude,
+      (asset.longitude ?? '') === '' ? undefined : asset.longitude,
       sessionUser.userName,
       rightNowMillis,
       sessionUser.userName,

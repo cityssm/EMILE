@@ -3,7 +3,7 @@ export interface WorkerMessage {
     timeMillis: number;
     pid: number;
 }
-export type CacheTableName = 'AbsenceTypes' | 'AfterHoursReasons' | 'CallOutResponseTypes' | 'EmployeeProperties';
+export type CacheTableName = 'AssetCategories';
 export interface ClearCacheWorkerMessage extends WorkerMessage {
     messageType: 'clearCache';
     tableName: CacheTableName;

@@ -1,6 +1,8 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable @typescript-eslint/indent */
 
+import { AliasProperties } from "./aliasTypePropertyTypes"
+
 interface RecordUserNameDateTime {
   recordCreate_userName: string
   recordCreate_dateTime: Date | string
@@ -10,6 +12,10 @@ interface RecordUserNameDateTime {
 
   recordDelete_userName?: string
   recordDelete_dateTime?: Date
+}
+
+interface RecordOrderNumber {
+  orderNumber: number
 }
 
 /*
@@ -22,21 +28,24 @@ interface RecordGreenButton {
 
 export interface EnergyAccumulationBehaviour
   extends Partial<RecordUserNameDateTime>,
-    Partial<RecordGreenButton> {
+    Partial<RecordGreenButton>,
+    Partial<RecordOrderNumber> {
   accumulationBehaviourId?: number
   accumulationBehaviour: string
 }
 
 export interface EnergyServiceCategory
   extends Partial<RecordUserNameDateTime>,
-    Partial<RecordGreenButton> {
+    Partial<RecordGreenButton>,
+    Partial<RecordOrderNumber> {
   serviceCategoryId?: number
   serviceCategory: string
 }
 
 export interface EnergyUnit
   extends Partial<RecordUserNameDateTime>,
-    Partial<RecordGreenButton> {
+    Partial<RecordGreenButton>,
+    Partial<RecordOrderNumber> {
   unitId?: number
   unit: string
   unitLong?: string
@@ -44,14 +53,16 @@ export interface EnergyUnit
 
 export interface EnergyReadingType
   extends Partial<RecordUserNameDateTime>,
-    Partial<RecordGreenButton> {
+    Partial<RecordGreenButton>,
+    Partial<RecordOrderNumber> {
   readingTypeId?: number
   readingType: string
 }
 
 export interface EnergyCommodity
   extends Partial<RecordUserNameDateTime>,
-    Partial<RecordGreenButton> {
+    Partial<RecordGreenButton>,
+    Partial<RecordOrderNumber> {
   commodityId?: number
   commodity: string
 }
@@ -60,10 +71,31 @@ export interface EnergyCommodity
  * Asset Interfaces
  */
 
-export interface AssetCategory extends Partial<RecordUserNameDateTime> {
+export interface AssetCategory
+  extends Partial<RecordUserNameDateTime>,
+    Partial<RecordOrderNumber> {
   categoryId?: number
   category: string
   fontAwesomeIconClasses?: `fas fa-${string}` | `far fa-${string}`
+}
+
+export interface AssetAliasType
+  extends Partial<RecordUserNameDateTime>,
+    Partial<RecordOrderNumber> {
+  aliasTypeId?: number
+  aliasType: string
+  regularExpression?: string
+
+  aliasPropertiesJson?: string
+  aliasProperties?: AliasProperties
+}
+
+export interface AssetAlias
+  extends Partial<RecordUserNameDateTime>,
+    Partial<AssetAliasType> {
+  aliasId?: number
+  assetId?: number
+  assetAlias: string
 }
 
 export interface Asset
@@ -71,6 +103,9 @@ export interface Asset
     Partial<AssetCategory> {
   assetId?: number
   assetName: string
+  latitude?: number
+  longitude?: number
+  assetAliases?: AssetAlias[]
 }
 
 export interface AssetGroup extends Partial<RecordUserNameDateTime> {

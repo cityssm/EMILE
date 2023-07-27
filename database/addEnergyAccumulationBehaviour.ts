@@ -16,14 +16,15 @@ export function addEnergyAccumulationBehaviour(
   const result = emileDB
     .prepare(
       `insert into EnergyAccumulationBehaviours (
-        accumulationBehaviour, greenButtonId,
+        accumulationBehaviour, greenButtonId, orderNumber,
         recordCreate_userName, recordCreate_timeMillis,
         recordUpdate_userName, recordUpdate_timeMillis)
-        values (?, ?, ?, ?, ?, ?)`
+        values (?, ?, ?, ?, ?, ?, ?)`
     )
     .run(
       accumulationBehaviour.accumulationBehaviour,
       accumulationBehaviour.greenButtonId,
+      accumulationBehaviour.orderNumber ?? 0,
       sessionUser.userName,
       rightNowMillis,
       sessionUser.userName,

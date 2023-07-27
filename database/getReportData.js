@@ -10,7 +10,7 @@ export function getReportData(reportName, reportParameters = {}) {
         }
         case 'assets-formatted': {
             sql = `select a.assetId, a.assetName,
-        a.categoryId, c.category, c.fontAwesomeIconClasses
+        a.categoryId, c.category
         from Assets a
         left join AssetCategories c on a.categoryId = c.categoryId
         where a.recordDelete_timeMillis is null

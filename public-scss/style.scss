@@ -1,6 +1,7 @@
 @import '@cityssm/bulma-a11y/bulma-a11y';
 @import 'bulma/sass/utilities/derived-variables';
 @import '@cityssm/fa-glow/fa-glow';
+@import '@cityssm/bulma-sticky-table/sticky-table';
 @import 'bulma-tooltip/src/sass';
 
 $white: #fff;
@@ -58,10 +59,14 @@ $black: #000;
 }
 
 /*
- * "Readonly" selects
+ * Disabled form helpers
  */
 
 .select option:disabled {
+  display: none;
+}
+
+[disabled] .is-hidden-disabled {
   display: none;
 }
 

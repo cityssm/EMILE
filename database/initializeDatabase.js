@@ -2,6 +2,7 @@ import { lookups as greenButtonLookups } from '@cityssm/green-button-parser';
 import sqlite from 'better-sqlite3';
 import Debug from 'debug';
 import { databasePath } from '../helpers/functions.database.js';
+import { addAssetAliasType } from './addAssetAliasType.js';
 import { addAssetCategory } from './addAssetCategory.js';
 import { addEnergyAccumulationBehaviour } from './addEnergyAccumulationBehaviour.js';
 import { addEnergyCommodity } from './addEnergyCommodity.js';
@@ -23,6 +24,7 @@ const recordColumns = ` recordCreate_userName varchar(30) not null,
     recordDelete_userName varchar(30),
     recordDelete_timeMillis integer`;
 const greenButtonColumns = ' greenButtonId varchar(50)';
+const orderNumberColumns = ' orderNumber integer not null default 0';
 export function initializeDatabase() {
     const emileDB = sqlite(databasePath);
     const row = emileDB
@@ -40,6 +42,7 @@ export function initializeDatabase() {
         serviceCategoryId integer primary key autoincrement,
         serviceCategory varchar(100) not null,
         ${greenButtonColumns},
+        ${orderNumberColumns},
         ${recordColumns}
     )`)
         .run();
@@ -60,6 +63,7 @@ export function initializeDatabase() {
         unit varchar(100) not null,
         unitLong varchar(100) not null,
         ${greenButtonColumns},
+        ${orderNumberColumns},
         ${recordColumns}
       )`)
         .run();
@@ -78,6 +82,7 @@ export function initializeDatabase() {
         readingTypeId integer primary key autoincrement,
         readingType varchar(100) not null,
         ${greenButtonColumns},
+        ${orderNumberColumns},
         ${recordColumns}
       )`)
         .run();
@@ -97,6 +102,7 @@ export function initializeDatabase() {
         commodityId integer primary key autoincrement,
         commodity varchar(100) not null,
         ${greenButtonColumns},
+        ${orderNumberColumns},
         ${recordColumns}
       )`)
         .run();
@@ -116,6 +122,7 @@ export function initializeDatabase() {
         accumulationBehaviourId integer primary key autoincrement,
         accumulationBehaviour varchar(100) not null,
         ${greenButtonColumns},
+        ${orderNumberColumns},
         ${recordColumns}
       )`)
         .run();
@@ -147,6 +154,7 @@ export function initializeDatabase() {
         categoryId integer primary key autoincrement,
         category varchar(100) not null,
         fontAwesomeIconClasses varchar(50),
+        ${orderNumberColumns},
         ${recordColumns}
       )`)
         .run();
@@ -172,6 +180,8 @@ export function initializeDatabase() {
         assetId integer primary key autoincrement,
         assetName varchar(100) not null,
         categoryId integer not null references AssetCategories (categoryId),
+        latitude decimal(8, 6) check (latitude >= -90 and latitude <= 90),
+        longitude decimal(9, 6) check (longitude >= -180 and longitude <= 180),
         ${recordColumns}
       )`)
         .run();
@@ -181,16 +191,32 @@ export function initializeDatabase() {
         aliasType varchar(100) not null,
         regularExpression varchar(500),
         aliasPropertiesJson text,
+        ${orderNumberColumns},
         ${recordColumns}
       )`)
         .run();
+    result = emileDB
+        .prepare('select aliasTypeId from AssetAliasTypes limit 1')
+        .get();
+    if (result === undefined) {
+        addAssetAliasType({
+            aliasType: 'Green Button Interval Block - Link Prefix',
+            aliasProperties: {
+                propertyType: 'GreenButton',
+                contentType: 'IntervalBlock',
+                entryKey: 'link',
+                comparison: 'startsWith'
+            }
+        }, initializeDatabaseUser);
+    }
     emileDB
         .prepare(`create table if not exists AssetAliases (
         aliasId integer primary key autoincrement,
         assetId integer not null references Assets (assetId),
         aliasTypeId integer not null references AssetAliasTypes (aliasTypeId),
         assetAlias varchar(500) not null,
-        ${recordColumns}
+        ${recordColumns},
+        unique (aliasTypeId, assetAlias, recordDelete_timeMillis)
       )`)
         .run();
     emileDB

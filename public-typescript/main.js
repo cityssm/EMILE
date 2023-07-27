@@ -2,7 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 (() => {
     var _a;
-    const urlPrefix = (_a = document.querySelector('main').dataset.urlPrefix) !== null && _a !== void 0 ? _a : '';
+    const mainElement = document.querySelector('main');
+    const urlPrefix = (_a = mainElement.dataset.urlPrefix) !== null && _a !== void 0 ? _a : '';
+    const canUpdate = mainElement.dataset.canUpdate === 'true';
     /*
      * Unsaved Changes
      */
@@ -22,6 +24,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
     }
     const Emile = {
         urlPrefix,
+        canUpdate,
         setUnsavedChanges,
         clearUnsavedChanges,
         hasUnsavedChanges

@@ -11,7 +11,7 @@ export function getAssetCategories(): AssetCategory[] {
       `select categoryId, category, fontAwesomeIconClasses
         from AssetCategories
         where recordDelete_timeMillis is null
-        order by category`
+        order by orderNumber, category`
     )
     .all() as AssetCategory[]
 

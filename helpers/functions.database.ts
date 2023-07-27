@@ -2,7 +2,7 @@ import Debug from 'debug'
 
 import * as configFunctions from './functions.config.js'
 
-const debug = Debug('emile:databasePaths')
+const debug = Debug('emile:functions.database')
 
 // Determine if test databases should be used
 

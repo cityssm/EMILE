@@ -5,11 +5,11 @@ export function addEnergyCommodity(commodity, sessionUser, connectedEmileDB) {
     const rightNowMillis = Date.now();
     const result = emileDB
         .prepare(`insert into EnergyCommodities (
-        commodity, greenButtonId,
+        commodity, greenButtonId, orderNumber,
         recordCreate_userName, recordCreate_timeMillis,
         recordUpdate_userName, recordUpdate_timeMillis)
-        values (?, ?, ?, ?, ?, ?)`)
-        .run(commodity.commodity, commodity.greenButtonId, sessionUser.userName, rightNowMillis, sessionUser.userName, rightNowMillis);
+        values (?, ?, ?, ?, ?, ?, ?)`)
+        .run(commodity.commodity, commodity.greenButtonId, commodity.orderNumber ?? 0, sessionUser.userName, rightNowMillis, sessionUser.userName, rightNowMillis);
     if (connectedEmileDB === undefined) {
         emileDB.close();
     }

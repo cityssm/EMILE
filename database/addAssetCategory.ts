@@ -16,14 +16,15 @@ export function addAssetCategory(
   const result = emileDB
     .prepare(
       `insert into AssetCategories (
-        category, fontAwesomeIconClasses,
+        category, fontAwesomeIconClasses, orderNumber,
         recordCreate_userName, recordCreate_timeMillis,
         recordUpdate_userName, recordUpdate_timeMillis)
-        values (?, ?, ?, ?, ?, ?)`
+        values (?, ?, ?, ?, ?, ?, ?)`
     )
     .run(
       category.category,
       category.fontAwesomeIconClasses ?? 'fas fa-bolt',
+      category.orderNumber ?? 0,
       sessionUser.userName,
       rightNowMillis,
       sessionUser.userName,

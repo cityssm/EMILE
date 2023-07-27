@@ -27,7 +27,24 @@
         <div class="level-left">
           <div class="level-item">
             <div class="control has-icons-left">
-              <input class="input" id="filter--assets" type="text" placeholder="Filter assets" />
+              <div class="select">
+                <select id="filter--categoryId">
+                  <option value="">(All Categories)</option>
+                  <% for (const category of assetCategories) { %>
+                    <option value="<%= category.categoryId %>">
+                      <%= category.category %>
+                    </option>
+                  <% } %>
+                </select>
+              </div>
+              <span class="icon is-small is-left">
+                <i class="fas fa-search" aria-hidden="true"></i>
+              </span>
+            </div>
+          </div>
+          <div class="level-item">
+            <div class="control has-icons-left">
+              <input class="input" id="filter--assets" type="text" placeholder="Filter assets" aria-label="Filter assets" />
               <span class="icon is-small is-left">
                 <i class="fas fa-search" aria-hidden="true"></i>
               </span>

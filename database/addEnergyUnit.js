@@ -5,11 +5,11 @@ export function addEnergyUnit(unit, sessionUser, connectedEmileDB) {
     const rightNowMillis = Date.now();
     const result = emileDB
         .prepare(`insert into EnergyUnits (
-        unit, unitLong, greenButtonId,
+        unit, unitLong, greenButtonId, orderNumber,
         recordCreate_userName, recordCreate_timeMillis,
         recordUpdate_userName, recordUpdate_timeMillis)
-        values (?, ?, ?, ?, ?, ?, ?)`)
-        .run(unit.unit, unit.unitLong ?? unit.unit, unit.greenButtonId, sessionUser.userName, rightNowMillis, sessionUser.userName, rightNowMillis);
+        values (?, ?, ?, ?, ?, ?, ?, ?)`)
+        .run(unit.unit, unit.unitLong ?? unit.unit, unit.greenButtonId, unit.orderNumber ?? 0, sessionUser.userName, rightNowMillis, sessionUser.userName, rightNowMillis);
     if (connectedEmileDB === undefined) {
         emileDB.close();
     }

@@ -3,10 +3,11 @@ import type { cityssmGlobal } from '@cityssm/bulma-webapp-js/src/types.js'
 import type { Emile as EmileGlobal } from '../types/globalTypes.js'
 
 declare const cityssm: cityssmGlobal
-
 ;(() => {
-  const urlPrefix =
-    (document.querySelector('main') as HTMLElement).dataset.urlPrefix ?? ''
+  const mainElement = document.querySelector('main') as HTMLElement
+
+  const urlPrefix = mainElement.dataset.urlPrefix ?? ''
+  const canUpdate = mainElement.dataset.canUpdate === 'true'
 
   /*
    * Unsaved Changes
@@ -32,6 +33,7 @@ declare const cityssm: cityssmGlobal
 
   const Emile: EmileGlobal = {
     urlPrefix,
+    canUpdate,
     setUnsavedChanges,
     clearUnsavedChanges,
     hasUnsavedChanges
