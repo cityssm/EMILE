@@ -25,9 +25,11 @@ import configFunctions, {
 } from './helpers/functions.config.js'
 import routerAssets from './routes/assets.js'
 import routerDashboard from './routes/dashboard.js'
+import routerData from './routes/data.js'
 import routerLogin from './routes/login.js'
 import routerReports from './routes/reports.js'
 import { version } from './version.js'
+import { updateGetHandler } from './handlers/permissions.js'
 
 const debug = Debug(`emile:app:${process.pid}`)
 
@@ -222,6 +224,7 @@ app.get(urlPrefix + '/', sessionChecker, (_request, response) => {
 
 app.use(`${urlPrefix}/dashboard`, sessionChecker, routerDashboard)
 app.use(`${urlPrefix}/assets`, sessionChecker, routerAssets)
+app.use(`${urlPrefix}/data`, updateGetHandler, sessionChecker, routerData)
 app.use(`${urlPrefix}/reports`, sessionChecker, routerReports)
 
 if (getConfigProperty('session.doKeepAlive')) {

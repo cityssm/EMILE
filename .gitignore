@@ -8,11 +8,16 @@ cypress/videos/
 
 data/sessions/
 
-node_modules/
-
 data/*.db
 data/*.db-journal
 
 data/config.d.ts
 data/config.js
 data/config.ts
+
+data/files/imported/*
+!data/files/imported/README.md
+data/files/uploads/*
+!data/files/uploads/README.md
+
+node_modules/

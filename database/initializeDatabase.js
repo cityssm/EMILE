@@ -150,6 +150,20 @@ export function initializeDatabase() {
       )`)
         .run();
     emileDB
+        .prepare(`create table if not exists EnergyDataFiles (
+        fileId integer primary key autoincrement,
+        originalFileName varchar(200) not null,
+        systemFileName varchar(200) not null,
+        systemFolderPath varchar(200) not null,
+        parserPropertiesJson text,
+        isPending bit not null default 1,
+        processedTimeMillis integer,
+        isFailed bit not null default 0,
+        processedMessage text,
+        ${recordColumns}
+      )`)
+        .run();
+    emileDB
         .prepare(`create table if not exists AssetCategories (
         categoryId integer primary key autoincrement,
         category varchar(100) not null,
@@ -241,6 +255,7 @@ export function initializeDatabase() {
         dataId integer primary key autoincrement,
         assetId integer not null references Assets (assetId),
         dataTypeId integer not null references EnergyDataTypes (dataTypeId),
+        fileId integer references EnergyDataFiles (fileId),
         timeSeconds integer not null check (timeSeconds > 0),
         durationSeconds integer not null check (durationSeconds > 0),
         endTimeSeconds integer not null generated always as (timeSeconds + durationSeconds) virtual,

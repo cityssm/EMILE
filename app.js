@@ -17,9 +17,11 @@ import { getSafeRedirectURL } from './helpers/functions.authentication.js';
 import configFunctions, { getConfigProperty } from './helpers/functions.config.js';
 import routerAssets from './routes/assets.js';
 import routerDashboard from './routes/dashboard.js';
+import routerData from './routes/data.js';
 import routerLogin from './routes/login.js';
 import routerReports from './routes/reports.js';
 import { version } from './version.js';
+import { updateGetHandler } from './handlers/permissions.js';
 const debug = Debug(`emile:app:${process.pid}`);
 if (getConfigProperty('tempUsers').length > 0) {
     debug('Temporary user accounts currently active!');
@@ -111,6 +113,7 @@ app.get(urlPrefix + '/', sessionChecker, (_request, response) => {
 });
 app.use(`${urlPrefix}/dashboard`, sessionChecker, routerDashboard);
 app.use(`${urlPrefix}/assets`, sessionChecker, routerAssets);
+app.use(`${urlPrefix}/data`, updateGetHandler, sessionChecker, routerData);
 app.use(`${urlPrefix}/reports`, sessionChecker, routerReports);
 if (getConfigProperty('session.doKeepAlive')) {
     app.all(`${urlPrefix}/keepAlive`, (_request, response) => {

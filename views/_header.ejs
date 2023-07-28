@@ -47,14 +47,16 @@
                 <span>Assets</span>
               </a>
             </li>
-            <li>
-              <a
-                class="<%= (headTitle === 'Data' ? 'is-active' : '') %>"
-                href="<%= urlPrefix %>/data">
-                <span class="icon"><i class="fas fa-table" aria-hidden="true"></i></span>
-                <span>Data</span>
-              </a>
-            </li>
+            <% if (user.canUpdate) { %>
+              <li>
+                <a
+                  class="<%= (headTitle === 'Data' ? 'is-active' : '') %>"
+                  href="<%= urlPrefix %>/data">
+                  <span class="icon"><i class="fas fa-table" aria-hidden="true"></i></span>
+                  <span>Data</span>
+                </a>
+              </li>
+            <% } %>
             <li>
               <a
                 class="<%= (headTitle === 'Reports' ? 'is-active' : '') %>"
