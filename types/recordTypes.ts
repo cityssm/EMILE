@@ -1,7 +1,7 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable @typescript-eslint/indent */
 
-import { AliasProperties } from "./aliasTypePropertyTypes"
+import type { AliasProperties } from './aliasTypePropertyTypes.js'
 
 interface RecordUserNameDateTime {
   recordCreate_userName: string
@@ -103,8 +103,8 @@ export interface Asset
     Partial<AssetCategory> {
   assetId?: number
   assetName: string
-  latitude?: number
-  longitude?: number
+  latitude?: number | null
+  longitude?: number | null
   assetAliases?: AssetAlias[]
 }
 

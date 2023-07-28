@@ -22,9 +22,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
     function hasUnsavedChanges() {
         return _hasUnsavedChanges;
     }
+    /*
+     * Map Link
+     */
+    function getMapLink(latitude, longitude) {
+        return `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+    }
+    /*
+     * Build Global
+     */
     const Emile = {
         urlPrefix,
         canUpdate,
+        getMapLink,
         setUnsavedChanges,
         clearUnsavedChanges,
         hasUnsavedChanges

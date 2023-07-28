@@ -4,7 +4,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 ;
 (() => {
-    var _a;
+    var _a, _b;
     const Emile = exports.Emile;
     /*
      * Assets
@@ -19,7 +19,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         cityssm.postJSON(Emile.urlPrefix + '/assets/doGetAsset', {
             assetId
         }, (rawResponseJSON) => {
-            var _a, _b, _c, _d, _e, _f, _g;
+            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
             const responseJSON = rawResponseJSON;
             if (!responseJSON.success) {
                 bulmaJS.alert({
@@ -55,6 +55,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
             }
             ;
             modalElement.querySelector('#assetView--assetName').value = responseJSON.asset.assetName;
+            modalElement.querySelector('#assetView--latitude').value = (_j = (_h = responseJSON.asset.latitude) === null || _h === void 0 ? void 0 : _h.toFixed(6)) !== null && _j !== void 0 ? _j : '';
+            modalElement.querySelector('#assetView--longitude').value = (_l = (_k = responseJSON.asset.longitude) === null || _k === void 0 ? void 0 : _k.toFixed(6)) !== null && _l !== void 0 ? _l : '';
         });
     }
     function updateAsset(formEvent) {
@@ -145,7 +147,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         openAssetByAssetId(assetId);
     }
     function renderAssets() {
-        var _a, _b, _c, _d, _e, _f;
+        var _a, _b, _c, _d, _e, _f, _g, _h;
         ;
         document.querySelector('#count--assets').textContent =
             assets.length.toString();
@@ -169,6 +171,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
       <th class="has-width-10"></th>
       <th>Category</th>
       <th>Asset</th>
+      <th class="has-text-centered has-width-10">
+        <i class="far fa-map" aria-hidden="true"></i>
+        <span class="is-sr-only">Map</span>
+      </th>
       </tr></thead>
       <tbody></tbody>`;
         // eslint-disable-next-line no-labels
@@ -192,8 +198,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
         <i class="${(_e = asset.fontAwesomeIconClasses) !== null && _e !== void 0 ? _e : 'fas fa-bolt'}" aria-hidden="true"></i>
         </td>
         <td data-field="category"></td>
-        <td><a data-field="assetName" href="#"></a></td>`;
-            rowElement.querySelector('[data-field="category"]').textContent = (_f = asset.category) !== null && _f !== void 0 ? _f : '';
+        <td><a data-field="assetName" href="#"></a></td>
+        <td class="has-width-10 has-text-centered">
+          ${((_f = asset.latitude) !== null && _f !== void 0 ? _f : '') === '' || ((_g = asset.longitude) !== null && _g !== void 0 ? _g : '') === ''
+                ? ''
+                : `<a class="has-tooltip-left" data-tooltip="Open Map" href="${Emile.getMapLink(asset.latitude, asset.longitude)}" target="_blank" rel="noopener noreferrer" aria-label="Open Map">
+                <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                </a>`}
+        </td>`;
+            rowElement.querySelector('[data-field="category"]').textContent = (_h = asset.category) !== null && _h !== void 0 ? _h : '';
             const assetNameElement = rowElement.querySelector('[data-field="assetName"]');
             assetNameElement.textContent = asset.assetName;
             assetNameElement.addEventListener('click', openAssetByClick);
@@ -222,6 +235,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
                     assets = responseJSON.assets;
                     renderAssets();
                     addAssetCloseModalFunction();
+                    openAssetByAssetId(responseJSON.assetId.toString());
                 }
             });
         }
@@ -240,6 +254,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
                 var _a;
                 addAssetCloseModalFunction = closeModalFunction;
                 bulmaJS.toggleHtmlClipped();
+                modalElement.querySelector('#assetAdd--categoryId').focus();
                 (_a = modalElement
                     .querySelector('form')) === null || _a === void 0 ? void 0 : _a.addEventListener('submit', doAddAsset);
             },
@@ -253,6 +268,212 @@ Object.defineProperty(exports, "__esModule", { value: true });
      */
     let assetGroups = exports.assetGroups;
     delete exports.assetGroups;
+    const assetGroupFilterElement = document.querySelector('#filter--assetGroups');
+    function populateAssetGroupModal(modalElement, groupId) {
+        cityssm.postJSON(Emile.urlPrefix + '/assets/doGetAssetGroup', {
+            groupId
+        }, (rawResponseJSON) => {
+            var _a, _b;
+            const responseJSON = rawResponseJSON;
+            if (!responseJSON.success) {
+                bulmaJS.alert({
+                    title: 'Error Loading Asset Group Details',
+                    message: 'Please refresh the page and try again.',
+                    contextualColorName: 'danger'
+                });
+                return;
+            }
+            ;
+            modalElement.querySelector('#assetGroupView--groupId').value = (_b = (_a = responseJSON.assetGroup.groupId) === null || _a === void 0 ? void 0 : _a.toString()) !== null && _b !== void 0 ? _b : '';
+            modalElement.querySelector('.modal-card-head [data-field="groupName"]').textContent = responseJSON.assetGroup.groupName;
+            modalElement.querySelector('#assetGroupView--groupName').value = responseJSON.assetGroup.groupName;
+            modalElement.querySelector('#assetGroupView--isShared').value = responseJSON.assetGroup.isShared ? '1' : '0';
+            modalElement.querySelector('#assetGroupView--groupDescription').value = responseJSON.assetGroup.groupDescription;
+        });
+    }
+    function updateAssetGroup(formEvent) {
+        formEvent.preventDefault();
+        cityssm.postJSON(Emile.urlPrefix + '/assets/doUpdateAssetGroup', formEvent.currentTarget, (rawResponseJSON) => {
+            var _a;
+            const responseJSON = rawResponseJSON;
+            if (responseJSON.success) {
+                assetGroups = responseJSON.assetGroups;
+                bulmaJS.alert({
+                    message: 'Asset group updated successfully.',
+                    contextualColorName: 'success'
+                });
+                renderAssets();
+            }
+            else {
+                bulmaJS.alert({
+                    title: 'Error Updating Asset Group',
+                    message: (_a = responseJSON.errorMessage) !== null && _a !== void 0 ? _a : 'Please try again.',
+                    contextualColorName: 'danger'
+                });
+            }
+        });
+    }
+    function openGroupByGroupId(groupId) {
+        let assetGroupCloseModalFunction;
+        function deleteAssetGroup(clickEvent) {
+            clickEvent.preventDefault();
+            function doDelete() {
+                cityssm.postJSON(Emile.urlPrefix + '/assets/doDeleteAssetGroup', {
+                    groupId
+                }, (rawResponseJSON) => {
+                    var _a;
+                    const responseJSON = rawResponseJSON;
+                    if (responseJSON.success) {
+                        assetGroups = responseJSON.assetGroups;
+                        renderAssetGroups();
+                        assetGroupCloseModalFunction();
+                    }
+                    else {
+                        bulmaJS.alert({
+                            title: 'Error Deleting Asset Group',
+                            message: (_a = responseJSON.errorMessage) !== null && _a !== void 0 ? _a : '',
+                            contextualColorName: 'danger'
+                        });
+                    }
+                });
+            }
+            bulmaJS.confirm({
+                title: 'Delete Asset Group',
+                message: 'Are you sure you want to delete this group?',
+                contextualColorName: 'warning',
+                okButton: {
+                    text: 'Yes, Delete Asset Group',
+                    callbackFunction: doDelete
+                }
+            });
+        }
+        cityssm.openHtmlModal('assetGroup-view', {
+            onshow(modalElement) {
+                populateAssetGroupModal(modalElement, groupId);
+                if (Emile.canUpdate) {
+                    ;
+                    modalElement.querySelector('#form--assetGroupView fieldset').disabled = false;
+                }
+            },
+            onshown(modalElement, closeModalFunction) {
+                var _a, _b;
+                bulmaJS.toggleHtmlClipped();
+                bulmaJS.init(modalElement);
+                if (Emile.canUpdate) {
+                    assetGroupCloseModalFunction = closeModalFunction;
+                    (_a = modalElement
+                        .querySelector('#form--assetGroupView')) === null || _a === void 0 ? void 0 : _a.addEventListener('submit', updateAssetGroup);
+                    (_b = modalElement
+                        .querySelector('.is-delete-button')) === null || _b === void 0 ? void 0 : _b.addEventListener('click', deleteAssetGroup);
+                }
+            },
+            onremoved() {
+                bulmaJS.toggleHtmlClipped();
+            }
+        });
+    }
+    function openGroupByClick(clickEvent) {
+        var _a, _b;
+        clickEvent.preventDefault();
+        const groupId = (_b = (_a = clickEvent.currentTarget.closest('tr')) === null || _a === void 0 ? void 0 : _a.dataset.groupId) !== null && _b !== void 0 ? _b : '';
+        openGroupByGroupId(groupId);
+    }
+    function renderAssetGroups() {
+        var _a, _b, _c, _d, _e;
+        ;
+        document.querySelector('#count--assetGroups').textContent = assetGroups.length.toString();
+        const containerElement = document.querySelector('#container--assetGroups');
+        if (assetGroups.length === 0) {
+            containerElement.innerHTML = `<div class="message is-info">
+        <p class="message-body">
+          <strong>No Asset Groups Found</strong><br />
+          Grouping together assets can assist with reporting on multiple assets.
+        </p>
+        </div>`;
+            return;
+        }
+        const searchPieces = assetGroupFilterElement.value
+            .trim()
+            .toLowerCase()
+            .split(' ');
+        const tableElement = document.createElement('table');
+        tableElement.className = 'table is-fullwidth is-striped has-sticky-header';
+        tableElement.innerHTML = `<thead><tr>
+      <th>Group</th>
+      <th class="has-text-centered has-width-10">
+        <i class="fas fa-city" aria-hidden="true"></i>
+        <span class="is-sr-only">Number of Assets</span>
+      </th>
+      </tr></thead>
+      <tbody></tbody>`;
+        // eslint-disable-next-line no-labels
+        assetGroupLoop: for (const assetGroup of assetGroups) {
+            const searchText = assetGroup.groupName.toLowerCase() +
+                ' ' +
+                ((_a = assetGroup.groupDescription) !== null && _a !== void 0 ? _a : '').toLowerCase();
+            for (const searchPiece of searchPieces) {
+                if (!searchText.includes(searchPiece)) {
+                    // eslint-disable-next-line no-labels
+                    continue assetGroupLoop;
+                }
+            }
+            const rowElement = document.createElement('tr');
+            rowElement.dataset.groupId = (_c = (_b = assetGroup.groupId) === null || _b === void 0 ? void 0 : _b.toString()) !== null && _c !== void 0 ? _c : '';
+            rowElement.innerHTML = `<td>
+          <a data-field="groupName" href="#"></a><br />
+          <span class="is-size-7" data-field="groupDescription"></span>
+        </td>
+        <td class="has-width-10 has-text-right">
+          <span class="has-tooltip-left" data-tooltip="Group Members">${(_d = assetGroup.groupMemberCount) !== null && _d !== void 0 ? _d : 0}</span>
+        </td>`;
+            const groupNameElement = rowElement.querySelector('[data-field="groupName"]');
+            groupNameElement.textContent = assetGroup.groupName;
+            groupNameElement.addEventListener('click', openGroupByClick);
+            tableElement.querySelector('tbody').append(rowElement);
+            rowElement.querySelector('[data-field="groupDescription"]').textContent = (_e = assetGroup.groupDescription) !== null && _e !== void 0 ? _e : '';
+        }
+        if (tableElement.querySelectorAll('tbody tr').length === 0) {
+            containerElement.innerHTML = `<div class="message is-info">
+        <p class="message-body">
+          <strong>There are no groups that meet your search criteria.</strong><br />
+          Try to be less specific in your search. 
+        </p>
+        </div>`;
+        }
+        else {
+            containerElement.innerHTML = '';
+            containerElement.append(tableElement);
+        }
+    }
+    (_b = document
+        .querySelector('#button--addAssetGroup')) === null || _b === void 0 ? void 0 : _b.addEventListener('click', () => {
+        let addAssetGroupCloseModalFunction;
+        function doAddAssetGroup(formEvent) {
+            formEvent.preventDefault();
+            cityssm.postJSON(Emile.urlPrefix + '/assets/doAddAssetGroup', formEvent.currentTarget, (rawResponseJSON) => {
+                const responseJSON = rawResponseJSON;
+                if (responseJSON.success) {
+                    assetGroups = responseJSON.assetGroups;
+                    renderAssetGroups();
+                    addAssetGroupCloseModalFunction();
+                    openGroupByGroupId(responseJSON.groupId.toString());
+                }
+            });
+        }
+        cityssm.openHtmlModal('assetGroup-add', {
+            onshown(modalElement, closeModalFunction) {
+                var _a;
+                addAssetGroupCloseModalFunction = closeModalFunction;
+                bulmaJS.toggleHtmlClipped();
+                modalElement.querySelector('#assetGroupAdd--groupName').focus();
+                (_a = modalElement
+                    .querySelector('form')) === null || _a === void 0 ? void 0 : _a.addEventListener('submit', doAddAssetGroup);
+            },
+            onremoved() {
+                bulmaJS.toggleHtmlClipped();
+            }
+        });
+    });
     /*
      * Initialize
      */
@@ -262,4 +483,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
     assetFilterElement.addEventListener('keyup', renderAssets);
     assetCategoryFilterElement.addEventListener('change', renderAssets);
     renderAssets();
+    // Asset Groups
+    assetGroupFilterElement.addEventListener('keyup', renderAssetGroups);
+    renderAssetGroups();
 })();

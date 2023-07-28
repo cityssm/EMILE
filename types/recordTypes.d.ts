@@ -1,4 +1,4 @@
-import { AliasProperties } from "./aliasTypePropertyTypes";
+import type { AliasProperties } from './aliasTypePropertyTypes.js';
 interface RecordUserNameDateTime {
     recordCreate_userName: string;
     recordCreate_dateTime: Date | string;
@@ -54,8 +54,8 @@ export interface AssetAlias extends Partial<RecordUserNameDateTime>, Partial<Ass
 export interface Asset extends Partial<RecordUserNameDateTime>, Partial<AssetCategory> {
     assetId?: number;
     assetName: string;
-    latitude?: number;
-    longitude?: number;
+    latitude?: number | null;
+    longitude?: number | null;
     assetAliases?: AssetAlias[];
 }
 export interface AssetGroup extends Partial<RecordUserNameDateTime> {

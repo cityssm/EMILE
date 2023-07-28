@@ -1,34 +1,46 @@
-import { Router, type RequestHandler } from 'express'
+import { Router } from 'express'
 
 import handler_assets from '../handlers/assets-get/assets.js'
 import handler_doAddAsset from '../handlers/assets-post/doAddAsset.js'
+import handler_doAddAssetGroup from '../handlers/assets-post/doAddAssetGroup.js'
 import handler_doDeleteAsset from '../handlers/assets-post/doDeleteAsset.js'
+import handler_doDeleteAssetGroup from '../handlers/assets-post/doDeleteAssetGroup.js'
 import handler_doGetAsset from '../handlers/assets-post/doGetAsset.js'
+import handler_doGetAssetGroup from '../handlers/assets-post/doGetAssetGroup.js'
 import handler_doUpdateAsset from '../handlers/assets-post/doUpdateAsset.js'
+import handler_doUpdateAssetGroup from '../handlers/assets-post/doUpdateAssetGroup.js'
 import { updatePostHandler } from '../handlers/permissions.js'
 
 export const router = Router()
 
-router.get('/', handler_assets as RequestHandler)
+router.get('/', handler_assets)
+
+// Assets
+
+router.post('/doAddAsset', updatePostHandler, handler_doAddAsset)
+
+router.post('/doGetAsset', handler_doGetAsset)
+
+router.post('/doUpdateAsset', updatePostHandler, handler_doUpdateAsset)
+
+router.post('/doDeleteAsset', updatePostHandler, handler_doDeleteAsset)
+
+// Asset Groups
+
+router.post('/doAddAssetGroup', updatePostHandler, handler_doAddAssetGroup)
+
+router.post('/doGetAssetGroup', handler_doGetAssetGroup)
 
 router.post(
-  '/doAddAsset',
+  '/doUpdateAssetGroup',
   updatePostHandler,
-  handler_doAddAsset as RequestHandler
+  handler_doUpdateAssetGroup
 )
 
-router.post('/doGetAsset', handler_doGetAsset as RequestHandler)
-
 router.post(
-  '/doUpdateAsset',
+  '/doDeleteAssetGroup',
   updatePostHandler,
-  handler_doUpdateAsset as RequestHandler
-)
-
-router.post(
-  '/doDeleteAsset',
-  updatePostHandler,
-  handler_doDeleteAsset as RequestHandler
+  handler_doDeleteAssetGroup
 )
 
 export default router

@@ -1,4 +1,4 @@
-export async function handler(request, response) {
+export function handler(request, response) {
     response.render('dashboard', {
         headTitle: 'Dashboard'
     });

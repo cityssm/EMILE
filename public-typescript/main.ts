@@ -31,9 +31,24 @@ declare const cityssm: cityssmGlobal
     return _hasUnsavedChanges
   }
 
+  /*
+   * Map Link
+   */
+
+  function getMapLink(latitude: number, longitude: number): string {
+    return `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`
+  }
+
+  /*
+   * Build Global
+   */
+
   const Emile: EmileGlobal = {
     urlPrefix,
     canUpdate,
+
+    getMapLink,
+
     setUnsavedChanges,
     clearUnsavedChanges,
     hasUnsavedChanges

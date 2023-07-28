@@ -1,9 +1,6 @@
 import type { Request, Response } from 'express'
 
-export async function handler(
-  request: Request,
-  response: Response
-): Promise<void> {
+export function handler(request: Request, response: Response): void {
   response.render('dashboard', {
     headTitle: 'Dashboard'
   })

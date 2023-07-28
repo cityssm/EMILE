@@ -10,7 +10,7 @@ export function getAsset(assetId: string | number): Asset | undefined {
 
   const asset = emileDB
     .prepare(
-      `select a.assetId, a.assetName,
+      `select a.assetId, a.assetName, a.latitude, a.longitude,
         a.categoryId, c.category, c.fontAwesomeIconClasses
         from Assets a
         left join AssetCategories c on a.categoryId = c.categoryId

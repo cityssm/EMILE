@@ -59,8 +59,18 @@ $black: #000;
 }
 
 /*
- * Disabled form helpers
+ * Form helpers
  */
+
+.input[type='number'] {
+  -moz-appearance: textfield;
+
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    margin: 0;
+    -webkit-appearance: none;
+  }
+}
 
 .select option:disabled {
   display: none;

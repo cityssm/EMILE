@@ -1,0 +1,41 @@
+<div class="modal" role="dialog" aria-label="Add a New Asset Group">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <div class="modal-card-head">
+      <h2 class="modal-card-title">Add a New Asset Group</h2>
+      <button
+        class="delete is-close-modal-button"
+        aria-label="close"
+        type="button"
+      ></button>
+    </div>
+    <section class="modal-card-body">
+      <form id="form--assetGroupAdd">
+        <div class="field">
+          <label class="label" for="assetGroupAdd--groupName">Group Name</label>
+          <div class="control has-icons-right">
+            <input
+              class="input"
+              id="assetGroupAdd--groupName"
+              name="groupName"
+              type="text"
+              maxlength="100"
+              autocomplete="off"
+              required
+            />
+            <span class="icon is-small is-right">
+              <i class="fas fa-asterisk" aria-hidden="true"></i>
+            </span>
+          </div>
+        </div>
+      </form>
+    </section>
+    <div class="modal-card-foot is-justify-content-right">
+      <button class="button is-success" type="submit" form="form--assetGroupAdd">
+        <span class="icon"><i class="fas fa-plus" aria-hidden="true"></i></span>
+        <span>Add Asset Group</span>
+      </button>
+      <button class="button is-close-modal-button" type="button">Cancel</button>
+    </div>
+  </div>
+</div>
