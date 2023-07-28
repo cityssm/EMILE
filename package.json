@@ -76,7 +76,7 @@
     "@types/session-file-store": "^1.2.2",
     "bulma": "^0.9.4",
     "bulma-tooltip": "^3.0.2",
-    "eslint": "^8.45.0",
+    "eslint": "^8.46.0",
     "eslint-config-cityssm": "^0.4.0",
     "gulp": "^4.0.2",
     "gulp-changed": "^4.0.3",
