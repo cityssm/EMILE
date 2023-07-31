@@ -1,17 +1,19 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable @typescript-eslint/indent */
 
+import type { ParserProperties } from '../parsers/parserPropertyTypes.js'
+
 import type { AliasProperties } from './aliasTypePropertyTypes.js'
 
 interface RecordUserNameDateTime {
   recordCreate_userName: string
-  recordCreate_dateTime: Date | string
+  recordCreate_timeMillis: number
 
   recordUpdate_userName: string
-  recordUpdate_dateTime: Date | string
+  recordUpdate_timeMillis: number
 
   recordDelete_userName?: string
-  recordDelete_dateTime?: Date
+  recordDelete_timeMillis?: number
 }
 
 interface RecordOrderNumber {
@@ -117,6 +119,29 @@ export interface AssetGroup extends Partial<RecordUserNameDateTime> {
 
   groupMembers?: Asset[]
   groupMemberCount?: number
+}
+
+/*
+ * Energy Data
+ */
+
+export interface EnergyDataFile extends Partial<RecordUserNameDateTime> {
+  fileId?: number
+  originalFileName: string
+  systemFileName: string
+  systemFolderPath: string
+
+  assetId?: number | null
+  assetName?: string | null
+
+  isPending: boolean
+
+  parserPropertiesJson?: string
+  parserProperties?: ParserProperties
+
+  processedTimeMillis?: number
+  isFailed: boolean
+  processedMessage?: string
 }
 
 /*

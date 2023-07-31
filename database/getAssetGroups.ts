@@ -4,7 +4,9 @@ import { databasePath } from '../helpers/functions.database.js'
 import type { AssetGroup } from '../types/recordTypes.js'
 
 export function getAssetGroups(sessionUser: EmileUser): AssetGroup[] {
-  const emileDB = sqlite(databasePath)
+  const emileDB = sqlite(databasePath, {
+    readonly: true
+  })
 
   const assetGroups = emileDB
     .prepare(

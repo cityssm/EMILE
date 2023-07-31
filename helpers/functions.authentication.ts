@@ -63,7 +63,7 @@ export async function authenticate(
   return await authenticateFunction(userName, password)
 }
 
-const safeRedirects = new Set(['/admin', '/assets', '/dashboard'])
+const safeRedirects = new Set(['/admin', '/assets', '/dashboard', '/data'])
 
 export function getSafeRedirectURL(possibleRedirectURL = ''): string {
   const urlPrefix = getConfigProperty('reverseProxy.urlPrefix')

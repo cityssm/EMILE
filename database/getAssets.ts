@@ -1,3 +1,6 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable @typescript-eslint/indent */
+
 import sqlite from 'better-sqlite3'
 
 import { databasePath } from '../helpers/functions.database.js'
@@ -30,11 +33,18 @@ export function getAssets(
 
   sql += ' order by c.orderNumber, c.category, a.assetName'
 
-  const emileDB = sqlite(databasePath)
+  const emileDB =
+    connectedEmileDB === undefined
+      ? sqlite(databasePath, {
+          readonly: true
+        })
+      : connectedEmileDB
 
   const assets = emileDB.prepare(sql).all(sqlParameters) as Asset[]
 
-  emileDB.close()
+  if (connectedEmileDB === undefined) {
+    emileDB.close()
+  }
 
   return assets
 }

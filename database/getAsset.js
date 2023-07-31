@@ -2,7 +2,9 @@ import sqlite from 'better-sqlite3';
 import { databasePath } from '../helpers/functions.database.js';
 import { getAssetAliases } from './getAssetAliases.js';
 export function getAsset(assetId) {
-    const emileDB = sqlite(databasePath);
+    const emileDB = sqlite(databasePath, {
+        readonly: true
+    });
     const asset = emileDB
         .prepare(`select a.assetId, a.assetName, a.latitude, a.longitude,
         a.categoryId, c.category, c.fontAwesomeIconClasses

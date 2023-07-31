@@ -1,7 +1,9 @@
 import sqlite from 'better-sqlite3';
 import { databasePath } from '../helpers/functions.database.js';
 export function getReportData(reportName, reportParameters = {}) {
-    const emileDB = sqlite(databasePath);
+    const emileDB = sqlite(databasePath, {
+        readonly: true
+    });
     let sql = '';
     switch (reportName) {
         case 'assets-all': {

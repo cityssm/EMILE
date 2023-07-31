@@ -12,7 +12,11 @@ export function getAssetAliases(filters, connectedEmileDB) {
         sqlParameters.push(filters.assetId ?? '');
     }
     sql += ' order by t.orderNumber, t.aliasType, a.assetId, a.assetAlias';
-    const emileDB = connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB;
+    const emileDB = connectedEmileDB === undefined
+        ? sqlite(databasePath, {
+            readonly: true
+        })
+        : connectedEmileDB;
     const assetAliases = emileDB.prepare(sql).all(sqlParameters);
     if (connectedEmileDB === undefined) {
         emileDB.close();

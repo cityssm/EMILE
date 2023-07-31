@@ -1,4 +1,5 @@
 import '../helpers/polyfills.js';
+import { fork } from 'node:child_process';
 import cluster from 'node:cluster';
 import os from 'node:os';
 import { dirname } from 'node:path';
@@ -50,4 +51,7 @@ if (process.env.STARTUP_TEST === 'true') {
         debug('Killing processes');
         process.exit(0);
     }, 10000);
+}
+else {
+    fork('./tasks/uploadedFilesProcessor.js');
 }

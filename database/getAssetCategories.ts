@@ -4,7 +4,9 @@ import { databasePath } from '../helpers/functions.database.js'
 import type { AssetCategory } from '../types/recordTypes.js'
 
 export function getAssetCategories(): AssetCategory[] {
-  const emileDB = sqlite(databasePath)
+  const emileDB = sqlite(databasePath, {
+    readonly: true
+  })
 
   const assetCategories = emileDB
     .prepare(

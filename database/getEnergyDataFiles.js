@@ -1,0 +1,81 @@
+import sqlite from 'better-sqlite3';
+import { databasePath } from '../helpers/functions.database.js';
+function getEnergyDataFiles(filters, options) {
+    let sql = `select f.fileId, f.originalFileName,
+    ${options.includeSystemFileAndFolder
+        ? ' f.systemFileName, f.systemFolderPath,'
+        : ''}
+    f.assetId,
+    ${options.includeAssetDetails
+        ? ' a.assetName, c.category, c.fontAwesomeIconClasses,'
+        : ''}
+    isPending, parserPropertiesJson,
+    processedTimeMillis, isFailed, processedMessage,
+    f.recordCreate_timeMillis, f.recordUpdate_timeMillis
+    from EnergyDataFiles f
+    left join Assets a on f.assetId = a.assetId
+    left join AssetCategories c on a.categoryId = c.categoryId
+    where f.recordDelete_timeMillis is null`;
+    const sqlParameters = [];
+    if ((filters.isPending ?? '') !== '') {
+        sql += ' and f.isPending = ?';
+        sqlParameters.push(filters.isPending ? 1 : 0);
+    }
+    if ((filters.isProcessed ?? '') !== '') {
+        sql += filters.isProcessed
+            ? ' and f.processedTimeMillis is not null'
+            : ' and f.processedTimeMillis is null';
+    }
+    if ((filters.isFailed ?? '') !== '') {
+        sql += ' and f.isFailed = ?';
+        sqlParameters.push(filters.isFailed ? 1 : 0);
+    }
+    sql += ' order by f.recordUpdate_timeMillis desc';
+    if (options.limit !== -1) {
+        sql += ` limit ${options.limit}`;
+    }
+    const emileDB = sqlite(databasePath, {
+        readonly: true
+    });
+    const assets = emileDB.prepare(sql).all(sqlParameters);
+    emileDB.close();
+    return assets;
+}
+export function getPendingEnergyDataFiles() {
+    return getEnergyDataFiles({
+        isPending: true
+    }, {
+        includeAssetDetails: true,
+        includeSystemFileAndFolder: false,
+        limit: -1
+    });
+}
+export function getFailedEnergyDataFiles() {
+    return getEnergyDataFiles({
+        isFailed: true
+    }, {
+        includeAssetDetails: true,
+        includeSystemFileAndFolder: false,
+        limit: -1
+    });
+}
+export function getProcessedEnergyDataFiles(searchString) {
+    return getEnergyDataFiles({
+        isProcessed: true,
+        isFailed: false
+    }, {
+        includeAssetDetails: true,
+        includeSystemFileAndFolder: false,
+        limit: 100
+    });
+}
+export function getEnergyDataFilesToProcess() {
+    return getEnergyDataFiles({
+        isPending: false,
+        isProcessed: false
+    }, {
+        includeAssetDetails: false,
+        includeSystemFileAndFolder: true,
+        limit: -1
+    });
+}

@@ -16,8 +16,14 @@ export function getAssets(filters = {}, connectedEmileDB) {
         sqlParameters.push(filters.groupId);
     }
     sql += ' order by c.orderNumber, c.category, a.assetName';
-    const emileDB = sqlite(databasePath);
+    const emileDB = connectedEmileDB === undefined
+        ? sqlite(databasePath, {
+            readonly: true
+        })
+        : connectedEmileDB;
     const assets = emileDB.prepare(sql).all(sqlParameters);
-    emileDB.close();
+    if (connectedEmileDB === undefined) {
+        emileDB.close();
+    }
     return assets;
 }

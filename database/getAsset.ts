@@ -6,7 +6,9 @@ import type { Asset } from '../types/recordTypes.js'
 import { getAssetAliases } from './getAssetAliases.js'
 
 export function getAsset(assetId: string | number): Asset | undefined {
-  const emileDB = sqlite(databasePath)
+  const emileDB = sqlite(databasePath, {
+    readonly: true
+  })
 
   const asset = emileDB
     .prepare(

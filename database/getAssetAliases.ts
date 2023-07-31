@@ -1,3 +1,6 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable @typescript-eslint/indent */
+
 import sqlite from 'better-sqlite3'
 
 import { databasePath } from '../helpers/functions.database.js'
@@ -27,7 +30,11 @@ export function getAssetAliases(
   sql += ' order by t.orderNumber, t.aliasType, a.assetId, a.assetAlias'
 
   const emileDB =
-    connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB
+    connectedEmileDB === undefined
+      ? sqlite(databasePath, {
+          readonly: true
+        })
+      : connectedEmileDB
 
   const assetAliases = emileDB.prepare(sql).all(sqlParameters) as AssetAlias[]
 

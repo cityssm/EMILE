@@ -9,7 +9,9 @@ export function getAssetGroup(
   groupId: number | string,
   sessionUser: EmileUser
 ): AssetGroup | undefined {
-  const emileDB = sqlite(databasePath)
+  const emileDB = sqlite(databasePath, {
+    readonly: true
+  })
 
   const assetGroup = emileDB
     .prepare(

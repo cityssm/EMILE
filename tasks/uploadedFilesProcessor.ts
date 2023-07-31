@@ -1,8 +1,37 @@
+import fs from 'node:fs/promises'
+import path from 'node:path'
+
+import chokidar from 'chokidar'
 import Debug from 'debug'
 import exitHook from 'exit-hook'
 import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async'
 
+import { addEnergyDataFile } from '../database/addEnergyDataFile.js'
+
 const debug = Debug('emile:tasks:uploadedFilesProcessor')
+
+const processorUser: EmileUser = {
+  userName: 'system.uploadProcessor',
+  canLogin: false,
+  canUpdate: true,
+  isAdmin: true
+}
+
+/*
+ * Settings
+ */
+
+const uploadsFolder = 'data/files/uploads'
+const importedFolderRoot = 'data/files/imported'
+
+const allowedFileExtensions = ['csv', 'txt', 'xml']
+
+// eslint-disable-next-line unicorn/better-regex
+const timestampPrependedRegex = /^\[\d+\].+/
+
+/*
+ * Task
+ */
 
 let terminateTask = false
 
@@ -21,6 +50,87 @@ async function processUploadedFiles(): Promise<void> {
 
   // Process
 
+  const fileNames = await fs.readdir(uploadsFolder)
+
+  const rightNow = new Date()
+
+  const systemFolderPath = path.join(
+    importedFolderRoot,
+    rightNow.getFullYear().toString() +
+      '-' +
+      (rightNow.getMonth() + 1).toString()
+  )
+
+  try {
+    await fs.mkdir(systemFolderPath)
+  } catch {
+    // ignore, already exists
+  }
+
+  for (const fileName of fileNames) {
+    if (terminateTask) {
+      break
+    }
+
+    const fileNameLowerCase = fileName.toLowerCase()
+
+    // Skip the readme.md file
+
+    if (fileNameLowerCase === 'readme.md') {
+      continue
+    }
+
+    // Check file extensions
+
+    const fileExtension = fileNameLowerCase.slice(
+      fileNameLowerCase.lastIndexOf('.') + 1
+    )
+    let extensionAllowed = false
+
+    for (const allowedFileExtension of allowedFileExtensions) {
+      if (allowedFileExtension === fileExtension) {
+        extensionAllowed = true
+        break
+      }
+    }
+
+    // Move file
+
+    let originalFileName = fileName
+
+    if (timestampPrependedRegex.test(originalFileName)) {
+      originalFileName = originalFileName.slice(
+        Math.max(0, originalFileName.indexOf(']') + 1)
+      )
+    }
+
+    const systemFileName = `${Date.now()}-${Math.round(
+      Math.random() * 1e9
+    )}.${fileExtension}`
+
+    await fs.copyFile(
+      path.join(uploadsFolder, fileName),
+      path.join(systemFolderPath, systemFileName)
+    )
+
+    addEnergyDataFile(
+      {
+        originalFileName,
+        systemFileName,
+        systemFolderPath,
+        isPending: extensionAllowed,
+        isFailed: !extensionAllowed,
+        processedTimeMillis: extensionAllowed ? undefined : Date.now(),
+        processedMessage: extensionAllowed
+          ? ''
+          : `File extension not allowed: ${fileExtension}`
+      },
+      processorUser
+    )
+
+    await fs.unlink(path.join(uploadsFolder, fileName))
+  }
+
   isProcessing = false
 
   if (processAgainOnComplete) {
@@ -29,11 +139,19 @@ async function processUploadedFiles(): Promise<void> {
   }
 }
 
-await processUploadedFiles().catch(() => {
+/*
+ * Run the task
+ */
+
+await processUploadedFiles().catch((error) => {
   debug('Error running task.')
+  debug(error)
 })
 
 const intervalID = setIntervalAsync(processUploadedFiles, 6 * 3600 * 1000)
+
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
+chokidar.watch(uploadsFolder).on('add', processUploadedFiles)
 
 exitHook(() => {
   terminateTask = true

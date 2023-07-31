@@ -1,5 +1,6 @@
 import '../helpers/polyfills.js'
 
+import { fork } from 'node:child_process'
 import type { Worker } from 'node:cluster'
 import cluster from 'node:cluster'
 import os from 'node:os'
@@ -88,4 +89,6 @@ if (process.env.STARTUP_TEST === 'true') {
     // eslint-disable-next-line n/no-process-exit, unicorn/no-process-exit
     process.exit(0)
   }, 10_000)
+} else {
+  fork('./tasks/uploadedFilesProcessor.js')
 }

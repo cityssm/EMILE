@@ -8,7 +8,9 @@ export function getReportData(
   reportName: string,
   reportParameters: ReportParameters = {}
 ): unknown[] | undefined {
-  const emileDB = sqlite(databasePath)
+  const emileDB = sqlite(databasePath, {
+    readonly: true
+  })
 
   let sql = ''
 
