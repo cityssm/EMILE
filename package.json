@@ -32,7 +32,7 @@
     "@cityssm/bulma-webapp-js": "^1.5.0",
     "@cityssm/express-abuse-points": "^1.1.0",
     "@cityssm/expressjs-server-js": "^2.3.3",
-    "@cityssm/green-button-parser": "^0.4.0",
+    "@cityssm/green-button-parser": "^0.6.0",
     "@cityssm/utils-datetime": "^0.1.1",
     "@fortawesome/fontawesome-free": "^5.15.4",
     "activedirectory2": "^2.2.0",
