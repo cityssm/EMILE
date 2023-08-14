@@ -19,8 +19,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
      */
     let pendingFiles = exports.pendingFiles;
     delete exports.pendingFiles;
+    function openPendingDataFileSettings(clickEvent) {
+        var _a, _b;
+        const fileId = Number.parseInt((_b = (_a = clickEvent.currentTarget.closest('tr')) === null || _a === void 0 ? void 0 : _a.dataset.fileId) !== null && _b !== void 0 ? _b : '', 10);
+        const pendingFile = pendingFiles.find((possibleFile) => {
+            return possibleFile.fileId === fileId;
+        });
+        cityssm.openHtmlModal('data-parserSettings', {});
+    }
     function renderPendingFiles() {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
         const pendingFilesCountElement = document.querySelector('#count--pendingFiles');
         const pendingFilesContainerElement = document.querySelector('#container--pendingFiles');
         pendingFilesCountElement.textContent = pendingFiles.length.toString();
@@ -36,7 +44,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         tableElement.innerHTML = `<thead><tr>
       <th>Pending File</th>
       <th>Parser Settings</th>
-      <th class="has-text-right">Options</th>
+      <th><span class="is-sr-only">Options</span></th>
       </tr></thead>
       <tbody></tbody>`;
         for (const pendingFile of pendingFiles) {
@@ -49,7 +57,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         </td>
         <td class="is-size-7">
           <span data-field="assetName">${pendingFile.assetId === null
-                ? '<i class="fas fa-fw fa-hat-wizard" aria-hidden="true"></i> Detect from File'
+                ? '<i class="fas fa-fw fa-hat-wizard" aria-hidden="true"></i> Detect Asset from File'
                 : ''}</span><br />
           <span>
             <i class="fas fa-fw fa-cog" aria-hidden="true"></i>
@@ -59,17 +67,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
           </span>
         </td>
         <td class="has-text-right">
-          <button class="button is-info" type="button">
+          <button class="button is-info is-settings-button" type="button">
             <span class="icon"><i class="fas fa-pencil-alt" aria-hidden="true"></i></span>
             <span>Settings</span>
           </button>
-          <button class="button is-success" type="button" ${((_g = (_f = pendingFile.parserProperties) === null || _f === void 0 ? void 0 : _f.parserClass) !== null && _g !== void 0 ? _g : '') === ''
+          <button class="button is-success is-parse-button" type="button" ${((_g = (_f = pendingFile.parserProperties) === null || _f === void 0 ? void 0 : _f.parserClass) !== null && _g !== void 0 ? _g : '') === ''
                 ? 'disabled'
                 : ''}>
             <span class="icon"><i class="fas fa-cogs" aria-hidden="true"></i></span>
             <span>Parse File</span>
           </button>
-          <button class="button is-danger is-light" type="button" aria-label="Delete File">
+          <button class="button is-danger is-light is-delete-button" type="button" aria-label="Delete File">
             <i class="fas fa-trash" aria-hidden="true"></i>
           </button>
         </td>`;
@@ -79,12 +87,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
             }
             ;
             rowElement.querySelector('[data-field="originalFileName"]').textContent = pendingFile.originalFileName;
-            (_j = tableElement.querySelector('tbody')) === null || _j === void 0 ? void 0 : _j.append(rowElement);
+            (_j = rowElement.querySelector('.is-settings-button')) === null || _j === void 0 ? void 0 : _j.addEventListener('click', openPendingDataFileSettings);
+            (_k = tableElement.querySelector('tbody')) === null || _k === void 0 ? void 0 : _k.append(rowElement);
         }
         pendingFilesContainerElement.innerHTML = '';
         pendingFilesContainerElement.append(tableElement);
     }
     renderPendingFiles();
+    /*
+     * Failed Files
+     */
+    let failedFiles = exports.failedFiles;
+    delete exports.failedFiles;
     /*
      * Upload Handling
      */
@@ -104,14 +118,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
         var _a, _b;
         dragEvent.preventDefault();
         const data = new FormData();
-        let fileIndex = -1;
         if (((_a = dragEvent.dataTransfer) === null || _a === void 0 ? void 0 : _a.items) !== undefined) {
             // Use DataTransferItemList interface to access the file(s)
             for (const item of dragEvent.dataTransfer.items) {
                 // If dropped items aren't files, reject them
                 if (item.kind === 'file') {
                     const file = item.getAsFile();
-                    fileIndex += 1;
                     data.append('file', file);
                 }
             }
@@ -119,7 +131,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
         else if (((_b = dragEvent.dataTransfer) === null || _b === void 0 ? void 0 : _b.files) !== undefined) {
             // Use DataTransfer interface to access the file(s)
             for (const file of dragEvent.dataTransfer.files) {
-                fileIndex += 1;
                 data.append('file', file);
             }
         }
@@ -135,7 +146,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
             return yield response.json();
         }))
             .then((responseJSON) => {
-            console.log(responseJSON);
+            if (responseJSON.success) {
+                pendingFiles = responseJSON.pendingFiles;
+                renderPendingFiles();
+                failedFiles = responseJSON.failedFiles;
+            }
+            return responseJSON.success;
         })
             .catch(() => {
             bulmaJS.alert({
@@ -145,4 +161,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
         });
         uploadDropZoneElement.classList.remove(...dragOverClasses);
     });
+    /*
+     * Page Initialize
+     */
+    bulmaJS.init();
 })();

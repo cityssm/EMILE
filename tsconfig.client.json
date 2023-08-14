@@ -13,6 +13,7 @@
   },
   "files": [
     "public-typescript/main.ts",
+    "public-typescript/dashboard.ts",
     "public-typescript/assets.ts",
     "public-typescript/data.ts"
   ],

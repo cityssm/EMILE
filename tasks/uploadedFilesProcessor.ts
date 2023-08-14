@@ -7,6 +7,7 @@ import exitHook from 'exit-hook'
 import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async'
 
 import { addEnergyDataFile } from '../database/addEnergyDataFile.js'
+import { fileExtensions as allowedFileExtensions, getDefaultParserPropertiesByFileName } from '../parsers/parserHelpers.js'
 
 const debug = Debug('emile:tasks:uploadedFilesProcessor')
 
@@ -23,8 +24,6 @@ const processorUser: EmileUser = {
 
 const uploadsFolder = 'data/files/uploads'
 const importedFolderRoot = 'data/files/imported'
-
-const allowedFileExtensions = ['csv', 'txt', 'xml']
 
 // eslint-disable-next-line unicorn/better-regex
 const timestampPrependedRegex = /^\[\d+\].+/
@@ -113,11 +112,14 @@ async function processUploadedFiles(): Promise<void> {
       path.join(systemFolderPath, systemFileName)
     )
 
+    const parserProperties = getDefaultParserPropertiesByFileName(originalFileName)
+
     addEnergyDataFile(
       {
         originalFileName,
         systemFileName,
         systemFolderPath,
+        parserProperties,
         isPending: extensionAllowed,
         isFailed: !extensionAllowed,
         processedTimeMillis: extensionAllowed ? undefined : Date.now(),

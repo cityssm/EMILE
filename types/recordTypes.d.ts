@@ -1,5 +1,4 @@
-import type { ParserProperties } from '../parsers/parserPropertyTypes.js';
-import type { AliasProperties } from './aliasTypePropertyTypes.js';
+import type { AliasProperties, ParserProperties } from '../parsers/parserHelpers.js';
 interface RecordUserNameDateTime {
     recordCreate_userName: string;
     recordCreate_timeMillis: number;
@@ -76,7 +75,7 @@ export interface EnergyDataFile extends Partial<RecordUserNameDateTime> {
     assetId?: number | null;
     assetName?: string | null;
     isPending: boolean;
-    parserPropertiesJson?: string;
+    parserPropertiesJson?: string | null;
     parserProperties?: ParserProperties;
     processedTimeMillis?: number;
     isFailed: boolean;

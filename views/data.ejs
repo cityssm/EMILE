@@ -2,6 +2,15 @@
 
 <h1 class="title is-1">Data</h1>
 
+<% if (assets.length === 0) { %>
+  <div class="message is-warning">
+    <p class="message-body">
+      <strong>There are currently no active assets in the system.</strong><br />
+      Assets can be created from uploaded data files.
+    </p>
+  </div>
+<% } %>
+
 <div class="tabs is-boxed">
   <ul>
     <li class="is-active">

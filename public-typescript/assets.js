@@ -9,10 +9,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
     /*
      * Assets
      */
-    const assetCategories = exports.assetCategories;
-    delete exports.assetCategories;
-    let assets = exports.assets;
-    delete exports.assets;
     const assetCategoryFilterElement = document.querySelector('#filter--categoryId');
     const assetFilterElement = document.querySelector('#filter--assets');
     function populateAssetModal(modalElement, assetId) {
@@ -35,7 +31,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
             const categoryElement = modalElement.querySelector('#assetView--categoryId');
             let categoryFound = false;
             if (Emile.canUpdate) {
-                for (const category of assetCategories) {
+                for (const category of Emile.assetCategories) {
                     const optionElement = document.createElement('option');
                     optionElement.value = (_d = (_c = category.categoryId) === null || _c === void 0 ? void 0 : _c.toString()) !== null && _d !== void 0 ? _d : '';
                     optionElement.textContent = category.category;
@@ -65,7 +61,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
             var _a;
             const responseJSON = rawResponseJSON;
             if (responseJSON.success) {
-                assets = responseJSON.assets;
+                Emile.assets = responseJSON.assets;
                 bulmaJS.alert({
                     message: 'Asset updated successfully.',
                     contextualColorName: 'success'
@@ -92,7 +88,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
                     var _a;
                     const responseJSON = rawResponseJSON;
                     if (responseJSON.success) {
-                        assets = responseJSON.assets;
+                        Emile.assets = responseJSON.assets;
                         renderAssets();
                         assetCloseModalFunction();
                     }
@@ -150,9 +146,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
         var _a, _b, _c, _d, _e, _f, _g, _h;
         ;
         document.querySelector('#count--assets').textContent =
-            assets.length.toString();
+            Emile.assets.length.toString();
         const containerElement = document.querySelector('#container--assets');
-        if (assets.length === 0) {
+        if (Emile.assets.length === 0) {
             containerElement.innerHTML = `<div class="message is-warning">
         <p class="message-body">
           <strong>No Assets Found</strong><br />
@@ -178,7 +174,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
       </tr></thead>
       <tbody></tbody>`;
         // eslint-disable-next-line no-labels
-        assetLoop: for (const asset of assets) {
+        assetLoop: for (const asset of Emile.assets) {
             if (assetCategoryFilterElement.value !== '' &&
                 assetCategoryFilterElement.value !== ((_a = asset.categoryId) === null || _a === void 0 ? void 0 : _a.toString())) {
                 continue;
@@ -232,7 +228,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
             cityssm.postJSON(Emile.urlPrefix + '/assets/doAddAsset', formEvent.currentTarget, (rawResponseJSON) => {
                 const responseJSON = rawResponseJSON;
                 if (responseJSON.success) {
-                    assets = responseJSON.assets;
+                    Emile.assets = responseJSON.assets;
                     renderAssets();
                     addAssetCloseModalFunction();
                     openAssetByAssetId(responseJSON.assetId.toString());
@@ -243,7 +239,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
             onshow(modalElement) {
                 var _a, _b;
                 const categoryElement = modalElement.querySelector('#assetAdd--categoryId');
-                for (const category of assetCategories) {
+                for (const category of Emile.assetCategories) {
                     const optionElement = document.createElement('option');
                     optionElement.value = (_b = (_a = category.categoryId) === null || _a === void 0 ? void 0 : _a.toString()) !== null && _b !== void 0 ? _b : '';
                     optionElement.textContent = category.category;
@@ -266,8 +262,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
     /*
      * Asset Groups
      */
-    let assetGroups = exports.assetGroups;
-    delete exports.assetGroups;
     const assetGroupFilterElement = document.querySelector('#filter--assetGroups');
     function populateAssetGroupModal(modalElement, groupId) {
         cityssm.postJSON(Emile.urlPrefix + '/assets/doGetAssetGroup', {
@@ -297,7 +291,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
             var _a;
             const responseJSON = rawResponseJSON;
             if (responseJSON.success) {
-                assetGroups = responseJSON.assetGroups;
+                Emile.assetGroups = responseJSON.assetGroups;
                 bulmaJS.alert({
                     message: 'Asset group updated successfully.',
                     contextualColorName: 'success'
@@ -324,7 +318,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
                     var _a;
                     const responseJSON = rawResponseJSON;
                     if (responseJSON.success) {
-                        assetGroups = responseJSON.assetGroups;
+                        Emile.assetGroups = responseJSON.assetGroups;
                         renderAssetGroups();
                         assetGroupCloseModalFunction();
                     }
@@ -381,9 +375,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
     function renderAssetGroups() {
         var _a, _b, _c, _d, _e;
         ;
-        document.querySelector('#count--assetGroups').textContent = assetGroups.length.toString();
+        document.querySelector('#count--assetGroups').textContent = Emile.assetGroups.length.toString();
         const containerElement = document.querySelector('#container--assetGroups');
-        if (assetGroups.length === 0) {
+        if (Emile.assetGroups.length === 0) {
             containerElement.innerHTML = `<div class="message is-info">
         <p class="message-body">
           <strong>No Asset Groups Found</strong><br />
@@ -407,7 +401,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
       </tr></thead>
       <tbody></tbody>`;
         // eslint-disable-next-line no-labels
-        assetGroupLoop: for (const assetGroup of assetGroups) {
+        assetGroupLoop: for (const assetGroup of Emile.assetGroups) {
             const searchText = assetGroup.groupName.toLowerCase() +
                 ' ' +
                 ((_a = assetGroup.groupDescription) !== null && _a !== void 0 ? _a : '').toLowerCase();
@@ -453,7 +447,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
             cityssm.postJSON(Emile.urlPrefix + '/assets/doAddAssetGroup', formEvent.currentTarget, (rawResponseJSON) => {
                 const responseJSON = rawResponseJSON;
                 if (responseJSON.success) {
-                    assetGroups = responseJSON.assetGroups;
+                    Emile.assetGroups = responseJSON.assetGroups;
                     renderAssetGroups();
                     addAssetGroupCloseModalFunction();
                     openGroupByGroupId(responseJSON.groupId.toString());

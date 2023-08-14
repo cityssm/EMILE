@@ -1,9 +1,7 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable @typescript-eslint/indent */
 
-import type { ParserProperties } from '../parsers/parserPropertyTypes.js'
-
-import type { AliasProperties } from './aliasTypePropertyTypes.js'
+import type { AliasProperties, ParserProperties } from '../parsers/parserHelpers.js'
 
 interface RecordUserNameDateTime {
   recordCreate_userName: string
@@ -136,7 +134,7 @@ export interface EnergyDataFile extends Partial<RecordUserNameDateTime> {
 
   isPending: boolean
 
-  parserPropertiesJson?: string
+  parserPropertiesJson?: string | null
   parserProperties?: ParserProperties
 
   processedTimeMillis?: number

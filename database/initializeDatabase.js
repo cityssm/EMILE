@@ -217,7 +217,7 @@ export function initializeDatabase() {
         addAssetAliasType({
             aliasType: 'Green Button Interval Block - Link Prefix',
             aliasProperties: {
-                propertyType: 'GreenButton',
+                aliasType: 'GreenButton',
                 contentType: 'IntervalBlock',
                 entryKey: 'link',
                 comparison: 'startsWith'

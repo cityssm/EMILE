@@ -20,6 +20,19 @@ declare const cityssm: cityssmGlobal
   let pendingFiles = exports.pendingFiles as EnergyDataFile[]
   delete exports.pendingFiles
 
+  function openPendingDataFileSettings(clickEvent: Event): void {
+
+    const fileId = Number.parseInt((clickEvent.currentTarget as HTMLButtonElement).closest('tr')?.dataset.fileId ?? '', 10)
+
+    const pendingFile = pendingFiles.find((possibleFile) => {
+      return possibleFile.fileId === fileId
+    }) as EnergyDataFile
+
+    cityssm.openHtmlModal('data-parserSettings', {
+      
+    })
+  }
+
   function renderPendingFiles(): void {
     const pendingFilesCountElement = document.querySelector(
       '#count--pendingFiles'
@@ -46,7 +59,7 @@ declare const cityssm: cityssmGlobal
     tableElement.innerHTML = `<thead><tr>
       <th>Pending File</th>
       <th>Parser Settings</th>
-      <th class="has-text-right">Options</th>
+      <th><span class="is-sr-only">Options</span></th>
       </tr></thead>
       <tbody></tbody>`
 
@@ -54,7 +67,9 @@ declare const cityssm: cityssmGlobal
       const rowElement = document.createElement('tr')
       rowElement.dataset.fileId = pendingFile.fileId?.toString()
 
-      const recordCreateDate = new Date(pendingFile.recordCreate_timeMillis as number)
+      const recordCreateDate = new Date(
+        pendingFile.recordCreate_timeMillis as number
+      )
 
       rowElement.innerHTML = `<td>
           <span class="has-text-weight-bold" data-field="originalFileName"></span><br />
@@ -63,7 +78,7 @@ declare const cityssm: cityssmGlobal
         <td class="is-size-7">
           <span data-field="assetName">${
             pendingFile.assetId === null
-              ? '<i class="fas fa-fw fa-hat-wizard" aria-hidden="true"></i> Detect from File'
+              ? '<i class="fas fa-fw fa-hat-wizard" aria-hidden="true"></i> Detect Asset from File'
               : ''
           }</span><br />
           <span>
@@ -76,11 +91,11 @@ declare const cityssm: cityssmGlobal
           </span>
         </td>
         <td class="has-text-right">
-          <button class="button is-info" type="button">
+          <button class="button is-info is-settings-button" type="button">
             <span class="icon"><i class="fas fa-pencil-alt" aria-hidden="true"></i></span>
             <span>Settings</span>
           </button>
-          <button class="button is-success" type="button" ${
+          <button class="button is-success is-parse-button" type="button" ${
             (pendingFile.parserProperties?.parserClass ?? '') === ''
               ? 'disabled'
               : ''
@@ -88,7 +103,7 @@ declare const cityssm: cityssmGlobal
             <span class="icon"><i class="fas fa-cogs" aria-hidden="true"></i></span>
             <span>Parse File</span>
           </button>
-          <button class="button is-danger is-light" type="button" aria-label="Delete File">
+          <button class="button is-danger is-light is-delete-button" type="button" aria-label="Delete File">
             <i class="fas fa-trash" aria-hidden="true"></i>
           </button>
         </td>`
@@ -105,6 +120,8 @@ declare const cityssm: cityssmGlobal
         ) as HTMLElement
       ).textContent = pendingFile.originalFileName
 
+      rowElement.querySelector('.is-settings-button')?.addEventListener('click', openPendingDataFileSettings)
+
       tableElement.querySelector('tbody')?.append(rowElement)
     }
 
@@ -113,6 +130,13 @@ declare const cityssm: cityssmGlobal
   }
 
   renderPendingFiles()
+
+  /*
+   * Failed Files
+   */
+
+  let failedFiles = exports.failedFiles as EnergyDataFile[]
+  delete exports.failedFiles
 
   /*
    * Upload Handling
@@ -143,7 +167,6 @@ declare const cityssm: cityssmGlobal
     dragEvent.preventDefault()
 
     const data = new FormData()
-    let fileIndex = -1
 
     if (dragEvent.dataTransfer?.items !== undefined) {
       // Use DataTransferItemList interface to access the file(s)
@@ -151,14 +174,12 @@ declare const cityssm: cityssmGlobal
         // If dropped items aren't files, reject them
         if (item.kind === 'file') {
           const file = item.getAsFile() as File
-          fileIndex += 1
           data.append('file', file)
         }
       }
     } else if (dragEvent.dataTransfer?.files !== undefined) {
       // Use DataTransfer interface to access the file(s)
       for (const file of dragEvent.dataTransfer.files) {
-        fileIndex += 1
         data.append('file', file)
       }
     }
@@ -174,9 +195,22 @@ declare const cityssm: cityssmGlobal
       .then(async (response) => {
         return await response.json()
       })
-      .then((responseJSON) => {
-        console.log(responseJSON)
-      })
+      .then(
+        (responseJSON: {
+          success: boolean
+          pendingFiles: EnergyDataFile[]
+          failedFiles: EnergyDataFile[]
+        }) => {
+          if (responseJSON.success) {
+            pendingFiles = responseJSON.pendingFiles
+            renderPendingFiles()
+
+            failedFiles = responseJSON.failedFiles
+          }
+
+          return responseJSON.success
+        }
+      )
       .catch(() => {
         bulmaJS.alert({
           message: 'Error processing files.',
@@ -186,4 +220,10 @@ declare const cityssm: cityssmGlobal
 
     uploadDropZoneElement.classList.remove(...dragOverClasses)
   })
+
+  /*
+   * Page Initialize
+   */
+
+  bulmaJS.init()
 })()

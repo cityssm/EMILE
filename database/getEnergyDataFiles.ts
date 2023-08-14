@@ -75,11 +75,19 @@ function getEnergyDataFiles(
     readonly: true
   })
 
-  const assets = emileDB.prepare(sql).all(sqlParameters) as EnergyDataFile[]
+  const dataFiles = emileDB.prepare(sql).all(sqlParameters) as EnergyDataFile[]
 
   emileDB.close()
 
-  return assets
+  for (const dataFile of dataFiles) {
+    if (dataFile.parserPropertiesJson !== undefined && dataFile.parserPropertiesJson !== null) {
+      dataFile.parserProperties = JSON.parse(dataFile.parserPropertiesJson)
+    }
+
+    delete dataFile.parserPropertiesJson
+  }
+
+  return dataFiles
 }
 
 export function getPendingEnergyDataFiles(): EnergyDataFile[] {

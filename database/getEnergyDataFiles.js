@@ -37,9 +37,15 @@ function getEnergyDataFiles(filters, options) {
     const emileDB = sqlite(databasePath, {
         readonly: true
     });
-    const assets = emileDB.prepare(sql).all(sqlParameters);
+    const dataFiles = emileDB.prepare(sql).all(sqlParameters);
     emileDB.close();
-    return assets;
+    for (const dataFile of dataFiles) {
+        if (dataFile.parserPropertiesJson !== undefined && dataFile.parserPropertiesJson !== null) {
+            dataFile.parserProperties = JSON.parse(dataFile.parserPropertiesJson);
+        }
+        delete dataFile.parserPropertiesJson;
+    }
+    return dataFiles;
 }
 export function getPendingEnergyDataFiles() {
     return getEnergyDataFiles({

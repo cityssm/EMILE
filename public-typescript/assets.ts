@@ -26,12 +26,6 @@ interface ErrorResponse {
    * Assets
    */
 
-  const assetCategories = exports.assetCategories as AssetCategory[]
-  delete exports.assetCategories
-
-  let assets = exports.assets as Asset[]
-  delete exports.assets
-
   const assetCategoryFilterElement = document.querySelector(
     '#filter--categoryId'
   ) as HTMLSelectElement
@@ -82,7 +76,7 @@ interface ErrorResponse {
         let categoryFound = false
 
         if (Emile.canUpdate) {
-          for (const category of assetCategories) {
+          for (const category of Emile.assetCategories) {
             const optionElement = document.createElement('option')
 
             optionElement.value = category.categoryId?.toString() ?? ''
@@ -136,7 +130,7 @@ interface ErrorResponse {
           | ErrorResponse
 
         if (responseJSON.success) {
-          assets = responseJSON.assets
+          Emile.assets = responseJSON.assets
 
           bulmaJS.alert({
             message: 'Asset updated successfully.',
@@ -176,7 +170,7 @@ interface ErrorResponse {
               | ErrorResponse
 
             if (responseJSON.success) {
-              assets = responseJSON.assets
+              Emile.assets = responseJSON.assets
               renderAssets()
               assetCloseModalFunction()
             } else {
@@ -247,13 +241,13 @@ interface ErrorResponse {
 
   function renderAssets(): void {
     ;(document.querySelector('#count--assets') as HTMLElement).textContent =
-      assets.length.toString()
+      Emile.assets.length.toString()
 
     const containerElement = document.querySelector(
       '#container--assets'
     ) as HTMLElement
 
-    if (assets.length === 0) {
+    if (Emile.assets.length === 0) {
       containerElement.innerHTML = `<div class="message is-warning">
         <p class="message-body">
           <strong>No Assets Found</strong><br />
@@ -283,7 +277,7 @@ interface ErrorResponse {
       <tbody></tbody>`
 
     // eslint-disable-next-line no-labels
-    assetLoop: for (const asset of assets) {
+    assetLoop: for (const asset of Emile.assets) {
       if (
         assetCategoryFilterElement.value !== '' &&
         assetCategoryFilterElement.value !== asset.categoryId?.toString()
@@ -375,7 +369,7 @@ interface ErrorResponse {
             | ErrorResponse
 
           if (responseJSON.success) {
-            assets = responseJSON.assets
+            Emile.assets = responseJSON.assets
             renderAssets()
             addAssetCloseModalFunction()
 
@@ -391,7 +385,7 @@ interface ErrorResponse {
           '#assetAdd--categoryId'
         ) as HTMLSelectElement
 
-        for (const category of assetCategories) {
+        for (const category of Emile.assetCategories) {
           const optionElement = document.createElement('option')
           optionElement.value = category.categoryId?.toString() ?? ''
           optionElement.textContent = category.category
@@ -421,9 +415,6 @@ interface ErrorResponse {
   /*
    * Asset Groups
    */
-
-  let assetGroups = exports.assetGroups as AssetGroup[]
-  delete exports.assetGroups
 
   const assetGroupFilterElement = document.querySelector(
     '#filter--assetGroups'
@@ -499,7 +490,7 @@ interface ErrorResponse {
           | ErrorResponse
 
         if (responseJSON.success) {
-          assetGroups = responseJSON.assetGroups
+          Emile.assetGroups = responseJSON.assetGroups
 
           bulmaJS.alert({
             message: 'Asset group updated successfully.',
@@ -539,7 +530,7 @@ interface ErrorResponse {
               | ErrorResponse
 
             if (responseJSON.success) {
-              assetGroups = responseJSON.assetGroups
+              Emile.assetGroups = responseJSON.assetGroups
               renderAssetGroups()
               assetGroupCloseModalFunction()
             } else {
@@ -611,13 +602,13 @@ interface ErrorResponse {
   function renderAssetGroups(): void {
     ;(
       document.querySelector('#count--assetGroups') as HTMLElement
-    ).textContent = assetGroups.length.toString()
+    ).textContent = Emile.assetGroups.length.toString()
 
     const containerElement = document.querySelector(
       '#container--assetGroups'
     ) as HTMLElement
 
-    if (assetGroups.length === 0) {
+    if (Emile.assetGroups.length === 0) {
       containerElement.innerHTML = `<div class="message is-info">
         <p class="message-body">
           <strong>No Asset Groups Found</strong><br />
@@ -645,7 +636,7 @@ interface ErrorResponse {
       <tbody></tbody>`
 
     // eslint-disable-next-line no-labels
-    assetGroupLoop: for (const assetGroup of assetGroups) {
+    assetGroupLoop: for (const assetGroup of Emile.assetGroups) {
       const searchText =
         assetGroup.groupName.toLowerCase() +
         ' ' +
@@ -666,7 +657,9 @@ interface ErrorResponse {
           <span class="is-size-7" data-field="groupDescription"></span>
         </td>
         <td class="has-width-10 has-text-right">
-          <span class="has-tooltip-left" data-tooltip="Group Members">${assetGroup.groupMemberCount ?? 0}</span>
+          <span class="has-tooltip-left" data-tooltip="Group Members">${
+            assetGroup.groupMemberCount ?? 0
+          }</span>
         </td>`
 
       const groupNameElement = rowElement.querySelector(
@@ -720,7 +713,7 @@ interface ErrorResponse {
               | ErrorResponse
 
             if (responseJSON.success) {
-              assetGroups = responseJSON.assetGroups
+              Emile.assetGroups = responseJSON.assetGroups
               renderAssetGroups()
               addAssetGroupCloseModalFunction()
 

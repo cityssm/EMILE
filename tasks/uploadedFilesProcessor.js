@@ -5,6 +5,7 @@ import Debug from 'debug';
 import exitHook from 'exit-hook';
 import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async';
 import { addEnergyDataFile } from '../database/addEnergyDataFile.js';
+import { fileExtensions as allowedFileExtensions, getDefaultParserPropertiesByFileName } from '../parsers/parserHelpers.js';
 const debug = Debug('emile:tasks:uploadedFilesProcessor');
 const processorUser = {
     userName: 'system.uploadProcessor',
@@ -14,7 +15,6 @@ const processorUser = {
 };
 const uploadsFolder = 'data/files/uploads';
 const importedFolderRoot = 'data/files/imported';
-const allowedFileExtensions = ['csv', 'txt', 'xml'];
 const timestampPrependedRegex = /^\[\d+\].+/;
 let terminateTask = false;
 let isProcessing = false;
@@ -59,10 +59,12 @@ async function processUploadedFiles() {
         }
         const systemFileName = `${Date.now()}-${Math.round(Math.random() * 1e9)}.${fileExtension}`;
         await fs.copyFile(path.join(uploadsFolder, fileName), path.join(systemFolderPath, systemFileName));
+        const parserProperties = getDefaultParserPropertiesByFileName(originalFileName);
         addEnergyDataFile({
             originalFileName,
             systemFileName,
             systemFolderPath,
+            parserProperties,
             isPending: extensionAllowed,
             isFailed: !extensionAllowed,
             processedTimeMillis: extensionAllowed ? undefined : Date.now(),
