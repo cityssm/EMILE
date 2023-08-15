@@ -15,3 +15,38 @@ export function updateEnergyDataFileAsFailed(energyDataFile, sessionUser) {
     emileDB.close();
     return result.changes > 0;
 }
+export function updatePendingEnergyDataFile(energyDataFile, sessionUser) {
+    const parserPropertiesJson = energyDataFile.parserClass === ''
+        ? '{}'
+        : JSON.stringify({
+            parserClass: energyDataFile.parserClass
+        });
+    const emileDB = sqlite(databasePath);
+    const result = emileDB
+        .prepare(`update EnergyDataFiles
+        set assetId = ?,
+        parserPropertiesJson = ?,
+        recordUpdate_userName = ?,
+        recordUpdate_timeMillis = ?
+        where recordDelete_timeMillis is null
+        and fileId = ?`)
+        .run(energyDataFile.assetId === '' ? undefined : energyDataFile.assetId, parserPropertiesJson, sessionUser.userName, Date.now(), energyDataFile.fileId);
+    emileDB.close();
+    return result.changes > 0;
+}
+export function updateEnergyDataFileAsReadyToProcess(fileId, sessionUser) {
+    const emileDB = sqlite(databasePath);
+    const result = emileDB
+        .prepare(`update EnergyDataFiles
+        set isPending = 0,
+        isFailed = 0,
+        processedTimeMillis = null,
+        processedMessage = null,
+        recordUpdate_userName = ?,
+        recordUpdate_timeMillis = ?
+        where recordDelete_timeMillis is null
+        and fileId = ?`)
+        .run(sessionUser.userName, Date.now(), fileId);
+    emileDB.close();
+    return result.changes > 0;
+}

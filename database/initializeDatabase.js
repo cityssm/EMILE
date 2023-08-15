@@ -145,7 +145,6 @@ export function initializeDatabase() {
         readingTypeId integer not null references EnergyReadingTypes (readingTypeId),
         commodityId integer not null references EnergyCommodities (commodityId),
         accumulationBehaviourId integer not null references EnergyAccumulationBehaviours (accumulationBehaviourId),
-        ${greenButtonColumns},
         ${recordColumns}
       )`)
         .run();
@@ -205,7 +204,7 @@ export function initializeDatabase() {
         aliasTypeId integer primary key autoincrement,
         aliasType varchar(100) not null,
         regularExpression varchar(500),
-        aliasPropertiesJson text,
+        aliasTypeKey varchar(500),
         ${orderNumberColumns},
         ${recordColumns}
       )`)
@@ -215,13 +214,8 @@ export function initializeDatabase() {
         .get();
     if (result === undefined) {
         addAssetAliasType({
-            aliasType: 'Green Button Interval Block - Link Prefix',
-            aliasProperties: {
-                aliasType: 'GreenButton',
-                contentType: 'IntervalBlock',
-                entryKey: 'link',
-                comparison: 'startsWith'
-            }
+            aliasType: 'Green Button Interval Block Link',
+            aliasTypeKey: 'GreenButtonParser.IntervalBlock.link'
         }, initializeDatabaseUser);
     }
     emileDB

@@ -92,6 +92,28 @@ declare const cityssm: cityssmGlobal
     const allowGroupSelect = groupIdElement !== null
 
     /*
+     * Determine no selection text
+     */
+
+    let noSelectionText = buttonElement.dataset.noSelectionText ?? ''
+
+    if (
+      noSelectionText === '' &&
+      (assetIdElement === null || assetIdElement.value === '') &&
+      (groupIdElement === null || groupIdElement.value === '')
+    ) {
+      noSelectionText = buttonElement.textContent ?? ''
+    }
+
+    if (noSelectionText === '' && allowGroupSelect) {
+      noSelectionText = '(Select Assets)'
+    }
+
+    if (noSelectionText === '') {
+      noSelectionText = '(Select Asset)'
+    }
+
+    /*
      * Functions
      */
 
@@ -280,7 +302,7 @@ declare const cityssm: cityssmGlobal
     }
 
     /*
-     * Initialize button
+     * Initialize buttons
      */
 
     buttonElement?.addEventListener('click', () => {
@@ -344,6 +366,26 @@ declare const cityssm: cityssmGlobal
         }
       })
     })
+
+    assetSelectorOptions.assetSelectorElement
+      .querySelector('.is-clear-button')
+      ?.addEventListener('click', () => {
+        if (allowAssetSelect) {
+          assetIdElement.value = ''
+        }
+
+        if (allowGroupSelect) {
+          groupIdElement.value = ''
+        }
+
+        iconContainerElement.innerHTML =
+          '<i class="fas fa-bolt" aria-hidden="true"></i>'
+        buttonElement.textContent = noSelectionText
+
+        if (assetSelectorOptions.callbackFunction !== undefined) {
+          assetSelectorOptions.callbackFunction({ type: 'clear' })
+        }
+      })
   }
 
   /*

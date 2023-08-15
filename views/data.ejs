@@ -53,8 +53,11 @@
 <%- include('_footerA'); -%>
 
 <script>
+  exports.Emile.assets = <%- JSON.stringify(assets) %>;
+
   exports.pendingFiles = <%- JSON.stringify(pendingFiles) %>;
   exports.failedFiles = <%- JSON.stringify(failedFiles) %>;
+  exports.parserClasses = <%- JSON.stringify(parserClasses) %>;
 </script>
 <script src="<%= urlPrefix %>/javascripts/data.min.js"></script>
 

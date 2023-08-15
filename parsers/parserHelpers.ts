@@ -48,3 +48,10 @@ export function getDefaultParserPropertiesByFileName(
 
   return undefined
 }
+
+const parserClasses: string[] = []
+parserClasses.push(GreenButtonParser.name, CsvParser.name)
+
+export function getParserClasses(): string[] {
+  return parserClasses
+}

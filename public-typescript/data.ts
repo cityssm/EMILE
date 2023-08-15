@@ -1,4 +1,7 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable @typescript-eslint/indent */
+
+// eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable unicorn/prefer-module */
 
 // eslint-disable-next-line n/no-missing-import
@@ -13,23 +16,231 @@ declare const cityssm: cityssmGlobal
 ;(() => {
   const Emile = exports.Emile as EmileGlobal
 
+  const parserClasses = exports.parserClasses as string[]
+
   /*
    * Pending Files
    */
 
+  type PendingFilesResponseJSON =
+    | {
+        success: true
+        pendingFiles: EnergyDataFile[]
+      }
+    | {
+        success: false
+        errorMessage: string
+      }
+
   let pendingFiles = exports.pendingFiles as EnergyDataFile[]
   delete exports.pendingFiles
 
-  function openPendingDataFileSettings(clickEvent: Event): void {
+  function updatePendingEnergyDataFile(formEvent: Event): void {
+    formEvent.preventDefault()
 
-    const fileId = Number.parseInt((clickEvent.currentTarget as HTMLButtonElement).closest('tr')?.dataset.fileId ?? '', 10)
+    cityssm.postJSON(
+      Emile.urlPrefix + '/data/doUpdatePendingEnergyDataFile',
+      formEvent.currentTarget,
+      (rawResponseJSON) => {
+        const responseJSON = rawResponseJSON as PendingFilesResponseJSON
+
+        if (responseJSON.success) {
+          bulmaJS.alert({
+            message: 'File Updated Successfully',
+            contextualColorName: 'success'
+          })
+
+          pendingFiles = responseJSON.pendingFiles ?? []
+          renderPendingFiles()
+        } else {
+          bulmaJS.alert({
+            title: 'Error Updating File',
+            message: responseJSON.errorMessage ?? 'Please try again.',
+            contextualColorName: 'danger'
+          })
+        }
+      }
+    )
+  }
+
+  function openPendingDataFileSettings(clickEvent: Event): void {
+    const fileId = Number.parseInt(
+      (clickEvent.currentTarget as HTMLButtonElement).closest('tr')?.dataset
+        .fileId ?? '',
+      10
+    )
 
     const pendingFile = pendingFiles.find((possibleFile) => {
       return possibleFile.fileId === fileId
     }) as EnergyDataFile
 
     cityssm.openHtmlModal('data-parserSettings', {
-      
+      onshow(modalElement) {
+        ;(
+          modalElement.querySelector(
+            '#energyDataFileEdit--fileId'
+          ) as HTMLInputElement
+        ).value = pendingFile.fileId?.toString() ?? ''
+        ;(
+          modalElement.querySelector(
+            '[data-field="originalFileName"]'
+          ) as HTMLElement
+        ).textContent = pendingFile.originalFileName
+
+        if (pendingFile.assetId !== null) {
+          ;(
+            modalElement.querySelector(
+              '#energyDataFileEdit--assetId'
+            ) as HTMLInputElement
+          ).value = pendingFile.assetId?.toString() ?? ''
+          ;(
+            modalElement.querySelector(
+              '#energyDataFileEdit--assetSelector .icon'
+            ) as HTMLElement
+          ).innerHTML = `<i class="${
+            pendingFile.fontAwesomeIconClasses ?? 'fas fa-bolt'
+          }" aria-hidden="true"></i>`
+          ;(
+            modalElement.querySelector(
+              '#energyDataFileEdit--assetSelector button'
+            ) as HTMLElement
+          ).textContent = pendingFile.assetName ?? ''
+        }
+
+        const parserClassSelectElement = modalElement.querySelector(
+          '#energyDataFileEdit--parserClass'
+        ) as HTMLSelectElement
+
+        let parserClassFound = false
+
+        for (const parserClass of parserClasses) {
+          const optionElement = document.createElement('option')
+          optionElement.value = parserClass
+          optionElement.textContent = parserClass
+
+          if (parserClass === pendingFile.parserProperties?.parserClass) {
+            optionElement.selected = true
+            parserClassFound = true
+          }
+
+          parserClassSelectElement.append(optionElement)
+        }
+
+        if (
+          !parserClassFound &&
+          pendingFile.parserProperties !== undefined &&
+          pendingFile.parserProperties.parserClass !== undefined
+        ) {
+          const optionElement = document.createElement('option')
+          optionElement.value = pendingFile.parserProperties.parserClass
+          optionElement.textContent = pendingFile.parserProperties.parserClass
+          optionElement.selected = true
+          parserClassSelectElement.append(optionElement)
+        }
+      },
+      onshown(modalElement, closeModalFunction) {
+        bulmaJS.toggleHtmlClipped()
+
+        Emile.initializeAssetSelector({
+          assetSelectorElement: modalElement.querySelector(
+            '#energyDataFileEdit--assetSelector'
+          ) as HTMLElement
+        })
+
+        modalElement
+          .querySelector('form')
+          ?.addEventListener('submit', updatePendingEnergyDataFile)
+      },
+      onremoved() {
+        bulmaJS.toggleHtmlClipped()
+      }
+    })
+  }
+
+  function confirmDeletePendingDataFile(clickEvent: Event): void {
+    const fileId = Number.parseInt(
+      (clickEvent.currentTarget as HTMLButtonElement).closest('tr')?.dataset
+        .fileId ?? '',
+      10
+    )
+
+    function doDelete(): void {
+      cityssm.postJSON(Emile.urlPrefix + '/data/doDeletePendingEnergyDataFile', {
+        fileId
+      },
+      (rawResponseJSON) => {
+        const responseJSON = rawResponseJSON as PendingFilesResponseJSON
+
+        if (responseJSON.success) {
+          bulmaJS.alert({
+            message: 'File Deleted Successfully',
+            contextualColorName: 'success'
+          })
+
+          pendingFiles = responseJSON.pendingFiles
+          renderPendingFiles()
+        } else {
+          bulmaJS.alert({
+            title: 'Error Deleting File',
+            message: responseJSON.errorMessage ?? 'Please try again.',
+            contextualColorName: 'danger'
+          })
+        }
+      })
+    }
+
+    bulmaJS.confirm({
+      title: 'Delete File',
+      message: 'Are you sure you want to delete this file?',
+      contextualColorName: 'warning',
+      okButton: {
+        text: 'Yes, Delete File',
+        callbackFunction: doDelete
+      }
+    })
+  }
+
+  function confirmProcessPendingDataFile(clickEvent: Event): void {
+    const fileId = Number.parseInt(
+      (clickEvent.currentTarget as HTMLButtonElement).closest('tr')?.dataset
+        .fileId ?? '',
+      10
+    )
+
+    function doProcess(): void {
+      cityssm.postJSON(Emile.urlPrefix + '/data/doProcessPendingEnergyDataFile', {
+        fileId
+      },
+      (rawResponseJSON) => {
+        const responseJSON = rawResponseJSON as PendingFilesResponseJSON
+
+        if (responseJSON.success) {
+          bulmaJS.alert({
+            title: 'File Marked for Processing Successfully',
+            message: 'Processing may take a few minutes depending on how many files are being processed.',
+            contextualColorName: 'success'
+          })
+
+          pendingFiles = responseJSON.pendingFiles
+          renderPendingFiles()
+        } else {
+          bulmaJS.alert({
+            title: 'Error Updating File',
+            message: responseJSON.errorMessage ?? 'Please try again.',
+            contextualColorName: 'danger'
+          })
+        }
+      })
+    }
+
+    bulmaJS.confirm({
+      title: 'Mark File Ready to Process',
+      message: 'Are you sure you are ready for this file to be processed?',
+      contextualColorName: 'info',
+      okButton: {
+        text: 'Yes, Process File',
+        callbackFunction: doProcess
+      }
     })
   }
 
@@ -76,10 +287,12 @@ declare const cityssm: cityssmGlobal
           <span class="is-size-7">Uploaded ${recordCreateDate.toISOString()}</span>
         </td>
         <td class="is-size-7">
-          <span data-field="assetName">${
+          <span>${
             pendingFile.assetId === null
               ? '<i class="fas fa-fw fa-hat-wizard" aria-hidden="true"></i> Detect Asset from File'
-              : ''
+              : `<i class="fa-fw ${
+                  pendingFile.fontAwesomeIconClasses ?? 'fas fa-bolt'
+                }" aria-hidden="true"></i> <span data-field="assetName"></span>`
           }</span><br />
           <span>
             <i class="fas fa-fw fa-cog" aria-hidden="true"></i>
@@ -120,7 +333,17 @@ declare const cityssm: cityssmGlobal
         ) as HTMLElement
       ).textContent = pendingFile.originalFileName
 
-      rowElement.querySelector('.is-settings-button')?.addEventListener('click', openPendingDataFileSettings)
+      rowElement
+        .querySelector('.is-settings-button')
+        ?.addEventListener('click', openPendingDataFileSettings)
+
+      rowElement
+        .querySelector('.is-parse-button')
+        ?.addEventListener('click', confirmProcessPendingDataFile)
+
+      rowElement
+        .querySelector('.is-delete-button')
+        ?.addEventListener('click', confirmDeletePendingDataFile)
 
       tableElement.querySelector('tbody')?.append(rowElement)
     }

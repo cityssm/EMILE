@@ -1,3 +1,11 @@
+/**
+ * uploadedFilesProcessor
+ * - Accepts files uploaded through the web interface, or copied to the 'uploads' folder.
+ * - Validates that the file has an acceptable file extension.
+ * - Move the file to a storage folder.
+ * - Creates a database record for the new file.
+ */
+
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
@@ -7,7 +15,10 @@ import exitHook from 'exit-hook'
 import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async'
 
 import { addEnergyDataFile } from '../database/addEnergyDataFile.js'
-import { fileExtensions as allowedFileExtensions, getDefaultParserPropertiesByFileName } from '../parsers/parserHelpers.js'
+import {
+  fileExtensions as allowedFileExtensions,
+  getDefaultParserPropertiesByFileName
+} from '../parsers/parserHelpers.js'
 
 const debug = Debug('emile:tasks:uploadedFilesProcessor')
 
@@ -112,7 +123,8 @@ async function processUploadedFiles(): Promise<void> {
       path.join(systemFolderPath, systemFileName)
     )
 
-    const parserProperties = getDefaultParserPropertiesByFileName(originalFileName)
+    const parserProperties =
+      getDefaultParserPropertiesByFileName(originalFileName)
 
     addEnergyDataFile(
       {

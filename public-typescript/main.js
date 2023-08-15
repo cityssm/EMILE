@@ -32,6 +32,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
      * Asset Selector
      */
     function initializeAssetSelector(assetSelectorOptions) {
+        var _a, _b, _c;
         let assetSelectorCloseModalFunction;
         let assetFilterElement;
         let assetContainerElement;
@@ -49,6 +50,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
          */
         const groupIdElement = assetSelectorOptions.assetSelectorElement.querySelector('input[name="groupId"]');
         const allowGroupSelect = groupIdElement !== null;
+        /*
+         * Determine no selection text
+         */
+        let noSelectionText = (_a = buttonElement.dataset.noSelectionText) !== null && _a !== void 0 ? _a : '';
+        if (noSelectionText === '' &&
+            (assetIdElement === null || assetIdElement.value === '') &&
+            (groupIdElement === null || groupIdElement.value === '')) {
+            noSelectionText = (_b = buttonElement.textContent) !== null && _b !== void 0 ? _b : '';
+        }
+        if (noSelectionText === '' && allowGroupSelect) {
+            noSelectionText = '(Select Assets)';
+        }
+        if (noSelectionText === '') {
+            noSelectionText = '(Select Asset)';
+        }
         /*
          * Functions
          */
@@ -177,7 +193,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
             }
         }
         /*
-         * Initialize button
+         * Initialize buttons
          */
         buttonElement === null || buttonElement === void 0 ? void 0 : buttonElement.addEventListener('click', () => {
             cityssm.openHtmlModal('asset-select', {
@@ -220,6 +236,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
                     bulmaJS.toggleHtmlClipped();
                 }
             });
+        });
+        (_c = assetSelectorOptions.assetSelectorElement
+            .querySelector('.is-clear-button')) === null || _c === void 0 ? void 0 : _c.addEventListener('click', () => {
+            if (allowAssetSelect) {
+                assetIdElement.value = '';
+            }
+            if (allowGroupSelect) {
+                groupIdElement.value = '';
+            }
+            iconContainerElement.innerHTML =
+                '<i class="fas fa-bolt" aria-hidden="true"></i>';
+            buttonElement.textContent = noSelectionText;
+            if (assetSelectorOptions.callbackFunction !== undefined) {
+                assetSelectorOptions.callbackFunction({ type: 'clear' });
+            }
         });
     }
     /*

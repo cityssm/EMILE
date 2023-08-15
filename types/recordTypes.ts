@@ -1,7 +1,7 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable @typescript-eslint/indent */
 
-import type { AliasProperties, ParserProperties } from '../parsers/parserHelpers.js'
+import type { ParserProperties } from '../parsers/parserHelpers.js'
 
 interface RecordUserNameDateTime {
   recordCreate_userName: string
@@ -85,9 +85,7 @@ export interface AssetAliasType
   aliasTypeId?: number
   aliasType: string
   regularExpression?: string
-
-  aliasPropertiesJson?: string
-  aliasProperties?: AliasProperties
+  aliasTypeKey?: string
 }
 
 export interface AssetAlias
@@ -131,6 +129,8 @@ export interface EnergyDataFile extends Partial<RecordUserNameDateTime> {
 
   assetId?: number | null
   assetName?: string | null
+  category?: string | null
+  fontAwesomeIconClasses?: string | null
 
   isPending: boolean
 
@@ -140,6 +140,16 @@ export interface EnergyDataFile extends Partial<RecordUserNameDateTime> {
   processedTimeMillis?: number
   isFailed: boolean
   processedMessage?: string
+}
+
+export interface EnergyDataType
+  extends Partial<RecordUserNameDateTime>,
+    Partial<EnergyServiceCategory>,
+    Partial<EnergyUnit>,
+    Partial<EnergyReadingType>,
+    Partial<EnergyCommodity>,
+    Partial<EnergyAccumulationBehaviour> {
+  dataTypeId?: number
 }
 
 /*

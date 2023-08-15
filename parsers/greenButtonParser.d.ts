@@ -11,6 +11,8 @@ export interface GreenButtonParserProperties {
 }
 export declare class GreenButtonParser extends BaseParser {
     static fileExtensions: string[];
+    static aliasTypeKey: string;
+    static assetAliasType: import("../types/recordTypes.js").AssetAliasType | undefined;
     static parserUser: EmileUser;
     parseFile(): Promise<boolean>;
 }

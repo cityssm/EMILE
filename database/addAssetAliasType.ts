@@ -11,16 +11,12 @@ export function addAssetAliasType(
   const emileDB =
     connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB
 
-  const aliasPropertiesJson =
-    aliasType.aliasPropertiesJson ??
-    JSON.stringify(aliasType.aliasProperties ?? {})
-
   const rightNowMillis = Date.now()
 
   const result = emileDB
     .prepare(
       `insert into AssetAliasTypes (
-        aliasType, regularExpression, aliasPropertiesJson, orderNumber,
+        aliasType, regularExpression, aliasTypeKey, orderNumber,
         recordCreate_userName, recordCreate_timeMillis,
         recordUpdate_userName, recordUpdate_timeMillis)
         values (?, ?, ?, ?, ?, ?, ?, ?)`
@@ -28,7 +24,7 @@ export function addAssetAliasType(
     .run(
       aliasType.aliasType,
       aliasType.regularExpression ?? '',
-      aliasPropertiesJson,
+      aliasType.aliasTypeKey ?? '',
       aliasType.orderNumber ?? 0,
       sessionUser.userName,
       rightNowMillis,

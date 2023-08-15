@@ -19,5 +19,7 @@ export interface InitializeAssetSelectorOptions {
     } | {
         type: 'assetGroup';
         groupId: number;
+    } | {
+        type: 'clear';
     }) => void;
 }

@@ -1,6 +1,6 @@
 "use strict";
 // eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable unicorn/prefer-module */
+/* eslint-disable @typescript-eslint/indent */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -14,21 +14,160 @@ Object.defineProperty(exports, "__esModule", { value: true });
 (() => {
     var _a, _b;
     const Emile = exports.Emile;
-    /*
-     * Pending Files
-     */
+    const parserClasses = exports.parserClasses;
     let pendingFiles = exports.pendingFiles;
     delete exports.pendingFiles;
+    function updatePendingEnergyDataFile(formEvent) {
+        formEvent.preventDefault();
+        cityssm.postJSON(Emile.urlPrefix + '/data/doUpdatePendingEnergyDataFile', formEvent.currentTarget, (rawResponseJSON) => {
+            var _a, _b;
+            const responseJSON = rawResponseJSON;
+            if (responseJSON.success) {
+                bulmaJS.alert({
+                    message: 'File Updated Successfully',
+                    contextualColorName: 'success'
+                });
+                pendingFiles = (_a = responseJSON.pendingFiles) !== null && _a !== void 0 ? _a : [];
+                renderPendingFiles();
+            }
+            else {
+                bulmaJS.alert({
+                    title: 'Error Updating File',
+                    message: (_b = responseJSON.errorMessage) !== null && _b !== void 0 ? _b : 'Please try again.',
+                    contextualColorName: 'danger'
+                });
+            }
+        });
+    }
     function openPendingDataFileSettings(clickEvent) {
         var _a, _b;
         const fileId = Number.parseInt((_b = (_a = clickEvent.currentTarget.closest('tr')) === null || _a === void 0 ? void 0 : _a.dataset.fileId) !== null && _b !== void 0 ? _b : '', 10);
         const pendingFile = pendingFiles.find((possibleFile) => {
             return possibleFile.fileId === fileId;
         });
-        cityssm.openHtmlModal('data-parserSettings', {});
+        cityssm.openHtmlModal('data-parserSettings', {
+            onshow(modalElement) {
+                var _a, _b, _c, _d, _e, _f, _g;
+                ;
+                modalElement.querySelector('#energyDataFileEdit--fileId').value = (_b = (_a = pendingFile.fileId) === null || _a === void 0 ? void 0 : _a.toString()) !== null && _b !== void 0 ? _b : '';
+                modalElement.querySelector('[data-field="originalFileName"]').textContent = pendingFile.originalFileName;
+                if (pendingFile.assetId !== null) {
+                    ;
+                    modalElement.querySelector('#energyDataFileEdit--assetId').value = (_d = (_c = pendingFile.assetId) === null || _c === void 0 ? void 0 : _c.toString()) !== null && _d !== void 0 ? _d : '';
+                    modalElement.querySelector('#energyDataFileEdit--assetSelector .icon').innerHTML = `<i class="${(_e = pendingFile.fontAwesomeIconClasses) !== null && _e !== void 0 ? _e : 'fas fa-bolt'}" aria-hidden="true"></i>`;
+                    modalElement.querySelector('#energyDataFileEdit--assetSelector button').textContent = (_f = pendingFile.assetName) !== null && _f !== void 0 ? _f : '';
+                }
+                const parserClassSelectElement = modalElement.querySelector('#energyDataFileEdit--parserClass');
+                let parserClassFound = false;
+                for (const parserClass of parserClasses) {
+                    const optionElement = document.createElement('option');
+                    optionElement.value = parserClass;
+                    optionElement.textContent = parserClass;
+                    if (parserClass === ((_g = pendingFile.parserProperties) === null || _g === void 0 ? void 0 : _g.parserClass)) {
+                        optionElement.selected = true;
+                        parserClassFound = true;
+                    }
+                    parserClassSelectElement.append(optionElement);
+                }
+                if (!parserClassFound &&
+                    pendingFile.parserProperties !== undefined &&
+                    pendingFile.parserProperties.parserClass !== undefined) {
+                    const optionElement = document.createElement('option');
+                    optionElement.value = pendingFile.parserProperties.parserClass;
+                    optionElement.textContent = pendingFile.parserProperties.parserClass;
+                    optionElement.selected = true;
+                    parserClassSelectElement.append(optionElement);
+                }
+            },
+            onshown(modalElement, closeModalFunction) {
+                var _a;
+                bulmaJS.toggleHtmlClipped();
+                Emile.initializeAssetSelector({
+                    assetSelectorElement: modalElement.querySelector('#energyDataFileEdit--assetSelector')
+                });
+                (_a = modalElement
+                    .querySelector('form')) === null || _a === void 0 ? void 0 : _a.addEventListener('submit', updatePendingEnergyDataFile);
+            },
+            onremoved() {
+                bulmaJS.toggleHtmlClipped();
+            }
+        });
+    }
+    function confirmDeletePendingDataFile(clickEvent) {
+        var _a, _b;
+        const fileId = Number.parseInt((_b = (_a = clickEvent.currentTarget.closest('tr')) === null || _a === void 0 ? void 0 : _a.dataset.fileId) !== null && _b !== void 0 ? _b : '', 10);
+        function doDelete() {
+            cityssm.postJSON(Emile.urlPrefix + '/data/doDeletePendingEnergyDataFile', {
+                fileId
+            }, (rawResponseJSON) => {
+                var _a;
+                const responseJSON = rawResponseJSON;
+                if (responseJSON.success) {
+                    bulmaJS.alert({
+                        message: 'File Deleted Successfully',
+                        contextualColorName: 'success'
+                    });
+                    pendingFiles = responseJSON.pendingFiles;
+                    renderPendingFiles();
+                }
+                else {
+                    bulmaJS.alert({
+                        title: 'Error Deleting File',
+                        message: (_a = responseJSON.errorMessage) !== null && _a !== void 0 ? _a : 'Please try again.',
+                        contextualColorName: 'danger'
+                    });
+                }
+            });
+        }
+        bulmaJS.confirm({
+            title: 'Delete File',
+            message: 'Are you sure you want to delete this file?',
+            contextualColorName: 'warning',
+            okButton: {
+                text: 'Yes, Delete File',
+                callbackFunction: doDelete
+            }
+        });
+    }
+    function confirmProcessPendingDataFile(clickEvent) {
+        var _a, _b;
+        const fileId = Number.parseInt((_b = (_a = clickEvent.currentTarget.closest('tr')) === null || _a === void 0 ? void 0 : _a.dataset.fileId) !== null && _b !== void 0 ? _b : '', 10);
+        function doProcess() {
+            cityssm.postJSON(Emile.urlPrefix + '/data/doProcessPendingEnergyDataFile', {
+                fileId
+            }, (rawResponseJSON) => {
+                var _a;
+                const responseJSON = rawResponseJSON;
+                if (responseJSON.success) {
+                    bulmaJS.alert({
+                        title: 'File Marked for Processing Successfully',
+                        message: 'Processing may take a few minutes depending on how many files are being processed.',
+                        contextualColorName: 'success'
+                    });
+                    pendingFiles = responseJSON.pendingFiles;
+                    renderPendingFiles();
+                }
+                else {
+                    bulmaJS.alert({
+                        title: 'Error Updating File',
+                        message: (_a = responseJSON.errorMessage) !== null && _a !== void 0 ? _a : 'Please try again.',
+                        contextualColorName: 'danger'
+                    });
+                }
+            });
+        }
+        bulmaJS.confirm({
+            title: 'Mark File Ready to Process',
+            message: 'Are you sure you are ready for this file to be processed?',
+            contextualColorName: 'info',
+            okButton: {
+                text: 'Yes, Process File',
+                callbackFunction: doProcess
+            }
+        });
     }
     function renderPendingFiles() {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
         const pendingFilesCountElement = document.querySelector('#count--pendingFiles');
         const pendingFilesContainerElement = document.querySelector('#container--pendingFiles');
         pendingFilesCountElement.textContent = pendingFiles.length.toString();
@@ -56,14 +195,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
           <span class="is-size-7">Uploaded ${recordCreateDate.toISOString()}</span>
         </td>
         <td class="is-size-7">
-          <span data-field="assetName">${pendingFile.assetId === null
+          <span>${pendingFile.assetId === null
                 ? '<i class="fas fa-fw fa-hat-wizard" aria-hidden="true"></i> Detect Asset from File'
-                : ''}</span><br />
+                : `<i class="fa-fw ${(_b = pendingFile.fontAwesomeIconClasses) !== null && _b !== void 0 ? _b : 'fas fa-bolt'}" aria-hidden="true"></i> <span data-field="assetName"></span>`}</span><br />
           <span>
             <i class="fas fa-fw fa-cog" aria-hidden="true"></i>
-            ${((_c = (_b = pendingFile.parserProperties) === null || _b === void 0 ? void 0 : _b.parserClass) !== null && _c !== void 0 ? _c : '') === ''
+            ${((_d = (_c = pendingFile.parserProperties) === null || _c === void 0 ? void 0 : _c.parserClass) !== null && _d !== void 0 ? _d : '') === ''
                 ? 'No Parser Selected'
-                : (_e = (_d = pendingFile.parserProperties) === null || _d === void 0 ? void 0 : _d.parserClass) !== null && _e !== void 0 ? _e : ''}
+                : (_f = (_e = pendingFile.parserProperties) === null || _e === void 0 ? void 0 : _e.parserClass) !== null && _f !== void 0 ? _f : ''}
           </span>
         </td>
         <td class="has-text-right">
@@ -71,7 +210,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
             <span class="icon"><i class="fas fa-pencil-alt" aria-hidden="true"></i></span>
             <span>Settings</span>
           </button>
-          <button class="button is-success is-parse-button" type="button" ${((_g = (_f = pendingFile.parserProperties) === null || _f === void 0 ? void 0 : _f.parserClass) !== null && _g !== void 0 ? _g : '') === ''
+          <button class="button is-success is-parse-button" type="button" ${((_h = (_g = pendingFile.parserProperties) === null || _g === void 0 ? void 0 : _g.parserClass) !== null && _h !== void 0 ? _h : '') === ''
                 ? 'disabled'
                 : ''}>
             <span class="icon"><i class="fas fa-cogs" aria-hidden="true"></i></span>
@@ -83,12 +222,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
         </td>`;
             if (pendingFile.assetId !== null) {
                 ;
-                rowElement.querySelector('[data-field="assetName"]').textContent = (_h = pendingFile.assetName) !== null && _h !== void 0 ? _h : '';
+                rowElement.querySelector('[data-field="assetName"]').textContent = (_j = pendingFile.assetName) !== null && _j !== void 0 ? _j : '';
             }
             ;
             rowElement.querySelector('[data-field="originalFileName"]').textContent = pendingFile.originalFileName;
-            (_j = rowElement.querySelector('.is-settings-button')) === null || _j === void 0 ? void 0 : _j.addEventListener('click', openPendingDataFileSettings);
-            (_k = tableElement.querySelector('tbody')) === null || _k === void 0 ? void 0 : _k.append(rowElement);
+            (_k = rowElement
+                .querySelector('.is-settings-button')) === null || _k === void 0 ? void 0 : _k.addEventListener('click', openPendingDataFileSettings);
+            (_l = rowElement
+                .querySelector('.is-parse-button')) === null || _l === void 0 ? void 0 : _l.addEventListener('click', confirmProcessPendingDataFile);
+            (_m = rowElement
+                .querySelector('.is-delete-button')) === null || _m === void 0 ? void 0 : _m.addEventListener('click', confirmDeletePendingDataFile);
+            (_o = tableElement.querySelector('tbody')) === null || _o === void 0 ? void 0 : _o.append(rowElement);
         }
         pendingFilesContainerElement.innerHTML = '';
         pendingFilesContainerElement.append(tableElement);

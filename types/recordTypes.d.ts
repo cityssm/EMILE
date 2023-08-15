@@ -1,4 +1,4 @@
-import type { AliasProperties, ParserProperties } from '../parsers/parserHelpers.js';
+import type { ParserProperties } from '../parsers/parserHelpers.js';
 interface RecordUserNameDateTime {
     recordCreate_userName: string;
     recordCreate_timeMillis: number;
@@ -43,8 +43,7 @@ export interface AssetAliasType extends Partial<RecordUserNameDateTime>, Partial
     aliasTypeId?: number;
     aliasType: string;
     regularExpression?: string;
-    aliasPropertiesJson?: string;
-    aliasProperties?: AliasProperties;
+    aliasTypeKey?: string;
 }
 export interface AssetAlias extends Partial<RecordUserNameDateTime>, Partial<AssetAliasType> {
     aliasId?: number;
@@ -74,12 +73,17 @@ export interface EnergyDataFile extends Partial<RecordUserNameDateTime> {
     systemFolderPath: string;
     assetId?: number | null;
     assetName?: string | null;
+    category?: string | null;
+    fontAwesomeIconClasses?: string | null;
     isPending: boolean;
     parserPropertiesJson?: string | null;
     parserProperties?: ParserProperties;
     processedTimeMillis?: number;
     isFailed: boolean;
     processedMessage?: string;
+}
+export interface EnergyDataType extends Partial<RecordUserNameDateTime>, Partial<EnergyServiceCategory>, Partial<EnergyUnit>, Partial<EnergyReadingType>, Partial<EnergyCommodity>, Partial<EnergyAccumulationBehaviour> {
+    dataTypeId?: number;
 }
 declare global {
     interface EmileUser extends Partial<RecordUserNameDateTime> {

@@ -1,3 +1,6 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable @typescript-eslint/indent */
+
 import sqlite from 'better-sqlite3'
 
 import { databasePath } from '../helpers/functions.database.js'
@@ -5,10 +8,16 @@ import type { Asset } from '../types/recordTypes.js'
 
 import { getAssetAliases } from './getAssetAliases.js'
 
-export function getAsset(assetId: string | number): Asset | undefined {
-  const emileDB = sqlite(databasePath, {
-    readonly: true
-  })
+export function getAsset(
+  assetId: string | number,
+  connectedEmileDB?: sqlite.Database
+): Asset | undefined {
+  const emileDB =
+    connectedEmileDB === undefined
+      ? sqlite(databasePath, {
+          readonly: true
+        })
+      : connectedEmileDB
 
   const asset = emileDB
     .prepare(
@@ -30,7 +39,39 @@ export function getAsset(assetId: string | number): Asset | undefined {
     )
   }
 
-  emileDB.close()
+  if (connectedEmileDB === undefined) {
+    emileDB.close()
+  }
 
   return asset
+}
+
+export function getAssetByAssetAlias(
+  assetAlias: string,
+  aliasTypeId?: number | string
+): Asset | undefined {
+  const emileDB = sqlite(databasePath, {
+    readonly: true
+  })
+
+  let sql = `select assetId from AssetAliases
+    where recordDelete_timeMillis is null
+    and assetAlias = ?`
+
+  const sqlParameters: unknown[] = [assetAlias]
+
+  if (aliasTypeId !== undefined) {
+    sql += ' and aliasTypeId = ?'
+    sqlParameters.push(aliasTypeId)
+  }
+
+  const asset = emileDB.prepare(sql).get(sqlParameters) as
+    | { assetId: number }
+    | undefined
+
+  if (asset !== undefined) {
+    return getAsset(asset.assetId, emileDB)
+  }
+
+  return undefined
 }
