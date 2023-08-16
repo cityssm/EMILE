@@ -66,24 +66,27 @@ export interface AssetGroup extends Partial<RecordUserNameDateTime> {
     groupMembers?: Asset[];
     groupMemberCount?: number;
 }
-export interface EnergyDataFile extends Partial<RecordUserNameDateTime> {
+export interface EnergyDataFile extends Partial<RecordUserNameDateTime>, Partial<Asset> {
     fileId?: number;
     originalFileName: string;
     systemFileName: string;
     systemFolderPath: string;
-    assetId?: number | null;
-    assetName?: string | null;
-    category?: string | null;
-    fontAwesomeIconClasses?: string | null;
     isPending: boolean;
     parserPropertiesJson?: string | null;
     parserProperties?: ParserProperties;
     processedTimeMillis?: number;
     isFailed: boolean;
     processedMessage?: string;
+    energyDataCount?: number;
 }
 export interface EnergyDataType extends Partial<RecordUserNameDateTime>, Partial<EnergyServiceCategory>, Partial<EnergyUnit>, Partial<EnergyReadingType>, Partial<EnergyCommodity>, Partial<EnergyAccumulationBehaviour> {
     dataTypeId?: number;
+}
+export interface EnergyData extends Partial<RecordUserNameDateTime>, Partial<Asset>, Partial<EnergyDataType>, Partial<EnergyDataFile> {
+    timeSeconds: number;
+    durationSeconds: number;
+    endTimeSeconds?: number;
+    dataValue: number;
 }
 declare global {
     interface EmileUser extends Partial<RecordUserNameDateTime> {

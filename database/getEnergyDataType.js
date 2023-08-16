@@ -13,7 +13,7 @@ export function getEnergyDataType(dataTypeId, connectedEmileDB) {
         })
         : connectedEmileDB;
     const energyDataType = emileDB
-        .prepare(`select t.dateTypeId,
+        .prepare(`select t.dataTypeId,
           t.serviceCategoryId, s.serviceCategory,
           t.unitId, u.unit, u.unitLong,
           t.readingTypeId, r.readingType,
@@ -40,51 +40,72 @@ export function getEnergyDataType(dataTypeId, connectedEmileDB) {
 }
 export function getEnergyDataTypeByGreenButtonIds(greenButtonIds, sessionUser, createIfUnavailable = true) {
     const emileDB = sqlite(databasePath);
-    let energyDataType = emileDB
-        .prepare(`select t.dateTypeId,
-          t.serviceCategoryId, s.serviceCategory,
-          t.unitId, u.unit, u.unitLong,
-          t.readingTypeId, r.readingType,
-          t.commodityId, c.commodity,
-          t.accumulationBehaviourId, a.accumulationBehaviour
-        from EnergyDataTypes t
-        left join EnergyServiceCategories s
-          on t.serviceCategoryId = s.serviceCategoryId
-        left join EnergyUnits u
-          on t.unitId = u.unitId
-        left join EnergyReadingTypes r
-          on t.readingTypeId = r.readingTypeId
-        left join EnergyCommodities c
-          on t.commodityId = c.commodityId
-        left join EnergyAccumulationBehaviours a
-          on t.accumulationBehaviourId = a.accumulationBehaviourId
-        where t.recordDelete_timeMillis is null
-          and s.greenButtonId = ?
-          and u.greenButtonId = ?
-          and r.greenButtonId = ?
-          and c.greenButtonId = ?
-          and a.greenButtonId = ?`)
-        .get(greenButtonIds.serviceCategoryId, greenButtonIds.unitId, greenButtonIds.readingTypeId, greenButtonIds.commodityId, greenButtonIds.accumulationBehaviourId);
+    console.log(greenButtonIds);
+    let sql = `select t.dataTypeId,
+      t.serviceCategoryId, s.serviceCategory,
+      t.unitId, u.unit, u.unitLong,
+      t.readingTypeId, r.readingType,
+      t.commodityId, c.commodity,
+      t.accumulationBehaviourId, a.accumulationBehaviour
+    from EnergyDataTypes t
+    left join EnergyServiceCategories s
+      on t.serviceCategoryId = s.serviceCategoryId
+    left join EnergyUnits u
+      on t.unitId = u.unitId
+    left join EnergyReadingTypes r
+      on t.readingTypeId = r.readingTypeId
+    left join EnergyCommodities c
+      on t.commodityId = c.commodityId
+    left join EnergyAccumulationBehaviours a
+      on t.accumulationBehaviourId = a.accumulationBehaviourId
+    where t.recordDelete_timeMillis is null
+      and s.greenButtonId = ?
+      and u.greenButtonId = ?`;
+    const sqlParameters = [
+        greenButtonIds.serviceCategoryId,
+        greenButtonIds.unitId
+    ];
+    if (greenButtonIds.readingTypeId !== undefined) {
+        sql += ' and r.greenButtonId = ?';
+        sqlParameters.push(greenButtonIds.readingTypeId);
+    }
+    if (greenButtonIds.commodityId !== undefined) {
+        sql += ' and c.greenButtonId = ?';
+        sqlParameters.push(greenButtonIds.commodityId);
+    }
+    if (greenButtonIds.accumulationBehaviourId !== undefined) {
+        sql += ' and a.greenButtonId = ?';
+        sqlParameters.push(greenButtonIds.accumulationBehaviourId);
+    }
+    let energyDataType = emileDB.prepare(sql).get(sqlParameters);
     if (energyDataType === undefined && createIfUnavailable) {
         const serviceCategory = getEnergyServiceCategoryByGreenButtonId(greenButtonIds.serviceCategoryId, emileDB);
         const unit = getEnergyUnitByGreenButtonId(greenButtonIds.unitId, emileDB);
-        const readingType = getEnergyReadingTypeByGreenButtonId(greenButtonIds.readingTypeId, emileDB);
-        const commodity = getEnergyCommodityByGreenButtonId(greenButtonIds.commodityId, emileDB);
-        const accumulationBehaviour = getEnergyAccumulationBehaviourByGreenButtonId(greenButtonIds.accumulationBehaviourId);
+        const readingType = greenButtonIds.readingTypeId === undefined
+            ? undefined
+            : getEnergyReadingTypeByGreenButtonId(greenButtonIds.readingTypeId, emileDB);
+        const commodity = greenButtonIds.commodityId === undefined
+            ? undefined
+            : getEnergyCommodityByGreenButtonId(greenButtonIds.commodityId, emileDB);
+        const accumulationBehaviour = greenButtonIds.accumulationBehaviourId === undefined
+            ? undefined
+            : getEnergyAccumulationBehaviourByGreenButtonId(greenButtonIds.accumulationBehaviourId);
         if (serviceCategory === undefined ||
             unit === undefined ||
-            readingType === undefined ||
-            commodity === undefined ||
-            accumulationBehaviour === undefined) {
+            (readingType === undefined &&
+                greenButtonIds.readingTypeId !== undefined) ||
+            (commodity === undefined && greenButtonIds.commodityId !== undefined) ||
+            (accumulationBehaviour === undefined &&
+                greenButtonIds.accumulationBehaviourId !== undefined)) {
             emileDB.close();
             return undefined;
         }
         const dataTypeId = addEnergyDataType({
             serviceCategoryId: serviceCategory.serviceCategoryId,
             unitId: unit.unitId,
-            readingTypeId: readingType.readingTypeId,
-            commodityId: commodity.commodityId,
-            accumulationBehaviourId: accumulationBehaviour.accumulationBehaviourId
+            readingTypeId: readingType?.readingTypeId,
+            commodityId: commodity?.commodityId,
+            accumulationBehaviourId: accumulationBehaviour?.accumulationBehaviourId
         }, sessionUser, emileDB);
         energyDataType = getEnergyDataType(dataTypeId, emileDB);
     }

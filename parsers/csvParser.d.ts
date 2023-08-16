@@ -1,9 +1,4 @@
-import { BaseParser, type StringComparison } from './baseParser.js';
-export interface CsvAliasProperties {
-    aliasType: 'CSV';
-    columnName: string;
-    comparison: StringComparison;
-}
+import { BaseParser } from './baseParser.js';
 export interface CsvParserProperties {
     parserClass: 'CsvParser';
 }

@@ -5,19 +5,14 @@ import * as greenButtonParser from '@cityssm/green-button-parser'
 
 import { addAsset } from '../database/addAsset.js'
 import { addAssetAlias } from '../database/addAssetAlias.js'
+import { addEnergyData } from '../database/addEnergyData.js'
 import { getAssetByAssetAlias } from '../database/getAsset.js'
 import { getAssetAliasTypeByAliasTypeKey } from '../database/getAssetAliasType.js'
 import { getEnergyDataTypeByGreenButtonIds } from '../database/getEnergyDataType.js'
+import { updateEnergyDataFileAsProcessed } from '../database/updateEnergyDataFile.js'
 import { getAssetCategories } from '../helpers/functions.cache.js'
 
-import { BaseParser, type StringComparison } from './baseParser.js'
-
-export interface GreenButtonAliasProperties {
-  aliasType: 'GreenButton'
-  contentType: greenButtonParser.types.GreenButtonContentType
-  entryKey: 'id' | 'title' | 'link'
-  comparison: StringComparison
-}
+import { BaseParser } from './baseParser.js'
 
 export interface GreenButtonParserProperties {
   parserClass: 'GreenButtonParser'
@@ -56,6 +51,10 @@ export class GreenButtonParser extends BaseParser {
           'IntervalBlock'
         )
 
+      if (intervalBlockEntries.length === 0) {
+        throw new Error('File contains no IntervalBlock entries.')
+      }
+
       for (const intervalBlockEntry of intervalBlockEntries) {
         /*
          * Ensure an assetId is available
@@ -69,8 +68,13 @@ export class GreenButtonParser extends BaseParser {
 
         let assetId = this.energyDataFile.assetId
 
-        // Detect asset
+        /*
+         * Detect asset if not set
+         */
+
         if ((assetId ?? '') === '') {
+          console.log(`assetAlias: ${assetAlias}`)
+
           const asset = getAssetByAssetAlias(
             assetAlias,
             GreenButtonParser.assetAliasType?.aliasTypeId
@@ -148,12 +152,11 @@ export class GreenButtonParser extends BaseParser {
               '',
             unitId: readingType.content.ReadingType.uom?.toString() ?? '',
             readingTypeId:
-              readingType.content.ReadingType.kind?.toString() ?? '',
+              readingType.content.ReadingType.kind?.toString(),
             commodityId:
-              readingType.content.ReadingType.commodity?.toString() ?? '',
+              readingType.content.ReadingType.commodity?.toString(),
             accumulationBehaviourId:
-              readingType.content.ReadingType.accumulationBehaviour?.toString() ??
-              ''
+              readingType.content.ReadingType.accumulationBehaviour?.toString()
           },
           GreenButtonParser.parserUser,
           true
@@ -169,10 +172,30 @@ export class GreenButtonParser extends BaseParser {
 
         for (const intervalBlock of intervalBlockEntry.content.IntervalBlock) {
           for (const intervalReading of intervalBlock.IntervalReading ?? []) {
-            // TODO - RECORD READINGS
+            if (
+              intervalReading.timePeriod !== undefined &&
+              intervalReading.value !== undefined
+            ) {
+              addEnergyData(
+                {
+                  assetId,
+                  dataTypeId: energyDataType.dataTypeId,
+                  fileId: this.energyDataFile.fileId,
+                  timeSeconds: intervalReading.timePeriod?.start,
+                  durationSeconds: intervalReading.timePeriod?.duration,
+                  dataValue: intervalReading.value
+                },
+                GreenButtonParser.parserUser
+              )
+            }
           }
         }
       }
+
+      updateEnergyDataFileAsProcessed(
+        this.energyDataFile.fileId as number,
+        GreenButtonParser.parserUser
+      )
     } catch (error) {
       this.handleParseFileError(error)
       return false

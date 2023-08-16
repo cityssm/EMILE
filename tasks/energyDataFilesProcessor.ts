@@ -11,6 +11,7 @@ import type { BaseParser } from '../parsers/baseParser.js'
 import { CsvParser } from '../parsers/csvParser.js'
 import { GreenButtonParser } from '../parsers/greenButtonParser.js'
 import { getParserClasses } from '../parsers/parserHelpers.js'
+import type { RunFileProcessorWorkerMessage } from '../types/applicationTypes.js'
 
 const debug = Debug('emile:tasks:energyDataFilesProcessor')
 
@@ -26,14 +27,33 @@ const processorUser: EmileUser = {
  */
 
 let terminateTask = false
+let isRunning = false
+let runAgainOnComplete = false
 
 async function processFiles(): Promise<void> {
+  if (isRunning) {
+    debug('Already running')
+    runAgainOnComplete = true
+    return
+  }
+
+  debug('Process started')
+
+  isRunning = true
+  runAgainOnComplete = false
+
   const dataFiles = getEnergyDataFilesToProcess()
 
+  if (dataFiles.length > 0) {
+    debug(`${dataFiles.length} files to process.`)
+  }
+
   for (const dataFile of dataFiles) {
-    if (terminateTask) {
+    if (terminateTask || runAgainOnComplete) {
       break
     }
+
+    debug(`Parsing ${dataFile.originalFileName} ...`)
 
     /*
      * Validate file exists and can be read
@@ -117,7 +137,27 @@ async function processFiles(): Promise<void> {
      * Parse the file
      */
 
-    await parser.parseFile()
+    try {
+      await parser.parseFile()
+    } catch {
+      updateEnergyDataFileAsFailed(
+        {
+          fileId: dataFile.fileId as number,
+          processedTimeMillis: Date.now(),
+          processedMessage: `Error parsing file: ${
+            (dataFile.parserProperties?.parserClass as string) ?? ''
+          }`
+        },
+        processorUser
+      )
+    }
+  }
+
+  isRunning = false
+
+  if (!terminateTask && runAgainOnComplete) {
+    runAgainOnComplete = false
+    await processFiles()
   }
 }
 
@@ -130,7 +170,7 @@ await processFiles().catch((error) => {
   debug(error)
 })
 
-const intervalID = setIntervalAsync(processFiles, 3 * 60 * 1000)
+const intervalID = setIntervalAsync(processFiles, 10 * 60 * 1000)
 
 exitHook(() => {
   terminateTask = true
@@ -138,5 +178,20 @@ exitHook(() => {
     void clearIntervalAsync(intervalID)
   } catch {
     debug('Error exiting task.')
+  }
+})
+
+/*
+ * Response to messaging
+ */
+
+/*
+ * Respond to messaging
+ */
+
+process.on('message', (message: RunFileProcessorWorkerMessage) => {
+  if (message.messageType === 'runFileProcessor') {
+    debug('Running by request')
+    void processFiles()
   }
 })

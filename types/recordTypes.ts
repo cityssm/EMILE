@@ -121,16 +121,13 @@ export interface AssetGroup extends Partial<RecordUserNameDateTime> {
  * Energy Data
  */
 
-export interface EnergyDataFile extends Partial<RecordUserNameDateTime> {
+export interface EnergyDataFile
+  extends Partial<RecordUserNameDateTime>,
+    Partial<Asset> {
   fileId?: number
   originalFileName: string
   systemFileName: string
   systemFolderPath: string
-
-  assetId?: number | null
-  assetName?: string | null
-  category?: string | null
-  fontAwesomeIconClasses?: string | null
 
   isPending: boolean
 
@@ -140,6 +137,8 @@ export interface EnergyDataFile extends Partial<RecordUserNameDateTime> {
   processedTimeMillis?: number
   isFailed: boolean
   processedMessage?: string
+
+  energyDataCount?: number
 }
 
 export interface EnergyDataType
@@ -151,6 +150,17 @@ export interface EnergyDataType
     Partial<EnergyAccumulationBehaviour> {
   dataTypeId?: number
 }
+
+export interface EnergyData
+  extends Partial<RecordUserNameDateTime>,
+    Partial<Asset>,
+    Partial<EnergyDataType>,
+    Partial<EnergyDataFile> {
+      timeSeconds: number
+      durationSeconds: number
+      endTimeSeconds?: number
+      dataValue: number
+    }
 
 /*
  * USER TYPES

@@ -16,5 +16,17 @@
   },
   "compileOnSave": true,
   "buildOnSave": true,
-  "exclude": ["node_modules/*", "public-typescript/*"]
+  "exclude": ["node_modules/*", "public-typescript/*"],
+  "include": [
+    "*",
+    "bin/*",
+    "data/*",
+    "database/*",
+    "handlers/**/*",
+    "helpers/*",
+    "parsers/*",
+    "routes/*",
+    "tasks/*",
+    "types/*"
+  ]
 }

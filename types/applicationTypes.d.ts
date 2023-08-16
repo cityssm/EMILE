@@ -1,5 +1,6 @@
+type MessageTypes = 'clearCache' | 'runFileProcessor';
 export interface WorkerMessage {
-    messageType: string;
+    messageType: MessageTypes;
     timeMillis: number;
     pid: number;
 }
@@ -8,3 +9,7 @@ export interface ClearCacheWorkerMessage extends WorkerMessage {
     messageType: 'clearCache';
     tableName: CacheTableName;
 }
+export interface RunFileProcessorWorkerMessage extends WorkerMessage {
+    messageType: 'runFileProcessor';
+}
+export {};

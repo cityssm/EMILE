@@ -1,6 +1,6 @@
 import '../helpers/polyfills.js'
 
-import { fork } from 'node:child_process'
+import { fork, type ChildProcess } from 'node:child_process'
 import type { Worker } from 'node:cluster'
 import cluster from 'node:cluster'
 import os from 'node:os'
@@ -46,6 +46,7 @@ const clusterSettings = {
 cluster.setupPrimary(clusterSettings)
 
 const activeWorkers = new Map<number, Worker>()
+let fileProcessorChildProcess: ChildProcess
 
 for (let index = 0; index < processCount; index += 1) {
   const worker = cluster.fork()
@@ -55,13 +56,28 @@ for (let index = 0; index < processCount; index += 1) {
 }
 
 cluster.on('message', (worker, message: WorkerMessage) => {
-  for (const [pid, activeWorker] of activeWorkers.entries()) {
-    if (activeWorker === undefined || pid === message.pid) {
-      continue
-    }
+  switch (message.messageType) {
+    case 'clearCache': {
+      for (const [pid, activeWorker] of activeWorkers.entries()) {
+        if (activeWorker === undefined || pid === message.pid) {
+          continue
+        }
 
-    debug(`Relaying message to worker: ${pid}`)
-    activeWorker.send(message)
+        debug(`Relaying message to worker: ${pid}`)
+        activeWorker.send(message)
+      }
+      break
+    }
+    case 'runFileProcessor': {
+      if (
+        fileProcessorChildProcess === undefined ||
+        fileProcessorChildProcess.exitCode !== null
+      ) {
+        debug('File Processor Child Process unavailable.')
+      } else {
+        fileProcessorChildProcess.send(message)
+      }
+    }
   }
 })
 
@@ -91,4 +107,6 @@ if (process.env.STARTUP_TEST === 'true') {
   }, 10_000)
 } else {
   fork('./tasks/uploadedFilesProcessor.js')
+
+  fileProcessorChildProcess = fork('./tasks/energyDataFilesProcessor.js')
 }

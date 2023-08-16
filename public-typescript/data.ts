@@ -26,6 +26,7 @@ declare const cityssm: cityssmGlobal
     | {
         success: true
         pendingFiles: EnergyDataFile[]
+        processedFiles?: EnergyDataFile[]
       }
     | {
         success: false
@@ -165,28 +166,31 @@ declare const cityssm: cityssmGlobal
     )
 
     function doDelete(): void {
-      cityssm.postJSON(Emile.urlPrefix + '/data/doDeletePendingEnergyDataFile', {
-        fileId
-      },
-      (rawResponseJSON) => {
-        const responseJSON = rawResponseJSON as PendingFilesResponseJSON
+      cityssm.postJSON(
+        Emile.urlPrefix + '/data/doDeletePendingEnergyDataFile',
+        {
+          fileId
+        },
+        (rawResponseJSON) => {
+          const responseJSON = rawResponseJSON as PendingFilesResponseJSON
 
-        if (responseJSON.success) {
-          bulmaJS.alert({
-            message: 'File Deleted Successfully',
-            contextualColorName: 'success'
-          })
+          if (responseJSON.success) {
+            bulmaJS.alert({
+              message: 'File Deleted Successfully',
+              contextualColorName: 'success'
+            })
 
-          pendingFiles = responseJSON.pendingFiles
-          renderPendingFiles()
-        } else {
-          bulmaJS.alert({
-            title: 'Error Deleting File',
-            message: responseJSON.errorMessage ?? 'Please try again.',
-            contextualColorName: 'danger'
-          })
+            pendingFiles = responseJSON.pendingFiles
+            renderPendingFiles()
+          } else {
+            bulmaJS.alert({
+              title: 'Error Deleting File',
+              message: responseJSON.errorMessage ?? 'Please try again.',
+              contextualColorName: 'danger'
+            })
+          }
         }
-      })
+      )
     }
 
     bulmaJS.confirm({
@@ -208,29 +212,33 @@ declare const cityssm: cityssmGlobal
     )
 
     function doProcess(): void {
-      cityssm.postJSON(Emile.urlPrefix + '/data/doProcessPendingEnergyDataFile', {
-        fileId
-      },
-      (rawResponseJSON) => {
-        const responseJSON = rawResponseJSON as PendingFilesResponseJSON
+      cityssm.postJSON(
+        Emile.urlPrefix + '/data/doProcessPendingEnergyDataFile',
+        {
+          fileId
+        },
+        (rawResponseJSON) => {
+          const responseJSON = rawResponseJSON as PendingFilesResponseJSON
 
-        if (responseJSON.success) {
-          bulmaJS.alert({
-            title: 'File Marked for Processing Successfully',
-            message: 'Processing may take a few minutes depending on how many files are being processed.',
-            contextualColorName: 'success'
-          })
+          if (responseJSON.success) {
+            bulmaJS.alert({
+              title: 'File Marked for Processing Successfully',
+              message:
+                'Processing may take a few minutes depending on how many files are being processed.',
+              contextualColorName: 'success'
+            })
 
-          pendingFiles = responseJSON.pendingFiles
-          renderPendingFiles()
-        } else {
-          bulmaJS.alert({
-            title: 'Error Updating File',
-            message: responseJSON.errorMessage ?? 'Please try again.',
-            contextualColorName: 'danger'
-          })
+            pendingFiles = responseJSON.pendingFiles
+            renderPendingFiles()
+          } else {
+            bulmaJS.alert({
+              title: 'Error Updating File',
+              message: responseJSON.errorMessage ?? 'Please try again.',
+              contextualColorName: 'danger'
+            })
+          }
         }
-      })
+      )
     }
 
     bulmaJS.confirm({
@@ -355,11 +363,197 @@ declare const cityssm: cityssmGlobal
   renderPendingFiles()
 
   /*
-   * Failed Files
+   * Processed Files
    */
 
-  let failedFiles = exports.failedFiles as EnergyDataFile[]
-  delete exports.failedFiles
+  type ProcessedFilesResponseJSON =
+    | {
+        success: true
+        processedFiles: EnergyDataFile[]
+        pendingFiles?: EnergyDataFile[]
+      }
+    | {
+        success: false
+        errorMessage: string
+      }
+
+  let processedFiles = exports.processedFiles as EnergyDataFile[]
+  delete exports.processedFiles
+
+  function confirmReprocessProcessedDataFile(clickEvent: Event): void {
+    const fileId = Number.parseInt(
+      (clickEvent.currentTarget as HTMLButtonElement).closest('tr')?.dataset
+        .fileId ?? '',
+      10
+    )
+
+    function doReprocess(): void {
+      cityssm.postJSON(
+        Emile.urlPrefix + '/data/doReprocessProcessedEnergyDataFile',
+        {
+          fileId
+        },
+        (rawResponseJSON) => {
+          const responseJSON = rawResponseJSON as ProcessedFilesResponseJSON
+
+          if (responseJSON.success) {
+            bulmaJS.alert({
+              title: 'File Marked Moved to Pending List',
+              message:
+                'All data associated with the file has been deleted. You can now change any necessary processing settings, and process the file again.',
+              contextualColorName: 'success'
+            })
+
+            pendingFiles = responseJSON.pendingFiles ?? []
+            renderPendingFiles()
+
+            processedFiles = responseJSON.processedFiles
+            renderProcessedFiles()
+          } else {
+            bulmaJS.alert({
+              title: 'Error Updating File',
+              message: responseJSON.errorMessage ?? 'Please try again.',
+              contextualColorName: 'danger'
+            })
+          }
+        }
+      )
+    }
+
+    bulmaJS.confirm({
+      title: 'Mark File for Reprocessing',
+      message: 'Are you sure you want to reprocess this file?',
+      contextualColorName: 'info',
+      okButton: {
+        text: 'Yes, Reprocess File',
+        callbackFunction: doReprocess
+      }
+    })
+  }
+
+  function confirmDeleteProcessedDataFile(clickEvent: Event): void {
+    const fileId = Number.parseInt(
+      (clickEvent.currentTarget as HTMLButtonElement).closest('tr')?.dataset
+        .fileId ?? '',
+      10
+    )
+
+    function doDelete(): void {
+      cityssm.postJSON(
+        Emile.urlPrefix + '/data/doDeleteProcessedEnergyDataFile',
+        {
+          fileId
+        },
+        (rawResponseJSON) => {
+          const responseJSON = rawResponseJSON as ProcessedFilesResponseJSON
+
+          if (responseJSON.success) {
+            bulmaJS.alert({
+              message: 'File Deleted Successfully',
+              contextualColorName: 'success'
+            })
+
+            processedFiles = responseJSON.processedFiles
+            renderProcessedFiles()
+          } else {
+            bulmaJS.alert({
+              title: 'Error Deleting File',
+              message: responseJSON.errorMessage ?? 'Please try again.',
+              contextualColorName: 'danger'
+            })
+          }
+        }
+      )
+    }
+
+    bulmaJS.confirm({
+      title: 'Delete File',
+      message: 'Are you sure you want to delete this file?',
+      contextualColorName: 'warning',
+      okButton: {
+        text: 'Yes, Delete File',
+        callbackFunction: doDelete
+      }
+    })
+  }
+
+  function renderProcessedFiles(): void {
+    const containerElement = document.querySelector(
+      '#container--processedFiles'
+    ) as HTMLElement
+
+    const tableElement = document.createElement('table')
+    tableElement.className =
+      'table is-fullwidth is-striped is-hoverable has-sticky-header'
+    tableElement.innerHTML = `<thead><tr>
+      <th class="has-width-10"><span class="is-sr-only">Processed Status</span></th>
+      <th>Processed File</th>
+      <th>Results</th>
+      <th><span class="is-sr-only">Options</span></th>
+      </tr></thead>
+      <tbody></tbody>`
+
+    for (const dataFile of processedFiles) {
+      const rowElement = document.createElement('tr')
+      rowElement.dataset.fileId = dataFile.fileId?.toString()
+
+      rowElement.innerHTML = `<td>
+        ${
+          dataFile.isFailed
+            ? '<i class="fas fa-exclamation-circle has-text-danger" aria-hidden="true"></i>'
+            : '<i class="fas fa-check-circle has-text-success" aria-hidden="true"></i>'
+        }
+        </td>
+        <td><strong data-field="originalFileName"></strong></td>
+        <td data-field="results"></td>
+        <td class="has-text-right">
+          <button class="button is-warning is-reprocess-button" type="button">
+            <span class="icon"><i class="fas fa-cogs" aria-hidden="true"></i></span>
+            <span>Process Again</span>
+          </button>
+          ${
+            dataFile.isFailed
+              ? `<button class="button is-light is-danger is-delete-button" type="button">
+                  <i class="fas fa-trash" aria-hidden="true"></i>
+                  </button>`
+              : ''
+          }
+        </td>`
+      ;(
+        rowElement.querySelector(
+          '[data-field="originalFileName"]'
+        ) as HTMLElement
+      ).textContent = dataFile.originalFileName
+      ;(
+        rowElement.querySelector(
+          '[data-field="results"]'
+        ) as HTMLElement
+      ).textContent = dataFile.isFailed
+        ? dataFile.processedMessage ?? ''
+        : `${dataFile.energyDataCount ?? 0} data points`
+
+      rowElement
+        .querySelector('.is-reprocess-button')
+        ?.addEventListener('click', confirmReprocessProcessedDataFile)
+
+      rowElement
+        .querySelector('.is-delete-button')
+        ?.addEventListener('click', confirmDeleteProcessedDataFile)
+
+      tableElement.querySelector('tbody')?.append(rowElement)
+    }
+
+    if (processedFiles.length === 0) {
+      containerElement.innerHTML = `<div class="message is-info">
+        <p class="message-body">There are no processed files to display.</p>
+        </div>`
+    } else {
+      containerElement.innerHTML = ''
+      containerElement.append(tableElement)
+    }
+  }
+
+  renderProcessedFiles()
 
   /*
    * Upload Handling
@@ -418,22 +612,17 @@ declare const cityssm: cityssmGlobal
       .then(async (response) => {
         return await response.json()
       })
-      .then(
-        (responseJSON: {
-          success: boolean
-          pendingFiles: EnergyDataFile[]
-          failedFiles: EnergyDataFile[]
-        }) => {
-          if (responseJSON.success) {
-            pendingFiles = responseJSON.pendingFiles
-            renderPendingFiles()
+      .then((responseJSON: PendingFilesResponseJSON) => {
+        if (responseJSON.success) {
+          pendingFiles = responseJSON.pendingFiles
+          renderPendingFiles()
 
-            failedFiles = responseJSON.failedFiles
-          }
-
-          return responseJSON.success
+          processedFiles = responseJSON.processedFiles ?? []
+          renderProcessedFiles()
         }
-      )
+
+        return responseJSON.success
+      })
       .catch(() => {
         bulmaJS.alert({
           message: 'Error processing files.',

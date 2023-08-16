@@ -9,7 +9,7 @@ export function addAssetAlias(assetAlias, sessionUser, connectedEmileDB) {
         recordCreate_userName, recordCreate_timeMillis,
         recordUpdate_userName, recordUpdate_timeMillis)
         values (?, ?, ?, ?, ?, ?, ?)`)
-        .run(assetAlias.aliasId, assetAlias.aliasTypeId, assetAlias.assetAlias, sessionUser.userName, rightNowMillis, sessionUser.userName, rightNowMillis);
+        .run(assetAlias.assetId, assetAlias.aliasTypeId, assetAlias.assetAlias, sessionUser.userName, rightNowMillis, sessionUser.userName, rightNowMillis);
     if (connectedEmileDB === undefined) {
         emileDB.close();
     }

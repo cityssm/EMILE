@@ -142,9 +142,9 @@ export function initializeDatabase() {
         dataTypeId integer primary key autoincrement,
         serviceCategoryId integer not null references EnergyServiceCategories (serviceCategoryId),
         unitId integer not null references EnergyUnits (unitId),
-        readingTypeId integer not null references EnergyReadingTypes (readingTypeId),
-        commodityId integer not null references EnergyCommodities (commodityId),
-        accumulationBehaviourId integer not null references EnergyAccumulationBehaviours (accumulationBehaviourId),
+        readingTypeId integer references EnergyReadingTypes (readingTypeId),
+        commodityId integer references EnergyCommodities (commodityId),
+        accumulationBehaviourId integer references EnergyAccumulationBehaviours (accumulationBehaviourId),
         ${recordColumns}
       )`)
         .run();

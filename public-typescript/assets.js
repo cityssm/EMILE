@@ -143,7 +143,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         openAssetByAssetId(assetId);
     }
     function renderAssets() {
-        var _a, _b, _c, _d, _e, _f, _g, _h;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
         ;
         document.querySelector('#count--assets').textContent =
             Emile.assets.length.toString();
@@ -195,14 +195,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
         </td>
         <td data-field="category"></td>
         <td><a data-field="assetName" href="#"></a></td>
-        <td class="has-width-10 has-text-centered">
+        <td class="has-width-10 has-text-centered has-text-nowrap">
           ${((_f = asset.latitude) !== null && _f !== void 0 ? _f : '') === '' || ((_g = asset.longitude) !== null && _g !== void 0 ? _g : '') === ''
                 ? ''
                 : `<a class="has-tooltip-left" data-tooltip="Open Map" href="${Emile.getMapLink(asset.latitude, asset.longitude)}" target="_blank" rel="noopener noreferrer" aria-label="Open Map">
                 <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                ${(_h = asset.latitude) !== null && _h !== void 0 ? _h : 0}, ${(_j = asset.longitude) !== null && _j !== void 0 ? _j : 0}
                 </a>`}
         </td>`;
-            rowElement.querySelector('[data-field="category"]').textContent = (_h = asset.category) !== null && _h !== void 0 ? _h : '';
+            rowElement.querySelector('[data-field="category"]').textContent = (_k = asset.category) !== null && _k !== void 0 ? _k : '';
             const assetNameElement = rowElement.querySelector('[data-field="assetName"]');
             assetNameElement.textContent = asset.assetName;
             assetNameElement.addEventListener('click', openAssetByClick);
@@ -395,7 +396,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         tableElement.innerHTML = `<thead><tr>
       <th>Group</th>
       <th class="has-text-centered has-width-10">
-        <i class="fas fa-city" aria-hidden="true"></i>
+        <i class="fas fa-bolt" aria-hidden="true"></i>
         <span class="is-sr-only">Number of Assets</span>
       </th>
       </tr></thead>

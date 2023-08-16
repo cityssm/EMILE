@@ -4,7 +4,7 @@ export declare function getEnergyDataType(dataTypeId: number | string, connected
 export declare function getEnergyDataTypeByGreenButtonIds(greenButtonIds: {
     serviceCategoryId: string;
     unitId: string;
-    readingTypeId: string;
-    commodityId: string;
-    accumulationBehaviourId: string;
+    readingTypeId?: string;
+    commodityId?: string;
+    accumulationBehaviourId?: string;
 }, sessionUser: EmileUser, createIfUnavailable?: boolean): EnergyDataType | undefined;

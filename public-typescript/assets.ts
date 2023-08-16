@@ -9,7 +9,7 @@ import type { BulmaJS } from '@cityssm/bulma-js/types.js'
 import type { cityssmGlobal } from '@cityssm/bulma-webapp-js/src/types.js'
 
 import type { Emile as EmileGlobal } from '../types/globalTypes.js'
-import type { Asset, AssetCategory, AssetGroup } from '../types/recordTypes.js'
+import type { Asset, AssetGroup } from '../types/recordTypes.js'
 
 declare const bulmaJS: BulmaJS
 declare const cityssm: cityssmGlobal
@@ -307,7 +307,7 @@ interface ErrorResponse {
         </td>
         <td data-field="category"></td>
         <td><a data-field="assetName" href="#"></a></td>
-        <td class="has-width-10 has-text-centered">
+        <td class="has-width-10 has-text-centered has-text-nowrap">
           ${
             (asset.latitude ?? '') === '' || (asset.longitude ?? '') === ''
               ? ''
@@ -316,6 +316,7 @@ interface ErrorResponse {
                   asset.longitude as number
                 )}" target="_blank" rel="noopener noreferrer" aria-label="Open Map">
                 <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                ${asset.latitude ?? 0}, ${asset.longitude ?? 0}
                 </a>`
           }
         </td>`
@@ -629,7 +630,7 @@ interface ErrorResponse {
     tableElement.innerHTML = `<thead><tr>
       <th>Group</th>
       <th class="has-text-centered has-width-10">
-        <i class="fas fa-city" aria-hidden="true"></i>
+        <i class="fas fa-bolt" aria-hidden="true"></i>
         <span class="is-sr-only">Number of Assets</span>
       </th>
       </tr></thead>

@@ -83,6 +83,31 @@ export function updatePendingEnergyDataFile(
   return result.changes > 0
 }
 
+export function updateEnergyDataFileAsReadyToPending(
+  fileId: string | number,
+  sessionUser: EmileUser
+): boolean {
+  const emileDB = sqlite(databasePath)
+
+  const result = emileDB
+    .prepare(
+      `update EnergyDataFiles
+        set isPending = 1,
+        isFailed = 0,
+        processedTimeMillis = null,
+        processedMessage = null,
+        recordUpdate_userName = ?,
+        recordUpdate_timeMillis = ?
+        where recordDelete_timeMillis is null
+        and fileId = ?`
+    )
+    .run(sessionUser.userName, Date.now(), fileId)
+
+  emileDB.close()
+
+  return result.changes > 0
+}
+
 export function updateEnergyDataFileAsReadyToProcess(
   fileId: string | number,
   sessionUser: EmileUser
@@ -102,6 +127,30 @@ export function updateEnergyDataFileAsReadyToProcess(
         and fileId = ?`
     )
     .run(sessionUser.userName, Date.now(), fileId)
+
+  emileDB.close()
+
+  return result.changes > 0
+}
+
+export function updateEnergyDataFileAsProcessed(
+  fileId: number,
+  sessionUser: EmileUser
+): boolean {
+  const emileDB = sqlite(databasePath)
+
+  const rightNow = Date.now()
+
+  const result = emileDB
+    .prepare(
+      `update EnergyDataFiles
+        set processedTimeMillis = ?,
+        recordUpdate_userName = ?,
+        recordUpdate_timeMillis = ?
+        where recordDelete_timeMillis is null
+        and fileId = ?`
+    )
+    .run(rightNow, sessionUser.userName, Date.now(), fileId)
 
   emileDB.close()
 

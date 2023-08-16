@@ -13,6 +13,7 @@ import rateLimit from 'express-rate-limit';
 import session from 'express-session';
 import createError from 'http-errors';
 import FileStore from 'session-file-store';
+import { updateGetHandler } from './handlers/permissions.js';
 import { getSafeRedirectURL } from './helpers/functions.authentication.js';
 import configFunctions, { getConfigProperty } from './helpers/functions.config.js';
 import routerAssets from './routes/assets.js';
@@ -21,7 +22,6 @@ import routerData from './routes/data.js';
 import routerLogin from './routes/login.js';
 import routerReports from './routes/reports.js';
 import { version } from './version.js';
-import { updateGetHandler } from './handlers/permissions.js';
 const debug = Debug(`emile:app:${process.pid}`);
 if (getConfigProperty('tempUsers').length > 0) {
     debug('Temporary user accounts currently active!');
@@ -62,6 +62,7 @@ app.use('/favicon.ico', express.static(path.join('public', 'images', 'favicon', 
 app.use(`${urlPrefix}/favicon.ico`, express.static(path.join('public', 'images', 'favicon', 'favicon.ico')));
 app.use(`${urlPrefix}/lib/cityssm-bulma-js/bulma-js.js`, express.static(path.join('node_modules', '@cityssm', 'bulma-js', 'dist', 'bulma-js.js')));
 app.use(`${urlPrefix}/lib/cityssm-bulma-webapp-js`, express.static(path.join('node_modules', '@cityssm', 'bulma-webapp-js', 'dist')));
+app.use(`${urlPrefix}/lib/chartJs`, express.static(path.join('node_modules', 'chart.js', 'dist')));
 app.use(`${urlPrefix}/lib/fa`, express.static(path.join('node_modules', '@fortawesome', 'fontawesome-free')));
 const sessionCookieName = getConfigProperty('session.cookieName');
 const FileStoreSession = FileStore(session);

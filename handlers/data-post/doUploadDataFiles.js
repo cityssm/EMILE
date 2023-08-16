@@ -1,5 +1,5 @@
 import multer from 'multer';
-import { getFailedEnergyDataFiles, getPendingEnergyDataFiles } from '../../database/getEnergyDataFiles.js';
+import { getPendingEnergyDataFiles, getProcessedEnergyDataFiles } from '../../database/getEnergyDataFiles.js';
 export const storage = multer.diskStorage({
     destination: (request, file, callback) => {
         callback(null, './data/files/uploads');
@@ -10,11 +10,11 @@ export const storage = multer.diskStorage({
 });
 export function successHandler(request, response) {
     const pendingFiles = getPendingEnergyDataFiles();
-    const failedFiles = getFailedEnergyDataFiles();
+    const processedFiles = getProcessedEnergyDataFiles('');
     response.json({
         success: true,
         pendingFiles,
-        failedFiles
+        processedFiles
     });
 }
 export default {

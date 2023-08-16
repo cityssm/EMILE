@@ -22,7 +22,7 @@ export function addAssetAlias(
         values (?, ?, ?, ?, ?, ?, ?)`
     )
     .run(
-      assetAlias.aliasId,
+      assetAlias.assetId,
       assetAlias.aliasTypeId,
       assetAlias.assetAlias,
       sessionUser.userName,

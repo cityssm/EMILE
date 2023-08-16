@@ -16,12 +16,26 @@ const processorUser = {
     isAdmin: true
 };
 let terminateTask = false;
+let isRunning = false;
+let runAgainOnComplete = false;
 async function processFiles() {
+    if (isRunning) {
+        debug('Already running');
+        runAgainOnComplete = true;
+        return;
+    }
+    debug('Process started');
+    isRunning = true;
+    runAgainOnComplete = false;
     const dataFiles = getEnergyDataFilesToProcess();
+    if (dataFiles.length > 0) {
+        debug(`${dataFiles.length} files to process.`);
+    }
     for (const dataFile of dataFiles) {
-        if (terminateTask) {
+        if (terminateTask || runAgainOnComplete) {
             break;
         }
+        debug(`Parsing ${dataFile.originalFileName} ...`);
         const filePath = path.join(dataFile.systemFolderPath, dataFile.systemFileName);
         try {
             await fs.access(filePath, fs.constants.R_OK);
@@ -62,14 +76,28 @@ async function processFiles() {
                 continue;
             }
         }
-        await parser.parseFile();
+        try {
+            await parser.parseFile();
+        }
+        catch {
+            updateEnergyDataFileAsFailed({
+                fileId: dataFile.fileId,
+                processedTimeMillis: Date.now(),
+                processedMessage: `Error parsing file: ${dataFile.parserProperties?.parserClass ?? ''}`
+            }, processorUser);
+        }
+    }
+    isRunning = false;
+    if (!terminateTask && runAgainOnComplete) {
+        runAgainOnComplete = false;
+        await processFiles();
     }
 }
 await processFiles().catch((error) => {
     debug('Error running task.');
     debug(error);
 });
-const intervalID = setIntervalAsync(processFiles, 3 * 60 * 1000);
+const intervalID = setIntervalAsync(processFiles, 10 * 60 * 1000);
 exitHook(() => {
     terminateTask = true;
     try {
@@ -77,5 +105,11 @@ exitHook(() => {
     }
     catch {
         debug('Error exiting task.');
+    }
+});
+process.on('message', (message) => {
+    if (message.messageType === 'runFileProcessor') {
+        debug('Running by request');
+        void processFiles();
     }
 });

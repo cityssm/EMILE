@@ -1,15 +1,15 @@
 import { getAssets } from '../../database/getAssets.js';
-import { getFailedEnergyDataFiles, getPendingEnergyDataFiles } from '../../database/getEnergyDataFiles.js';
+import { getPendingEnergyDataFiles, getProcessedEnergyDataFiles } from '../../database/getEnergyDataFiles.js';
 import { getParserClasses } from '../../parsers/parserHelpers.js';
 export function handler(request, response) {
     const pendingFiles = getPendingEnergyDataFiles();
-    const failedFiles = getFailedEnergyDataFiles();
+    const processedFiles = getProcessedEnergyDataFiles('');
     const assets = getAssets();
     const parserClasses = getParserClasses();
     response.render('data', {
         headTitle: 'Data',
         pendingFiles,
-        failedFiles,
+        processedFiles,
         assets,
         parserClasses
     });

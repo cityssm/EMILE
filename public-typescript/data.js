@@ -238,11 +238,138 @@ Object.defineProperty(exports, "__esModule", { value: true });
         pendingFilesContainerElement.append(tableElement);
     }
     renderPendingFiles();
-    /*
-     * Failed Files
-     */
-    let failedFiles = exports.failedFiles;
-    delete exports.failedFiles;
+    let processedFiles = exports.processedFiles;
+    delete exports.processedFiles;
+    function confirmReprocessProcessedDataFile(clickEvent) {
+        var _a, _b;
+        const fileId = Number.parseInt((_b = (_a = clickEvent.currentTarget.closest('tr')) === null || _a === void 0 ? void 0 : _a.dataset.fileId) !== null && _b !== void 0 ? _b : '', 10);
+        function doReprocess() {
+            cityssm.postJSON(Emile.urlPrefix + '/data/doReprocessProcessedEnergyDataFile', {
+                fileId
+            }, (rawResponseJSON) => {
+                var _a, _b;
+                const responseJSON = rawResponseJSON;
+                if (responseJSON.success) {
+                    bulmaJS.alert({
+                        title: 'File Marked Moved to Pending List',
+                        message: 'All data associated with the file has been deleted. You can now change any necessary processing settings, and process the file again.',
+                        contextualColorName: 'success'
+                    });
+                    pendingFiles = (_a = responseJSON.pendingFiles) !== null && _a !== void 0 ? _a : [];
+                    renderPendingFiles();
+                    processedFiles = responseJSON.processedFiles;
+                    renderProcessedFiles();
+                }
+                else {
+                    bulmaJS.alert({
+                        title: 'Error Updating File',
+                        message: (_b = responseJSON.errorMessage) !== null && _b !== void 0 ? _b : 'Please try again.',
+                        contextualColorName: 'danger'
+                    });
+                }
+            });
+        }
+        bulmaJS.confirm({
+            title: 'Mark File for Reprocessing',
+            message: 'Are you sure you want to reprocess this file?',
+            contextualColorName: 'info',
+            okButton: {
+                text: 'Yes, Reprocess File',
+                callbackFunction: doReprocess
+            }
+        });
+    }
+    function confirmDeleteProcessedDataFile(clickEvent) {
+        var _a, _b;
+        const fileId = Number.parseInt((_b = (_a = clickEvent.currentTarget.closest('tr')) === null || _a === void 0 ? void 0 : _a.dataset.fileId) !== null && _b !== void 0 ? _b : '', 10);
+        function doDelete() {
+            cityssm.postJSON(Emile.urlPrefix + '/data/doDeleteProcessedEnergyDataFile', {
+                fileId
+            }, (rawResponseJSON) => {
+                var _a;
+                const responseJSON = rawResponseJSON;
+                if (responseJSON.success) {
+                    bulmaJS.alert({
+                        message: 'File Deleted Successfully',
+                        contextualColorName: 'success'
+                    });
+                    processedFiles = responseJSON.processedFiles;
+                    renderProcessedFiles();
+                }
+                else {
+                    bulmaJS.alert({
+                        title: 'Error Deleting File',
+                        message: (_a = responseJSON.errorMessage) !== null && _a !== void 0 ? _a : 'Please try again.',
+                        contextualColorName: 'danger'
+                    });
+                }
+            });
+        }
+        bulmaJS.confirm({
+            title: 'Delete File',
+            message: 'Are you sure you want to delete this file?',
+            contextualColorName: 'warning',
+            okButton: {
+                text: 'Yes, Delete File',
+                callbackFunction: doDelete
+            }
+        });
+    }
+    function renderProcessedFiles() {
+        var _a, _b, _c, _d, _e, _f;
+        const containerElement = document.querySelector('#container--processedFiles');
+        const tableElement = document.createElement('table');
+        tableElement.className =
+            'table is-fullwidth is-striped is-hoverable has-sticky-header';
+        tableElement.innerHTML = `<thead><tr>
+      <th class="has-width-10"><span class="is-sr-only">Processed Status</span></th>
+      <th>Processed File</th>
+      <th>Results</th>
+      <th><span class="is-sr-only">Options</span></th>
+      </tr></thead>
+      <tbody></tbody>`;
+        for (const dataFile of processedFiles) {
+            const rowElement = document.createElement('tr');
+            rowElement.dataset.fileId = (_a = dataFile.fileId) === null || _a === void 0 ? void 0 : _a.toString();
+            rowElement.innerHTML = `<td>
+        ${dataFile.isFailed
+                ? '<i class="fas fa-exclamation-circle has-text-danger" aria-hidden="true"></i>'
+                : '<i class="fas fa-check-circle has-text-success" aria-hidden="true"></i>'}
+        </td>
+        <td><strong data-field="originalFileName"></strong></td>
+        <td data-field="results"></td>
+        <td class="has-text-right">
+          <button class="button is-warning is-reprocess-button" type="button">
+            <span class="icon"><i class="fas fa-cogs" aria-hidden="true"></i></span>
+            <span>Process Again</span>
+          </button>
+          ${dataFile.isFailed
+                ? `<button class="button is-light is-danger is-delete-button" type="button">
+                  <i class="fas fa-trash" aria-hidden="true"></i>
+                  </button>`
+                : ''}
+        </td>`;
+            rowElement.querySelector('[data-field="originalFileName"]').textContent = dataFile.originalFileName;
+            rowElement.querySelector('[data-field="results"]').textContent = dataFile.isFailed
+                ? (_b = dataFile.processedMessage) !== null && _b !== void 0 ? _b : ''
+                : `${(_c = dataFile.energyDataCount) !== null && _c !== void 0 ? _c : 0} data points`;
+            (_d = rowElement
+                .querySelector('.is-reprocess-button')) === null || _d === void 0 ? void 0 : _d.addEventListener('click', confirmReprocessProcessedDataFile);
+            (_e = rowElement
+                .querySelector('.is-delete-button')) === null || _e === void 0 ? void 0 : _e.addEventListener('click', confirmDeleteProcessedDataFile);
+            (_f = tableElement.querySelector('tbody')) === null || _f === void 0 ? void 0 : _f.append(rowElement);
+        }
+        if (processedFiles.length === 0) {
+            containerElement.innerHTML = `<div class="message is-info">
+        <p class="message-body">There are no processed files to display.</p>
+        </div>`;
+        }
+        else {
+            containerElement.innerHTML = '';
+            containerElement.append(tableElement);
+        }
+    }
+    renderProcessedFiles();
     /*
      * Upload Handling
      */
@@ -290,10 +417,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
             return yield response.json();
         }))
             .then((responseJSON) => {
+            var _a;
             if (responseJSON.success) {
                 pendingFiles = responseJSON.pendingFiles;
                 renderPendingFiles();
-                failedFiles = responseJSON.failedFiles;
+                processedFiles = (_a = responseJSON.processedFiles) !== null && _a !== void 0 ? _a : [];
+                renderProcessedFiles();
             }
             return responseJSON.success;
         })

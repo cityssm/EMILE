@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express'
 import multer from 'multer'
 
-import { getFailedEnergyDataFiles, getPendingEnergyDataFiles } from '../../database/getEnergyDataFiles.js'
+import { getPendingEnergyDataFiles, getProcessedEnergyDataFiles } from '../../database/getEnergyDataFiles.js'
 
 export const storage = multer.diskStorage({
   destination: (request, file, callback) => {
@@ -16,12 +16,12 @@ export const storage = multer.diskStorage({
 
 export function successHandler(request: Request, response: Response): void {
   const pendingFiles = getPendingEnergyDataFiles()
-  const failedFiles = getFailedEnergyDataFiles()
+  const processedFiles = getProcessedEnergyDataFiles('')
 
   response.json({
     success: true,
     pendingFiles,
-    failedFiles
+    processedFiles
   })
 }
 

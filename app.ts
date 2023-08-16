@@ -19,6 +19,7 @@ import session from 'express-session'
 import createError from 'http-errors'
 import FileStore from 'session-file-store'
 
+import { updateGetHandler } from './handlers/permissions.js'
 import { getSafeRedirectURL } from './helpers/functions.authentication.js'
 import configFunctions, {
   getConfigProperty
@@ -29,7 +30,6 @@ import routerData from './routes/data.js'
 import routerLogin from './routes/login.js'
 import routerReports from './routes/reports.js'
 import { version } from './version.js'
-import { updateGetHandler } from './handlers/permissions.js'
 
 const debug = Debug(`emile:app:${process.pid}`)
 
@@ -128,6 +128,11 @@ app.use(
   express.static(
     path.join('node_modules', '@cityssm', 'bulma-webapp-js', 'dist')
   )
+)
+
+app.use(
+  `${urlPrefix}/lib/chartJs`,
+  express.static(path.join('node_modules', 'chart.js', 'dist'))
 )
 
 app.use(

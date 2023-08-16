@@ -21,7 +21,7 @@ export class BaseParser {
         deleteEnergyDataByFileId(this.energyDataFile.fileId, BaseParser.parserUser);
         updateEnergyDataFileAsFailed({
             fileId: this.energyDataFile.fileId,
-            processedMessage: error.name,
+            processedMessage: `${error.message}`,
             processedTimeMillis: Date.now()
         }, BaseParser.parserUser);
     }

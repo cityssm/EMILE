@@ -35,7 +35,7 @@ export class BaseParser {
     updateEnergyDataFileAsFailed(
       {
         fileId: this.energyDataFile.fileId as number,
-        processedMessage: error.name,
+        processedMessage: `${error.message}`,
         processedTimeMillis: Date.now()
       },
       BaseParser.parserUser

@@ -1,10 +1,8 @@
 import {
-  type CsvAliasProperties,
   CsvParser,
   type CsvParserProperties
 } from './csvParser.js'
 import {
-  type GreenButtonAliasProperties,
   GreenButtonParser,
   type GreenButtonParserProperties
 } from './greenButtonParser.js'
@@ -12,8 +10,6 @@ import {
 /*
  * Parser Types
  */
-
-export type AliasProperties = GreenButtonAliasProperties | CsvAliasProperties
 
 export type ParserProperties = GreenButtonParserProperties | CsvParserProperties
 

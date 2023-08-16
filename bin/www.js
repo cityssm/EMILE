@@ -20,6 +20,7 @@ const clusterSettings = {
 };
 cluster.setupPrimary(clusterSettings);
 const activeWorkers = new Map();
+let fileProcessorChildProcess;
 for (let index = 0; index < processCount; index += 1) {
     const worker = cluster.fork();
     if (worker.process.pid !== undefined) {
@@ -27,12 +28,26 @@ for (let index = 0; index < processCount; index += 1) {
     }
 }
 cluster.on('message', (worker, message) => {
-    for (const [pid, activeWorker] of activeWorkers.entries()) {
-        if (activeWorker === undefined || pid === message.pid) {
-            continue;
+    switch (message.messageType) {
+        case 'clearCache': {
+            for (const [pid, activeWorker] of activeWorkers.entries()) {
+                if (activeWorker === undefined || pid === message.pid) {
+                    continue;
+                }
+                debug(`Relaying message to worker: ${pid}`);
+                activeWorker.send(message);
+            }
+            break;
         }
-        debug(`Relaying message to worker: ${pid}`);
-        activeWorker.send(message);
+        case 'runFileProcessor': {
+            if (fileProcessorChildProcess === undefined ||
+                fileProcessorChildProcess.exitCode !== null) {
+                debug('File Processor Child Process unavailable.');
+            }
+            else {
+                fileProcessorChildProcess.send(message);
+            }
+        }
     }
 });
 cluster.on('exit', (worker) => {
@@ -54,4 +69,5 @@ if (process.env.STARTUP_TEST === 'true') {
 }
 else {
     fork('./tasks/uploadedFilesProcessor.js');
+    fileProcessorChildProcess = fork('./tasks/energyDataFilesProcessor.js');
 }

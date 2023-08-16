@@ -2,14 +2,14 @@ import type { Request, Response } from 'express'
 
 import { getAssets } from '../../database/getAssets.js'
 import {
-  getFailedEnergyDataFiles,
-  getPendingEnergyDataFiles
+  getPendingEnergyDataFiles,
+  getProcessedEnergyDataFiles
 } from '../../database/getEnergyDataFiles.js'
 import { getParserClasses } from '../../parsers/parserHelpers.js'
 
 export function handler(request: Request, response: Response): void {
   const pendingFiles = getPendingEnergyDataFiles()
-  const failedFiles = getFailedEnergyDataFiles()
+  const processedFiles = getProcessedEnergyDataFiles('')
 
   const assets = getAssets()
 
@@ -18,7 +18,7 @@ export function handler(request: Request, response: Response): void {
   response.render('data', {
     headTitle: 'Data',
     pendingFiles,
-    failedFiles,
+    processedFiles,
     assets,
     parserClasses
   })
