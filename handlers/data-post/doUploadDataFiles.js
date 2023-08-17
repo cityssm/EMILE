@@ -17,7 +17,7 @@ export function successHandler(request, response) {
         processedFiles
     });
 }
-export default {
+export const handlers = {
     uploadHander: multer({ storage }),
     successHandler
 };

@@ -5,10 +5,10 @@ import handler_doDeleteProcessedEnergyDataFile from '../handlers/data-post/doDel
 import handler_doProcessPendingEnergyDataFile from '../handlers/data-post/doProcessPendingEnergyDataFile.js';
 import handler_doReprocessProcessedEnergyDataFile from '../handlers/data-post/doReprocessProcessedEnergyDataFile.js';
 import handler_doUpdatePendingEnergyDataFile from '../handlers/data-post/doUpdatePendingEnergyDataFile.js';
-import handler_doUploadDataFiles from '../handlers/data-post/doUploadDataFiles.js';
+import { handlers as handlers_doUploadDataFiles } from '../handlers/data-post/doUploadDataFiles.js';
 export const router = Router();
 router.get('/', handler_data);
-router.post('/doUploadDataFiles', handler_doUploadDataFiles.uploadHander.array('file'), handler_doUploadDataFiles.successHandler);
+router.post('/doUploadDataFiles', handlers_doUploadDataFiles.uploadHander.array('file'), handlers_doUploadDataFiles.successHandler);
 router.post('/doUpdatePendingEnergyDataFile', handler_doUpdatePendingEnergyDataFile);
 router.post('/doProcessPendingEnergyDataFile', handler_doProcessPendingEnergyDataFile);
 router.post('/doDeletePendingEnergyDataFile', handler_doDeletePendingEnergyDataFile);
