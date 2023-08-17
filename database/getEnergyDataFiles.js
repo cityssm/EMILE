@@ -33,6 +33,10 @@ function getEnergyDataFiles(filters, options) {
         sql += ' and f.isFailed = ?';
         sqlParameters.push(filters.isFailed ? 1 : 0);
     }
+    if ((filters.searchString ?? '') !== '') {
+        sql += ' and (instr(f.originalFileName, ?) > 0)';
+        sqlParameters.push(filters.searchString);
+    }
     sql += ` group by ${groupByColumnNames}
     order by f.recordUpdate_timeMillis desc`;
     if (options.limit !== -1) {
@@ -72,7 +76,8 @@ export function getFailedEnergyDataFiles() {
 }
 export function getProcessedEnergyDataFiles(searchString) {
     return getEnergyDataFiles({
-        isProcessed: true
+        isProcessed: true,
+        searchString
     }, {
         includeAssetDetails: true,
         includeSystemFileAndFolder: false,

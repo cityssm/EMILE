@@ -79,7 +79,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
                     parserClassSelectElement.append(optionElement);
                 }
             },
-            onshown(modalElement, closeModalFunction) {
+            onshown(modalElement) {
                 var _a;
                 bulmaJS.toggleHtmlClipped();
                 Emile.initializeAssetSelector({

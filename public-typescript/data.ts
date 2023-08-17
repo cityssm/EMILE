@@ -140,7 +140,7 @@ declare const cityssm: cityssmGlobal
           parserClassSelectElement.append(optionElement)
         }
       },
-      onshown(modalElement, closeModalFunction) {
+      onshown(modalElement) {
         bulmaJS.toggleHtmlClipped()
 
         Emile.initializeAssetSelector({

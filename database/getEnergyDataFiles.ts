@@ -10,6 +10,7 @@ interface GetEnergyDataFilesFilters {
   isPending?: boolean
   isProcessed?: boolean
   isFailed?: boolean
+  searchString?: string
 }
 
 interface GetEnergyDataFilesOptions {
@@ -67,6 +68,11 @@ function getEnergyDataFiles(
 
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     sqlParameters.push(filters.isFailed ? 1 : 0)
+  }
+
+  if ((filters.searchString ?? '') !== '') {
+    sql += ' and (instr(f.originalFileName, ?) > 0)'
+    sqlParameters.push(filters.searchString)
   }
 
   sql += ` group by ${groupByColumnNames}
@@ -129,7 +135,8 @@ export function getProcessedEnergyDataFiles(
 ): EnergyDataFile[] {
   return getEnergyDataFiles(
     {
-      isProcessed: true
+      isProcessed: true,
+      searchString
     },
     {
       includeAssetDetails: true,
