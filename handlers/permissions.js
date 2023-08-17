@@ -11,7 +11,7 @@ export const adminGetHandler = (request, response, next) => {
         next();
         return;
     }
-    response.redirect(urlPrefix + '/dashboard');
+    response.redirect(`${urlPrefix}/dashboard`);
 };
 export const adminPostHandler = (request, response, next) => {
     if (request.session.user?.isAdmin ?? false) {
@@ -25,7 +25,7 @@ export const updateGetHandler = (request, response, next) => {
         next();
         return;
     }
-    response.redirect(urlPrefix + '/dashboard');
+    response.redirect(`${urlPrefix}/dashboard`);
 };
 export const updatePostHandler = (request, response, next) => {
     if (request.session.user?.canUpdate ?? false) {

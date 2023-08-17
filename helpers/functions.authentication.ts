@@ -19,7 +19,7 @@ async function authenticateViaActiveDirectory(
     try {
       const ad = new ActiveDirectory(activeDirectoryConfig)
 
-      ad.authenticate(userDomain + '\\' + userName, password, (error, auth) => {
+      ad.authenticate(`${userDomain}\\${userName}`, password, (error, auth) => {
         let authenticated = false
 
         if ((error ?? '') === '') {
@@ -41,7 +41,7 @@ async function authenticateViaADWebAuth(
   password: string
 ): Promise<boolean> {
   return await adWebAuth.authenticate(
-    userDomain + '\\' + userName,
+    `${userDomain}\\${userName}`,
     password,
     adWebAuthConfig
   )
@@ -80,5 +80,5 @@ export function getSafeRedirectURL(possibleRedirectURL = ''): string {
     }
   }
 
-  return urlPrefix + '/dashboard/'
+  return `${urlPrefix}/dashboard/`
 }

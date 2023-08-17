@@ -29,9 +29,7 @@ async function processUploadedFiles() {
     processAgainOnComplete = false;
     const fileNames = await fs.readdir(uploadsFolder);
     const rightNow = new Date();
-    const systemFolderPath = path.join(importedFolderRoot, rightNow.getFullYear().toString() +
-        '-' +
-        (rightNow.getMonth() + 1).toString());
+    const systemFolderPath = path.join(importedFolderRoot, `${rightNow.getFullYear().toString()}-${(rightNow.getMonth() + 1).toString()}`);
     try {
         await fs.mkdir(systemFolderPath);
     }

@@ -66,9 +66,7 @@ async function processUploadedFiles(): Promise<void> {
 
   const systemFolderPath = path.join(
     importedFolderRoot,
-    rightNow.getFullYear().toString() +
-      '-' +
-      (rightNow.getMonth() + 1).toString()
+    `${rightNow.getFullYear().toString()}-${(rightNow.getMonth() + 1).toString()}`
   )
 
   try {

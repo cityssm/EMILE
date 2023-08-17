@@ -10,7 +10,7 @@ async function authenticateViaActiveDirectory(userName, password) {
     return await new Promise((resolve) => {
         try {
             const ad = new ActiveDirectory(activeDirectoryConfig);
-            ad.authenticate(userDomain + '\\' + userName, password, (error, auth) => {
+            ad.authenticate(`${userDomain}\\${userName}`, password, (error, auth) => {
                 let authenticated = false;
                 if ((error ?? '') === '') {
                     authenticated = auth;
@@ -25,7 +25,7 @@ async function authenticateViaActiveDirectory(userName, password) {
 }
 const adWebAuthConfig = getConfigProperty('adWebAuthConfig');
 async function authenticateViaADWebAuth(userName, password) {
-    return await adWebAuth.authenticate(userDomain + '\\' + userName, password, adWebAuthConfig);
+    return await adWebAuth.authenticate(`${userDomain}\\${userName}`, password, adWebAuthConfig);
 }
 const authenticateFunction = activeDirectoryConfig === undefined
     ? authenticateViaADWebAuth
@@ -48,5 +48,5 @@ export function getSafeRedirectURL(possibleRedirectURL = '') {
             return urlPrefix + urlToCheck;
         }
     }
-    return urlPrefix + '/dashboard/';
+    return `${urlPrefix}/dashboard/`;
 }

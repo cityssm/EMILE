@@ -223,7 +223,7 @@ app.use((request, response, next) => {
   next()
 })
 
-app.get(urlPrefix + '/', sessionChecker, (_request, response) => {
+app.get(`${urlPrefix}/`, sessionChecker, (_request, response) => {
   response.redirect(`${urlPrefix}/dashboard`)
 })
 
@@ -247,17 +247,17 @@ app.get(`${urlPrefix}/logout`, (request, response) => {
   ) {
     request.session.destroy(() => {
       response.clearCookie(sessionCookieName)
-      response.redirect(urlPrefix + '/')
+      response.redirect(`${urlPrefix}/`)
     })
   } else {
-    response.redirect(urlPrefix + '/login')
+    response.redirect(`${urlPrefix}/login`)
   }
 })
 
 // Catch 404 and forward to error handler
 app.use((request, _response, next) => {
   debug(request.url)
-  next(createError(404, 'File not found: ' + request.url))
+  next(createError(404, `File not found: ${request.url}`))
 })
 
 export default app
