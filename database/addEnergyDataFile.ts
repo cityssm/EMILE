@@ -4,7 +4,7 @@ import { databasePath } from '../helpers/functions.database.js'
 import type { EnergyDataFile } from '../types/recordTypes.js'
 
 export function addEnergyDataFile(
-  dataFile: EnergyDataFile,
+  dataFile: Partial<EnergyDataFile>,
   sessionUser: EmileUser
 ): number {
   const emileDB = sqlite(databasePath)

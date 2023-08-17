@@ -14,51 +14,51 @@ interface RecordGreenButton {
     greenButtonId: string;
 }
 export interface EnergyAccumulationBehaviour extends Partial<RecordUserNameDateTime>, Partial<RecordGreenButton>, Partial<RecordOrderNumber> {
-    accumulationBehaviourId?: number;
+    accumulationBehaviourId: number;
     accumulationBehaviour: string;
 }
 export interface EnergyServiceCategory extends Partial<RecordUserNameDateTime>, Partial<RecordGreenButton>, Partial<RecordOrderNumber> {
-    serviceCategoryId?: number;
+    serviceCategoryId: number;
     serviceCategory: string;
 }
 export interface EnergyUnit extends Partial<RecordUserNameDateTime>, Partial<RecordGreenButton>, Partial<RecordOrderNumber> {
-    unitId?: number;
+    unitId: number;
     unit: string;
     unitLong?: string;
 }
 export interface EnergyReadingType extends Partial<RecordUserNameDateTime>, Partial<RecordGreenButton>, Partial<RecordOrderNumber> {
-    readingTypeId?: number;
+    readingTypeId: number;
     readingType: string;
 }
 export interface EnergyCommodity extends Partial<RecordUserNameDateTime>, Partial<RecordGreenButton>, Partial<RecordOrderNumber> {
-    commodityId?: number;
+    commodityId: number;
     commodity: string;
 }
 export interface AssetCategory extends Partial<RecordUserNameDateTime>, Partial<RecordOrderNumber> {
-    categoryId?: number;
+    categoryId: number;
     category: string;
     fontAwesomeIconClasses?: `fas fa-${string}` | `far fa-${string}`;
 }
 export interface AssetAliasType extends Partial<RecordUserNameDateTime>, Partial<RecordOrderNumber> {
-    aliasTypeId?: number;
+    aliasTypeId: number;
     aliasType: string;
     regularExpression?: string;
     aliasTypeKey?: string;
 }
 export interface AssetAlias extends Partial<RecordUserNameDateTime>, Partial<AssetAliasType> {
-    aliasId?: number;
-    assetId?: number;
+    aliasId: number;
+    assetId: number;
     assetAlias: string;
 }
 export interface Asset extends Partial<RecordUserNameDateTime>, Partial<AssetCategory> {
-    assetId?: number;
+    assetId: number;
     assetName: string;
     latitude?: number | null;
     longitude?: number | null;
     assetAliases?: AssetAlias[];
 }
 export interface AssetGroup extends Partial<RecordUserNameDateTime> {
-    groupId?: number;
+    groupId: number;
     groupName: string;
     groupDescription: string;
     isShared: boolean;
@@ -67,7 +67,7 @@ export interface AssetGroup extends Partial<RecordUserNameDateTime> {
     groupMemberCount?: number;
 }
 export interface EnergyDataFile extends Partial<RecordUserNameDateTime>, Partial<Asset> {
-    fileId?: number;
+    fileId: number;
     originalFileName: string;
     systemFileName: string;
     systemFolderPath: string;
@@ -83,6 +83,7 @@ export interface EnergyDataType extends Partial<RecordUserNameDateTime>, Partial
     dataTypeId?: number;
 }
 export interface EnergyData extends Partial<RecordUserNameDateTime>, Partial<Asset>, Partial<EnergyDataType>, Partial<EnergyDataFile> {
+    dataId: number;
     timeSeconds: number;
     durationSeconds: number;
     endTimeSeconds?: number;

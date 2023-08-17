@@ -1,5 +1,6 @@
 import cluster from 'node:cluster';
 import Debug from 'debug';
+import { getAssetAliasTypes as getAssetAliasTypesFromDatabase } from '../database/getAssetAliasTypes.js';
 import { getAssetCategories as getAssetCategoriesFromDatabase } from '../database/getAssetCategories.js';
 const debug = Debug(`emile:functions.cache:${process.pid}`);
 let assetCategories = [];
@@ -10,8 +11,20 @@ export function getAssetCategories() {
     }
     return assetCategories;
 }
+let assetAliasTypes = [];
+export function getAssetAliasTypes() {
+    if (assetAliasTypes.length === 0) {
+        debug('Cache miss: AssetAliasTypes');
+        assetAliasTypes = getAssetAliasTypesFromDatabase();
+    }
+    return assetAliasTypes;
+}
 export function clearCacheByTableName(tableName, relayMessage = true) {
     switch (tableName) {
+        case 'AssetAliasTypes': {
+            assetAliasTypes = [];
+            break;
+        }
         case 'AssetCategories': {
             assetCategories = [];
             break;

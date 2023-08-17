@@ -1,7 +1,7 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable @typescript-eslint/indent */
 
-import type { Asset, AssetCategory, AssetGroup } from './recordTypes.js'
+import type { Asset, AssetCategory, AssetGroup } from '../types/recordTypes.js'
 
 export interface Emile {
   urlPrefix: string

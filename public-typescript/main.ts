@@ -2,11 +2,12 @@
 import type { BulmaJS } from '@cityssm/bulma-js/types.js'
 import type { cityssmGlobal } from '@cityssm/bulma-webapp-js/src/types.js'
 
+import type { Asset, AssetGroup } from '../types/recordTypes.js'
+
 import type {
   Emile as EmileGlobal,
   InitializeAssetSelectorOptions
-} from '../types/globalTypes.js'
-import type { Asset, AssetGroup } from '../types/recordTypes.js'
+} from './globalTypes.js'
 
 declare const bulmaJS: BulmaJS
 declare const cityssm: cityssmGlobal

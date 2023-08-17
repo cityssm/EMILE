@@ -4,7 +4,7 @@ import { databasePath } from '../helpers/functions.database.js'
 import type { AssetCategory } from '../types/recordTypes.js'
 
 export function addAssetCategory(
-  category: AssetCategory,
+  category: Partial<AssetCategory>,
   sessionUser: EmileUser,
   connectedEmileDB?: sqlite.Database
 ): number {

@@ -5,17 +5,18 @@ import cluster from 'node:cluster'
 
 import Debug from 'debug'
 
+import { getAssetAliasTypes as getAssetAliasTypesFromDatabase } from '../database/getAssetAliasTypes.js'
 import { getAssetCategories as getAssetCategoriesFromDatabase } from '../database/getAssetCategories.js'
 import type {
   ClearCacheWorkerMessage,
   CacheTableName
 } from '../types/applicationTypes.js'
-import type { AssetCategory } from '../types/recordTypes.js'
+import type { AssetAliasType, AssetCategory } from '../types/recordTypes.js'
 
 const debug = Debug(`emile:functions.cache:${process.pid}`)
 
 /*
- * Absence Types
+ * Asset Categories
  */
 
 let assetCategories: AssetCategory[] = []
@@ -30,6 +31,21 @@ export function getAssetCategories(): AssetCategory[] {
 }
 
 /*
+ * Asset Alias Types
+ */
+
+let assetAliasTypes: AssetAliasType[] = []
+
+export function getAssetAliasTypes(): AssetAliasType[] {
+  if (assetAliasTypes.length === 0) {
+    debug('Cache miss: AssetAliasTypes')
+    assetAliasTypes = getAssetAliasTypesFromDatabase()
+  }
+
+  return assetAliasTypes
+}
+
+/*
  * Clear Caches
  */
 
@@ -39,6 +55,10 @@ export function clearCacheByTableName(
 ): void {
   // eslint-disable-next-line sonarjs/no-small-switch
   switch (tableName) {
+    case 'AssetAliasTypes': {
+      assetAliasTypes = []
+      break
+    }
     case 'AssetCategories': {
       assetCategories = []
       break

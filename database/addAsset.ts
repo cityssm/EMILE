@@ -4,7 +4,7 @@ import { databasePath } from '../helpers/functions.database.js'
 import type { Asset } from '../types/recordTypes.js'
 
 export function addAsset(
-  asset: Asset,
+  asset: Partial<Asset>,
   sessionUser: EmileUser,
   connectedEmileDB?: sqlite.Database
 ): number {

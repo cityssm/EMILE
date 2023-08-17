@@ -1,4 +1,4 @@
-import type { Asset, AssetCategory, AssetGroup } from './recordTypes.js';
+import type { Asset, AssetCategory, AssetGroup } from '../types/recordTypes.js';
 export interface Emile {
     urlPrefix: string;
     canUpdate: boolean;

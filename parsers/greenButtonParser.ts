@@ -193,7 +193,7 @@ export class GreenButtonParser extends BaseParser {
       }
 
       updateEnergyDataFileAsProcessed(
-        this.energyDataFile.fileId as number,
+        this.energyDataFile.fileId,
         GreenButtonParser.parserUser
       )
     } catch (error) {

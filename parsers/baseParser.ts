@@ -28,13 +28,13 @@ export class BaseParser {
 
   handleParseFileError(error: Error): void {
     deleteEnergyDataByFileId(
-      this.energyDataFile.fileId as number,
+      this.energyDataFile.fileId,
       BaseParser.parserUser
     )
 
     updateEnergyDataFileAsFailed(
       {
-        fileId: this.energyDataFile.fileId as number,
+        fileId: this.energyDataFile.fileId,
         processedMessage: `${error.message}`,
         processedTimeMillis: Date.now()
       },

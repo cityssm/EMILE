@@ -6,16 +6,72 @@ Object.defineProperty(exports, "__esModule", { value: true });
 (() => {
     var _a, _b;
     const Emile = exports.Emile;
-    /*
-     * Assets
-     */
+    const assetAliasTypes = exports.assetAliasTypes;
     const assetCategoryFilterElement = document.querySelector('#filter--categoryId');
     const assetFilterElement = document.querySelector('#filter--assets');
+    function deleteAssetAlias(clickEvent) {
+        const rowElement = clickEvent.currentTarget.closest('tr');
+        const aliasId = rowElement.dataset.aliasId;
+        const assetId = rowElement.dataset.assetId;
+        function doDelete() {
+            cityssm.postJSON(Emile.urlPrefix + '/assets/doDeleteAssetAlias', {
+                aliasId,
+                assetId
+            }, (rawResponseJSON) => {
+                var _a;
+                const responseJSON = rawResponseJSON;
+                if (responseJSON.success) {
+                    renderAssetAliases(responseJSON.assetAliases);
+                }
+                else {
+                    bulmaJS.alert({
+                        title: 'Error Deleting Alias',
+                        message: (_a = responseJSON.errorMessage) !== null && _a !== void 0 ? _a : 'Please try again.',
+                        contextualColorName: 'danger'
+                    });
+                }
+            });
+        }
+        bulmaJS.confirm({
+            title: 'Delete Asset Alias',
+            message: 'Are you sure you want to remove this asset alias?',
+            contextualColorName: 'warning',
+            okButton: {
+                text: 'Yes, Remove Alias',
+                callbackFunction: doDelete
+            }
+        });
+    }
+    function renderAssetAliases(assetAliases) {
+        var _a, _b, _c;
+        const tbodyElement = document.querySelector('.modal #tbody--assetAliases');
+        tbodyElement.innerHTML = '';
+        for (const assetAlias of assetAliases) {
+            const rowElement = document.createElement('tr');
+            rowElement.dataset.aliasId = assetAlias.aliasId.toString();
+            rowElement.dataset.assetId = assetAlias.assetId.toString();
+            rowElement.innerHTML = `<td data-field="aliasType"></td>
+        <td data-field="assetAlias"></td>
+        <td>
+          ${Emile.canUpdate
+                ? `<button class="button is-danger is-delete-button" type="button">
+                  <span class="icon"><i class="fas fa-trash" aria-hidden="true"></i></span>
+                  <span>Delete Alias</span>
+                  </button>`
+                : ''}
+        </td>`;
+            rowElement.querySelector('[data-field="aliasType"]').textContent = (_a = assetAlias.aliasType) !== null && _a !== void 0 ? _a : '';
+            rowElement.querySelector('[data-field="assetAlias"]').textContent = (_b = assetAlias.assetAlias) !== null && _b !== void 0 ? _b : '';
+            (_c = rowElement
+                .querySelector('.is-delete-button')) === null || _c === void 0 ? void 0 : _c.addEventListener('click', deleteAssetAlias);
+            tbodyElement.append(rowElement);
+        }
+    }
     function populateAssetModal(modalElement, assetId) {
         cityssm.postJSON(Emile.urlPrefix + '/assets/doGetAsset', {
             assetId
         }, (rawResponseJSON) => {
-            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
+            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
             const responseJSON = rawResponseJSON;
             if (!responseJSON.success) {
                 bulmaJS.alert({
@@ -25,6 +81,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
                 });
                 return;
             }
+            /*
+             * Asset Details Tab
+             */
             ;
             modalElement.querySelector('#assetView--assetId').value = (_b = (_a = responseJSON.asset.assetId) === null || _a === void 0 ? void 0 : _a.toString()) !== null && _b !== void 0 ? _b : '';
             modalElement.querySelector('.modal-card-head [data-field="assetName"]').textContent = responseJSON.asset.assetName;
@@ -53,6 +112,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
             modalElement.querySelector('#assetView--assetName').value = responseJSON.asset.assetName;
             modalElement.querySelector('#assetView--latitude').value = (_j = (_h = responseJSON.asset.latitude) === null || _h === void 0 ? void 0 : _h.toFixed(6)) !== null && _j !== void 0 ? _j : '';
             modalElement.querySelector('#assetView--longitude').value = (_l = (_k = responseJSON.asset.longitude) === null || _k === void 0 ? void 0 : _k.toFixed(6)) !== null && _l !== void 0 ? _l : '';
+            /*
+             * Asset Aliases Tabs
+             */
+            renderAssetAliases((_m = responseJSON.asset.assetAliases) !== null && _m !== void 0 ? _m : []);
         });
     }
     function updateAsset(formEvent) {
@@ -71,6 +134,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
             else {
                 bulmaJS.alert({
                     title: 'Error Updating Asset',
+                    message: (_a = responseJSON.errorMessage) !== null && _a !== void 0 ? _a : 'Please try again.',
+                    contextualColorName: 'danger'
+                });
+            }
+        });
+    }
+    function addAssetAlias(formEvent) {
+        formEvent.preventDefault();
+        const formElement = formEvent.currentTarget;
+        cityssm.postJSON(Emile.urlPrefix + '/assets/doAddAssetAlias', formElement, (rawResponseJSON) => {
+            var _a;
+            const responseJSON = rawResponseJSON;
+            if (responseJSON.success) {
+                renderAssetAliases(responseJSON.assetAliases);
+                formElement.reset();
+            }
+            else {
+                bulmaJS.alert({
+                    title: 'Error Adding Alias',
                     message: (_a = responseJSON.errorMessage) !== null && _a !== void 0 ? _a : 'Please try again.',
                     contextualColorName: 'danger'
                 });
@@ -113,23 +195,35 @@ Object.defineProperty(exports, "__esModule", { value: true });
         }
         cityssm.openHtmlModal('asset-view', {
             onshow(modalElement) {
+                var _a;
                 populateAssetModal(modalElement, assetId);
                 if (Emile.canUpdate) {
                     ;
                     modalElement.querySelector('#form--assetView fieldset').disabled = false;
+                    modalElement.querySelector('#assetAliasAdd--assetId').value = assetId;
+                    const aliasTypeSelectElement = modalElement.querySelector('#assetAliasAdd--aliasTypeId');
+                    for (const aliasType of assetAliasTypes) {
+                        const optionElement = document.createElement('option');
+                        optionElement.value = aliasType.aliasTypeId.toString();
+                        optionElement.textContent = aliasType.aliasType;
+                        aliasTypeSelectElement.append(optionElement);
+                    }
+                }
+                else {
+                    (_a = modalElement.querySelector('#tbody--assetAliasAdd')) === null || _a === void 0 ? void 0 : _a.remove();
                 }
             },
             onshown(modalElement, closeModalFunction) {
-                var _a, _b;
+                var _a, _b, _c;
                 bulmaJS.toggleHtmlClipped();
                 bulmaJS.init(modalElement);
-                if (Emile.canUpdate) {
-                    assetCloseModalFunction = closeModalFunction;
-                    (_a = modalElement
-                        .querySelector('#form--assetView')) === null || _a === void 0 ? void 0 : _a.addEventListener('submit', updateAsset);
-                    (_b = modalElement
-                        .querySelector('.is-delete-button')) === null || _b === void 0 ? void 0 : _b.addEventListener('click', deleteAsset);
-                }
+                assetCloseModalFunction = closeModalFunction;
+                (_a = modalElement
+                    .querySelector('#form--assetView')) === null || _a === void 0 ? void 0 : _a.addEventListener('submit', updateAsset);
+                (_b = modalElement
+                    .querySelector('.is-delete-button')) === null || _b === void 0 ? void 0 : _b.addEventListener('click', deleteAsset);
+                (_c = modalElement
+                    .querySelector('#form--assetAliasAdd')) === null || _c === void 0 ? void 0 : _c.addEventListener('submit', addAssetAlias);
             },
             onremoved() {
                 bulmaJS.toggleHtmlClipped();

@@ -8,8 +8,9 @@
 import type { BulmaJS } from '@cityssm/bulma-js/types.js'
 import type { cityssmGlobal } from '@cityssm/bulma-webapp-js/src/types.js'
 
-import type { Emile as EmileGlobal } from '../types/globalTypes.js'
 import type { EnergyDataFile } from '../types/recordTypes.js'
+
+import type { Emile as EmileGlobal } from './globalTypes.js'
 
 declare const bulmaJS: BulmaJS
 declare const cityssm: cityssmGlobal
@@ -525,9 +526,7 @@ declare const cityssm: cityssmGlobal
         ) as HTMLElement
       ).textContent = dataFile.originalFileName
       ;(
-        rowElement.querySelector(
-          '[data-field="results"]'
-        ) as HTMLElement
+        rowElement.querySelector('[data-field="results"]') as HTMLElement
       ).textContent = dataFile.isFailed
         ? dataFile.processedMessage ?? ''
         : `${dataFile.energyDataCount ?? 0} data points`

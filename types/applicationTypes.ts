@@ -6,7 +6,7 @@ export interface WorkerMessage {
   pid: number
 }
 
-export type CacheTableName = 'AssetCategories'
+export type CacheTableName = 'AssetCategories' | 'AssetAliasTypes'
 
 export interface ClearCacheWorkerMessage extends WorkerMessage {
   messageType: 'clearCache'

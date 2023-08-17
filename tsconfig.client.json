@@ -17,6 +17,8 @@
     "public-typescript/assets.ts",
     "public-typescript/data.ts"
   ],
+  "include": ["public-typescript/*"],
+  "exclude": ["data/*", "database/*", "helpers/*", "parsers/*"],
   "compileOnSave": true,
   "buildOnSave": true
 }

@@ -8,8 +8,14 @@
 import type { BulmaJS } from '@cityssm/bulma-js/types.js'
 import type { cityssmGlobal } from '@cityssm/bulma-webapp-js/src/types.js'
 
-import type { Emile as EmileGlobal } from '../types/globalTypes.js'
-import type { Asset, AssetGroup } from '../types/recordTypes.js'
+import type {
+  Asset,
+  AssetAlias,
+  AssetAliasType,
+  AssetGroup
+} from '../types/recordTypes.js'
+
+import type { Emile as EmileGlobal } from './globalTypes.js'
 
 declare const bulmaJS: BulmaJS
 declare const cityssm: cityssmGlobal
@@ -22,9 +28,21 @@ interface ErrorResponse {
 ;(() => {
   const Emile = exports.Emile as EmileGlobal
 
+  const assetAliasTypes = exports.assetAliasTypes as AssetAliasType[]
+
   /*
    * Assets
    */
+
+  type AssetAliasesResponseJSON =
+    | {
+        success: true
+        assetAliases: AssetAlias[]
+      }
+    | {
+        success: false
+        errorMessage?: string
+      }
 
   const assetCategoryFilterElement = document.querySelector(
     '#filter--categoryId'
@@ -33,6 +51,87 @@ interface ErrorResponse {
   const assetFilterElement = document.querySelector(
     '#filter--assets'
   ) as HTMLInputElement
+
+  function deleteAssetAlias(clickEvent: Event): void {
+    const rowElement = (clickEvent.currentTarget as HTMLElement).closest(
+      'tr'
+    ) as HTMLTableRowElement
+
+    const aliasId = rowElement.dataset.aliasId
+    const assetId = rowElement.dataset.assetId
+
+    function doDelete(): void {
+      cityssm.postJSON(
+        Emile.urlPrefix + '/assets/doDeleteAssetAlias',
+        {
+          aliasId,
+          assetId
+        },
+        (rawResponseJSON) => {
+          const responseJSON = rawResponseJSON as AssetAliasesResponseJSON
+
+          if (responseJSON.success) {
+            renderAssetAliases(responseJSON.assetAliases)
+          } else {
+            bulmaJS.alert({
+              title: 'Error Deleting Alias',
+              message: responseJSON.errorMessage ?? 'Please try again.',
+              contextualColorName: 'danger'
+            })
+          }
+        }
+      )
+    }
+
+    bulmaJS.confirm({
+      title: 'Delete Asset Alias',
+      message: 'Are you sure you want to remove this asset alias?',
+      contextualColorName: 'warning',
+      okButton: {
+        text: 'Yes, Remove Alias',
+        callbackFunction: doDelete
+      }
+    })
+  }
+
+  function renderAssetAliases(assetAliases: AssetAlias[]): void {
+    const tbodyElement = document.querySelector(
+      '.modal #tbody--assetAliases'
+    ) as HTMLTableSectionElement
+
+    tbodyElement.innerHTML = ''
+
+    for (const assetAlias of assetAliases) {
+      const rowElement = document.createElement('tr')
+      rowElement.dataset.aliasId = assetAlias.aliasId.toString()
+      rowElement.dataset.assetId = assetAlias.assetId.toString()
+
+      rowElement.innerHTML = `<td data-field="aliasType"></td>
+        <td data-field="assetAlias"></td>
+        <td>
+          ${
+            Emile.canUpdate
+              ? `<button class="button is-danger is-delete-button" type="button">
+                  <span class="icon"><i class="fas fa-trash" aria-hidden="true"></i></span>
+                  <span>Delete Alias</span>
+                  </button>`
+              : ''
+          }
+        </td>`
+      ;(
+        rowElement.querySelector('[data-field="aliasType"]') as HTMLElement
+      ).textContent = assetAlias.aliasType ?? ''
+      ;(
+        rowElement.querySelector('[data-field="assetAlias"]') as HTMLElement
+      ).textContent = assetAlias.assetAlias ?? ''
+
+      rowElement
+        .querySelector('.is-delete-button')
+        ?.addEventListener('click', deleteAssetAlias)
+
+      tbodyElement.append(rowElement)
+    }
+  }
 
   function populateAssetModal(
     modalElement: HTMLElement,
@@ -59,6 +158,10 @@ interface ErrorResponse {
           })
           return
         }
+
+        /*
+         * Asset Details Tab
+         */
 
         ;(
           modalElement.querySelector('#assetView--assetId') as HTMLInputElement
@@ -111,6 +214,12 @@ interface ErrorResponse {
             '#assetView--longitude'
           ) as HTMLInputElement
         ).value = responseJSON.asset.longitude?.toFixed(6) ?? ''
+
+        /*
+         * Asset Aliases Tabs
+         */
+
+        renderAssetAliases(responseJSON.asset.assetAliases ?? [])
       }
     )
   }
@@ -141,6 +250,31 @@ interface ErrorResponse {
         } else {
           bulmaJS.alert({
             title: 'Error Updating Asset',
+            message: responseJSON.errorMessage ?? 'Please try again.',
+            contextualColorName: 'danger'
+          })
+        }
+      }
+    )
+  }
+
+  function addAssetAlias(formEvent: Event): void {
+    formEvent.preventDefault()
+
+    const formElement = formEvent.currentTarget as HTMLFormElement
+
+    cityssm.postJSON(
+      Emile.urlPrefix + '/assets/doAddAssetAlias',
+      formElement,
+      (rawResponseJSON) => {
+        const responseJSON = rawResponseJSON as AssetAliasesResponseJSON
+
+        if (responseJSON.success) {
+          renderAssetAliases(responseJSON.assetAliases)
+          formElement.reset()
+        } else {
+          bulmaJS.alert({
+            title: 'Error Adding Alias',
             message: responseJSON.errorMessage ?? 'Please try again.',
             contextualColorName: 'danger'
           })
@@ -205,23 +339,45 @@ interface ErrorResponse {
               '#form--assetView fieldset'
             ) as HTMLFieldSetElement
           ).disabled = false
+          ;(
+            modalElement.querySelector(
+              '#assetAliasAdd--assetId'
+            ) as HTMLInputElement
+          ).value = assetId
+
+          const aliasTypeSelectElement = modalElement.querySelector(
+            '#assetAliasAdd--aliasTypeId'
+          ) as HTMLSelectElement
+
+          for (const aliasType of assetAliasTypes) {
+            const optionElement = document.createElement('option')
+
+            optionElement.value = aliasType.aliasTypeId.toString()
+            optionElement.textContent = aliasType.aliasType
+
+            aliasTypeSelectElement.append(optionElement)
+          }
+        } else {
+          modalElement.querySelector('#tbody--assetAliasAdd')?.remove()
         }
       },
       onshown(modalElement, closeModalFunction) {
         bulmaJS.toggleHtmlClipped()
         bulmaJS.init(modalElement)
 
-        if (Emile.canUpdate) {
-          assetCloseModalFunction = closeModalFunction
+        assetCloseModalFunction = closeModalFunction
 
-          modalElement
-            .querySelector('#form--assetView')
-            ?.addEventListener('submit', updateAsset)
+        modalElement
+          .querySelector('#form--assetView')
+          ?.addEventListener('submit', updateAsset)
 
-          modalElement
-            .querySelector('.is-delete-button')
-            ?.addEventListener('click', deleteAsset)
-        }
+        modalElement
+          .querySelector('.is-delete-button')
+          ?.addEventListener('click', deleteAsset)
+
+        modalElement
+          .querySelector('#form--assetAliasAdd')
+          ?.addEventListener('submit', addAssetAlias)
       },
       onremoved() {
         bulmaJS.toggleHtmlClipped()
