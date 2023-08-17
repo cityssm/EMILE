@@ -28,6 +28,13 @@
     </div>
   </div>
   <div class="level-right">
+    <%
+      const dateMax = dateTimeFunctions.dateToString(new Date())
+
+      const dateMin = (energyDataStatistics.timeSecondsMin ?? 0) === 0 
+        ? dateMax
+        : dateTimeFunctions.dateToString(new Date(energyDataStatistics.timeSecondsMin * 1000))
+    %>
     <div class="level-item">
       <div class="field has-addons">
         <div class="control">
@@ -43,6 +50,8 @@
             id="dashboard--startDate"
             name="startDate"
             type="date"
+            min="<%= dateMin %>"
+            max="<%= dateMax %>"
             required
           />
         </div>
@@ -63,6 +72,8 @@
             id="dashboard--endDate"
             name="endDate"
             type="date"
+            min="<%= dateMin %>"
+            max="<%= dateMax %>"
             required
           />
         </div>
