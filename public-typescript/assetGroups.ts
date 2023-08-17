@@ -51,7 +51,7 @@ interface ErrorResponse {
 
     function doDelete(): void {
       cityssm.postJSON(
-        Emile.urlPrefix + '/assets/doDeleteAssetGroupMember',
+        `${Emile.urlPrefix}/assets/doDeleteAssetGroupMember`,
         {
           groupId,
           assetId
@@ -167,7 +167,7 @@ interface ErrorResponse {
     groupId: string
   ): void {
     cityssm.postJSON(
-      Emile.urlPrefix + '/assets/doGetAssetGroup',
+      `${Emile.urlPrefix}/assets/doGetAssetGroup`,
       {
         groupId
       },
@@ -226,7 +226,7 @@ interface ErrorResponse {
     formEvent.preventDefault()
 
     cityssm.postJSON(
-      Emile.urlPrefix + '/assets/doUpdateAssetGroup',
+      `${Emile.urlPrefix}/assets/doUpdateAssetGroup`,
       formEvent.currentTarget,
       (rawResponseJSON) => {
         const responseJSON = rawResponseJSON as
@@ -262,7 +262,7 @@ interface ErrorResponse {
     const formElement = formEvent.currentTarget as HTMLFormElement
 
     cityssm.postJSON(
-      Emile.urlPrefix + '/assets/doAddAssetGroupMember',
+      `${Emile.urlPrefix}/assets/doAddAssetGroupMember`,
       formElement,
       (rawResponseJSON) => {
         const responseJSON = rawResponseJSON as GroupMembersResponseJSON

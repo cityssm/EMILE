@@ -13,7 +13,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         const groupId = (_a = rowElement.dataset.groupId) !== null && _a !== void 0 ? _a : '';
         const assetId = (_b = rowElement.dataset.assetId) !== null && _b !== void 0 ? _b : '';
         function doDelete() {
-            cityssm.postJSON(Emile.urlPrefix + '/assets/doDeleteAssetGroupMember', {
+            cityssm.postJSON(`${Emile.urlPrefix}/assets/doDeleteAssetGroupMember`, {
                 groupId,
                 assetId
             }, (rawResponseJSON) => {
@@ -92,7 +92,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         }
     }
     function populateAssetGroupModal(modalElement, groupId) {
-        cityssm.postJSON(Emile.urlPrefix + '/assets/doGetAssetGroup', {
+        cityssm.postJSON(`${Emile.urlPrefix}/assets/doGetAssetGroup`, {
             groupId
         }, (rawResponseJSON) => {
             var _a, _b, _c;
@@ -116,7 +116,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
     }
     function updateAssetGroup(formEvent) {
         formEvent.preventDefault();
-        cityssm.postJSON(Emile.urlPrefix + '/assets/doUpdateAssetGroup', formEvent.currentTarget, (rawResponseJSON) => {
+        cityssm.postJSON(`${Emile.urlPrefix}/assets/doUpdateAssetGroup`, formEvent.currentTarget, (rawResponseJSON) => {
             var _a;
             const responseJSON = rawResponseJSON;
             if (responseJSON.success) {
@@ -139,7 +139,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
     function addAssetGroupMember(formEvent) {
         formEvent.preventDefault();
         const formElement = formEvent.currentTarget;
-        cityssm.postJSON(Emile.urlPrefix + '/assets/doAddAssetGroupMember', formElement, (rawResponseJSON) => {
+        cityssm.postJSON(`${Emile.urlPrefix}/assets/doAddAssetGroupMember`, formElement, (rawResponseJSON) => {
             var _a;
             const responseJSON = rawResponseJSON;
             if (responseJSON.success) {

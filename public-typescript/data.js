@@ -19,7 +19,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
     delete exports.pendingFiles;
     function updatePendingEnergyDataFile(formEvent) {
         formEvent.preventDefault();
-        cityssm.postJSON(Emile.urlPrefix + '/data/doUpdatePendingEnergyDataFile', formEvent.currentTarget, (rawResponseJSON) => {
+        cityssm.postJSON(`${Emile.urlPrefix}/data/doUpdatePendingEnergyDataFile`, formEvent.currentTarget, (rawResponseJSON) => {
             var _a, _b;
             const responseJSON = rawResponseJSON;
             if (responseJSON.success) {
@@ -97,7 +97,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         var _a, _b;
         const fileId = Number.parseInt((_b = (_a = clickEvent.currentTarget.closest('tr')) === null || _a === void 0 ? void 0 : _a.dataset.fileId) !== null && _b !== void 0 ? _b : '', 10);
         function doDelete() {
-            cityssm.postJSON(Emile.urlPrefix + '/data/doDeletePendingEnergyDataFile', {
+            cityssm.postJSON(`${Emile.urlPrefix}/data/doDeletePendingEnergyDataFile`, {
                 fileId
             }, (rawResponseJSON) => {
                 var _a;
@@ -133,7 +133,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         var _a, _b;
         const fileId = Number.parseInt((_b = (_a = clickEvent.currentTarget.closest('tr')) === null || _a === void 0 ? void 0 : _a.dataset.fileId) !== null && _b !== void 0 ? _b : '', 10);
         function doProcess() {
-            cityssm.postJSON(Emile.urlPrefix + '/data/doProcessPendingEnergyDataFile', {
+            cityssm.postJSON(`${Emile.urlPrefix}/data/doProcessPendingEnergyDataFile`, {
                 fileId
             }, (rawResponseJSON) => {
                 var _a;
@@ -244,7 +244,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         var _a, _b;
         const fileId = Number.parseInt((_b = (_a = clickEvent.currentTarget.closest('tr')) === null || _a === void 0 ? void 0 : _a.dataset.fileId) !== null && _b !== void 0 ? _b : '', 10);
         function doReprocess() {
-            cityssm.postJSON(Emile.urlPrefix + '/data/doReprocessProcessedEnergyDataFile', {
+            cityssm.postJSON(`${Emile.urlPrefix}/data/doReprocessProcessedEnergyDataFile`, {
                 fileId
             }, (rawResponseJSON) => {
                 var _a, _b;
@@ -252,7 +252,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
                 if (responseJSON.success) {
                     bulmaJS.alert({
                         title: 'File Marked Moved to Pending List',
-                        message: 'All data associated with the file has been deleted. You can now change any necessary processing settings, and process the file again.',
+                        message: `All data associated with the file has been deleted.
+                  You can now change any necessary processing settings, and process the file again.`,
                         contextualColorName: 'success'
                     });
                     pendingFiles = (_a = responseJSON.pendingFiles) !== null && _a !== void 0 ? _a : [];
@@ -283,7 +284,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         var _a, _b;
         const fileId = Number.parseInt((_b = (_a = clickEvent.currentTarget.closest('tr')) === null || _a === void 0 ? void 0 : _a.dataset.fileId) !== null && _b !== void 0 ? _b : '', 10);
         function doDelete() {
-            cityssm.postJSON(Emile.urlPrefix + '/data/doDeleteProcessedEnergyDataFile', {
+            cityssm.postJSON(`${Emile.urlPrefix}/data/doDeleteProcessedEnergyDataFile`, {
                 fileId
             }, (rawResponseJSON) => {
                 var _a;
@@ -405,7 +406,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
                 data.append('file', file);
             }
         }
-        fetch(Emile.urlPrefix + '/data/doUploadDataFiles', {
+        fetch(`${Emile.urlPrefix}/data/doUploadDataFiles`, {
             credentials: 'same-origin',
             headers: {
                 'CSRF-Token': csrfToken

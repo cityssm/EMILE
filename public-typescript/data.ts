@@ -41,7 +41,7 @@ declare const cityssm: cityssmGlobal
     formEvent.preventDefault()
 
     cityssm.postJSON(
-      Emile.urlPrefix + '/data/doUpdatePendingEnergyDataFile',
+      `${Emile.urlPrefix}/data/doUpdatePendingEnergyDataFile`,
       formEvent.currentTarget,
       (rawResponseJSON) => {
         const responseJSON = rawResponseJSON as PendingFilesResponseJSON
@@ -168,7 +168,7 @@ declare const cityssm: cityssmGlobal
 
     function doDelete(): void {
       cityssm.postJSON(
-        Emile.urlPrefix + '/data/doDeletePendingEnergyDataFile',
+        `${Emile.urlPrefix}/data/doDeletePendingEnergyDataFile`,
         {
           fileId
         },
@@ -214,7 +214,7 @@ declare const cityssm: cityssmGlobal
 
     function doProcess(): void {
       cityssm.postJSON(
-        Emile.urlPrefix + '/data/doProcessPendingEnergyDataFile',
+        `${Emile.urlPrefix}/data/doProcessPendingEnergyDataFile`,
         {
           fileId
         },
@@ -390,7 +390,7 @@ declare const cityssm: cityssmGlobal
 
     function doReprocess(): void {
       cityssm.postJSON(
-        Emile.urlPrefix + '/data/doReprocessProcessedEnergyDataFile',
+        `${Emile.urlPrefix}/data/doReprocessProcessedEnergyDataFile`,
         {
           fileId
         },
@@ -400,8 +400,8 @@ declare const cityssm: cityssmGlobal
           if (responseJSON.success) {
             bulmaJS.alert({
               title: 'File Marked Moved to Pending List',
-              message:
-                'All data associated with the file has been deleted. You can now change any necessary processing settings, and process the file again.',
+              message: `All data associated with the file has been deleted.
+                  You can now change any necessary processing settings, and process the file again.`,
               contextualColorName: 'success'
             })
 
@@ -441,7 +441,7 @@ declare const cityssm: cityssmGlobal
 
     function doDelete(): void {
       cityssm.postJSON(
-        Emile.urlPrefix + '/data/doDeleteProcessedEnergyDataFile',
+        `${Emile.urlPrefix}/data/doDeleteProcessedEnergyDataFile`,
         {
           fileId
         },
@@ -486,6 +486,7 @@ declare const cityssm: cityssmGlobal
     const tableElement = document.createElement('table')
     tableElement.className =
       'table is-fullwidth is-striped is-hoverable has-sticky-header'
+
     tableElement.innerHTML = `<thead><tr>
       <th class="has-width-10"><span class="is-sr-only">Processed Status</span></th>
       <th>Processed File</th>
@@ -600,7 +601,7 @@ declare const cityssm: cityssmGlobal
       }
     }
 
-    fetch(Emile.urlPrefix + '/data/doUploadDataFiles', {
+    fetch(`${Emile.urlPrefix}/data/doUploadDataFiles`, {
       credentials: 'same-origin',
       headers: {
         'CSRF-Token': csrfToken

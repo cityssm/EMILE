@@ -14,7 +14,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         const aliasId = rowElement.dataset.aliasId;
         const assetId = rowElement.dataset.assetId;
         function doDelete() {
-            cityssm.postJSON(Emile.urlPrefix + '/assets/doDeleteAssetAlias', {
+            cityssm.postJSON(`${Emile.urlPrefix}/assets/doDeleteAssetAlias`, {
                 aliasId,
                 assetId
             }, (rawResponseJSON) => {
@@ -68,7 +68,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         }
     }
     function populateAssetModal(modalElement, assetId) {
-        cityssm.postJSON(Emile.urlPrefix + '/assets/doGetAsset', {
+        cityssm.postJSON(`${Emile.urlPrefix}/assets/doGetAsset`, {
             assetId
         }, (rawResponseJSON) => {
             var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
@@ -120,7 +120,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
     }
     function updateAsset(formEvent) {
         formEvent.preventDefault();
-        cityssm.postJSON(Emile.urlPrefix + '/assets/doUpdateAsset', formEvent.currentTarget, (rawResponseJSON) => {
+        cityssm.postJSON(`${Emile.urlPrefix}/assets/doUpdateAsset`, formEvent.currentTarget, (rawResponseJSON) => {
             var _a;
             const responseJSON = rawResponseJSON;
             if (responseJSON.success) {
@@ -143,7 +143,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
     function addAssetAlias(formEvent) {
         formEvent.preventDefault();
         const formElement = formEvent.currentTarget;
-        cityssm.postJSON(Emile.urlPrefix + '/assets/doAddAssetAlias', formElement, (rawResponseJSON) => {
+        cityssm.postJSON(`${Emile.urlPrefix}/assets/doAddAssetAlias`, formElement, (rawResponseJSON) => {
             var _a;
             const responseJSON = rawResponseJSON;
             if (responseJSON.success) {

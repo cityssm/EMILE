@@ -57,7 +57,7 @@ interface ErrorResponse {
 
     function doDelete(): void {
       cityssm.postJSON(
-        Emile.urlPrefix + '/assets/doDeleteAssetAlias',
+        `${Emile.urlPrefix}/assets/doDeleteAssetAlias`,
         {
           aliasId,
           assetId
@@ -133,7 +133,7 @@ interface ErrorResponse {
     assetId: string
   ): void {
     cityssm.postJSON(
-      Emile.urlPrefix + '/assets/doGetAsset',
+      `${Emile.urlPrefix}/assets/doGetAsset`,
       {
         assetId
       },
@@ -223,7 +223,7 @@ interface ErrorResponse {
     formEvent.preventDefault()
 
     cityssm.postJSON(
-      Emile.urlPrefix + '/assets/doUpdateAsset',
+      `${Emile.urlPrefix}/assets/doUpdateAsset`,
       formEvent.currentTarget,
       (rawResponseJSON) => {
         const responseJSON = rawResponseJSON as
@@ -259,7 +259,7 @@ interface ErrorResponse {
     const formElement = formEvent.currentTarget as HTMLFormElement
 
     cityssm.postJSON(
-      Emile.urlPrefix + '/assets/doAddAssetAlias',
+      `${Emile.urlPrefix}/assets/doAddAssetAlias`,
       formElement,
       (rawResponseJSON) => {
         const responseJSON = rawResponseJSON as AssetAliasesResponseJSON
