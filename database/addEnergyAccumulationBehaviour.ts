@@ -4,7 +4,7 @@ import { databasePath } from '../helpers/functions.database.js'
 import type { EnergyAccumulationBehaviour } from '../types/recordTypes.js'
 
 export function addEnergyAccumulationBehaviour(
-  accumulationBehaviour: EnergyAccumulationBehaviour,
+  accumulationBehaviour: Partial<EnergyAccumulationBehaviour>,
   sessionUser: EmileUser,
   connectedEmileDB?: sqlite.Database
 ): number {

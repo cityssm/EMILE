@@ -4,7 +4,7 @@ import { databasePath } from '../helpers/functions.database.js'
 import type { AssetGroup } from '../types/recordTypes.js'
 
 export function addAssetGroup(
-  group: AssetGroup,
+  group: Partial<AssetGroup>,
   sessionUser: EmileUser,
   connectedEmileDB?: sqlite.Database
 ): number {

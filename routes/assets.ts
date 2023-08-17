@@ -4,9 +4,11 @@ import handler_assets from '../handlers/assets-get/assets.js'
 import handler_doAddAsset from '../handlers/assets-post/doAddAsset.js'
 import handler_doAddAssetAlias from '../handlers/assets-post/doAddAssetAlias.js'
 import handler_doAddAssetGroup from '../handlers/assets-post/doAddAssetGroup.js'
+import handler_doAddAssetGroupMember from '../handlers/assets-post/doAddAssetGroupMember.js'
 import handler_doDeleteAsset from '../handlers/assets-post/doDeleteAsset.js'
 import handler_doDeleteAssetAlias from '../handlers/assets-post/doDeleteAssetAlias.js'
 import handler_doDeleteAssetGroup from '../handlers/assets-post/doDeleteAssetGroup.js'
+import handler_doDeleteAssetGroupMember from '../handlers/assets-post/doDeleteAssetGroupMember.js'
 import handler_doGetAsset from '../handlers/assets-post/doGetAsset.js'
 import handler_doGetAssetGroup from '../handlers/assets-post/doGetAssetGroup.js'
 import handler_doUpdateAsset from '../handlers/assets-post/doUpdateAsset.js'
@@ -47,6 +49,18 @@ router.post(
   '/doUpdateAssetGroup',
   updatePostHandler,
   handler_doUpdateAssetGroup
+)
+
+router.post(
+  '/doAddAssetGroupMember',
+  updatePostHandler,
+  handler_doAddAssetGroupMember
+)
+
+router.post(
+  '/doDeleteAssetGroupMember',
+  updatePostHandler,
+  handler_doDeleteAssetGroupMember
 )
 
 router.post(

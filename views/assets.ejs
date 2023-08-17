@@ -1,21 +1,23 @@
 <%- include('_header'); -%>
 
-<h1 class="title is-1">
-  Assets
-</h1>
+<h1 class="title is-1">Assets</h1>
 
 <div class="tabs is-boxed">
   <ul>
     <li class="is-active">
       <a href="#tab--assets">
-        <span class="icon is-small"><i class="fas fa-building" aria-hidden="true"></i></span>
+        <span class="icon is-small"
+          ><i class="fas fa-building" aria-hidden="true"></i
+        ></span>
         <span>Assets</span>
         <span class="tag ml-2" id="count--assets">-</span>
       </a>
     </li>
     <li>
       <a href="#tab--assetGroups">
-        <span class="icon is-small"><i class="fas fa-city" aria-hidden="true"></i></span>
+        <span class="icon is-small"
+          ><i class="fas fa-city" aria-hidden="true"></i
+        ></span>
         <span>Asset Groups</span>
         <span class="tag ml-2" id="count--assetGroups">-</span>
       </a>
@@ -33,9 +35,9 @@
                 <select id="filter--categoryId">
                   <option value="">(All Categories)</option>
                   <% for (const category of assetCategories) { %>
-                    <option value="<%= category.categoryId %>">
-                      <%= category.category %>
-                    </option>
+                  <option value="<%= category.categoryId %>">
+                    <%= category.category %>
+                  </option>
                   <% } %>
                 </select>
               </div>
@@ -46,7 +48,13 @@
           </div>
           <div class="level-item">
             <div class="control has-icons-left">
-              <input class="input" id="filter--assets" type="text" placeholder="Filter assets" aria-label="Filter assets" />
+              <input
+                class="input"
+                id="filter--assets"
+                type="text"
+                placeholder="Filter assets"
+                aria-label="Filter assets"
+              />
               <span class="icon is-small is-left">
                 <i class="fas fa-search" aria-hidden="true"></i>
               </span>
@@ -55,7 +63,11 @@
         </div>
         <div class="level-right">
           <div class="level-item">
-            <a class="button" href="<%= urlPrefix %>/reports/assets-formatted" download>
+            <a
+              class="button"
+              href="<%= urlPrefix %>/reports/assets-formatted"
+              download
+            >
               <span class="icon">
                 <i class="fas fa-file-csv" aria-hidden="true"></i>
               </span>
@@ -63,14 +75,18 @@
             </a>
           </div>
           <% if (user.canUpdate) { %>
-            <div class="level-item">
-              <button class="button is-success" id="button--addAsset" type="button">
-                <span class="icon">
-                  <i class="fas fa-plus" aria-hidden="true"></i>
-                </span>
-                <span>Create Asset</span>
-              </button>
-            </div>
+          <div class="level-item">
+            <button
+              class="button is-success"
+              id="button--addAsset"
+              type="button"
+            >
+              <span class="icon">
+                <i class="fas fa-plus" aria-hidden="true"></i>
+              </span>
+              <span>Create Asset</span>
+            </button>
+          </div>
           <% } %>
         </div>
       </div>
@@ -83,7 +99,13 @@
         <div class="level-left">
           <div class="level-item">
             <div class="control has-icons-left">
-              <input class="input" id="filter--assetGroups" type="text" placeholder="Filter asset groups" aria-label="Filter asset groups" />
+              <input
+                class="input"
+                id="filter--assetGroups"
+                type="text"
+                placeholder="Filter asset groups"
+                aria-label="Filter asset groups"
+              />
               <span class="icon is-small is-left">
                 <i class="fas fa-search" aria-hidden="true"></i>
               </span>
@@ -91,16 +113,20 @@
           </div>
         </div>
         <% if (user.canUpdate) { %>
-          <div class="level-right">
-            <div class="level-item">
-              <button class="button is-success" id="button--addAssetGroup" type="button">
-                <span class="icon">
-                  <i class="fas fa-plus" aria-hidden="true"></i>
-                </span>
-                <span>Create Asset Group</span>
-              </button>
-            </div>
+        <div class="level-right">
+          <div class="level-item">
+            <button
+              class="button is-success"
+              id="button--addAssetGroup"
+              type="button"
+            >
+              <span class="icon">
+                <i class="fas fa-plus" aria-hidden="true"></i>
+              </span>
+              <span>Create Asset Group</span>
+            </button>
           </div>
+        </div>
         <% } %>
       </div>
     </div>
@@ -115,7 +141,10 @@
   exports.Emile.assetGroups = <%- JSON.stringify(assetGroups) %>;
   exports.Emile.assetCategories = <%- JSON.stringify(assetCategories) %>;
   exports.assetAliasTypes = <%- JSON.stringify(assetAliasTypes) %>;
+
+  bulmaJS.init()
 </script>
 <script src="<%= urlPrefix %>/javascripts/assets.min.js"></script>
+<script src="<%= urlPrefix %>/javascripts/assetGroups.min.js"></script>
 
 <%- include('_footerB'); -%>

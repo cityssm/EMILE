@@ -11,12 +11,6 @@
     "skipLibCheck": true,
     "strictNullChecks": true
   },
-  "files": [
-    "public-typescript/main.ts",
-    "public-typescript/dashboard.ts",
-    "public-typescript/assets.ts",
-    "public-typescript/data.ts"
-  ],
   "include": ["public-typescript/*"],
   "exclude": ["data/*", "database/*", "helpers/*", "parsers/*"],
   "compileOnSave": true,

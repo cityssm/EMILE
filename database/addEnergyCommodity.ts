@@ -4,7 +4,7 @@ import { databasePath } from '../helpers/functions.database.js'
 import type { EnergyCommodity } from '../types/recordTypes.js'
 
 export function addEnergyCommodity(
-  commodity: EnergyCommodity,
+  commodity: Partial<EnergyCommodity>,
   sessionUser: EmileUser,
   connectedEmileDB?: sqlite.Database
 ): number {

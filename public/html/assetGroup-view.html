@@ -128,7 +128,50 @@
             </fieldset>
           </form>
         </div>
-        <div class="is-hidden" id="tab--groupMembers"></div>
+        <div class="is-hidden" id="tab--groupMembers">
+          <table class="table is-fullwidth is-striped is-hoverable">
+            <thead>
+              <tr>
+                <th colspan="2">Asset</th>
+                <th class="has-width-10"><span class="is-sr-only">Options</span></th>
+              </tr>
+            </thead>
+            <tbody id="tbody--groupMemberAdd">
+              <tr>
+                <td colspan="2">
+                  <div class="control">
+                    <div class="select is-fullwidth">
+                      <select
+                        id="groupMemberAdd--assetId"
+                        name="assetId"
+                        form="form--groupMemberAdd"
+                        required
+                      >
+                        <option value="">(Select an Asset)</option>
+                      </select>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <form id="form--groupMemberAdd">
+                    <input
+                      id="groupMemberAdd--groupId"
+                      name="groupId"
+                      type="hidden"
+                    />
+                    <button class="button is-success" type="submit">
+                      <span class="icon"
+                        ><i class="fas fa-plus" aria-hidden="true"></i
+                      ></span>
+                      <span>Add Member</span>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            </tbody>
+            <tbody id="tbody--groupMembers"></tbody>
+          </table>
+        </div>
       </div>
     </section>
     <div class="modal-card-foot is-justify-content-right">

@@ -4,7 +4,7 @@ import { databasePath } from '../helpers/functions.database.js'
 import type { EnergyReadingType } from '../types/recordTypes.js'
 
 export function addEnergyReadingType(
-  readingType: EnergyReadingType,
+  readingType: Partial<EnergyReadingType>,
   sessionUser: EmileUser,
   connectedEmileDB?: sqlite.Database
 ): number {

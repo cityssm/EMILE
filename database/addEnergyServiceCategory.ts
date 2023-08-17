@@ -4,7 +4,7 @@ import { databasePath } from '../helpers/functions.database.js'
 import type { EnergyServiceCategory } from '../types/recordTypes.js'
 
 export function addEnergyServiceCategory(
-  serviceCategory: EnergyServiceCategory,
+  serviceCategory: Partial<EnergyServiceCategory>,
   sessionUser: EmileUser,
   connectedEmileDB?: sqlite.Database
 ): number {

@@ -4,7 +4,7 @@ import { databasePath } from '../helpers/functions.database.js'
 import type { EnergyDataType } from '../types/recordTypes.js'
 
 export function addEnergyDataType(
-  energyDataType: EnergyDataType,
+  energyDataType: Partial<EnergyDataType>,
   sessionUser: EmileUser,
   connectedEmileDB?: sqlite.Database
 ): number {
