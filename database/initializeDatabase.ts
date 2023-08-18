@@ -428,6 +428,7 @@ export function initializeDatabase(): void {
         durationSeconds integer not null check (durationSeconds > 0),
         endTimeSeconds integer not null generated always as (timeSeconds + durationSeconds) virtual,
         dataValue decimal(10, 2) not null,
+        powerOfTenMultiplier integer not null default 0,
         ${recordColumns}
       )`
     )

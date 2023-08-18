@@ -1,13 +1,13 @@
 import Debug from 'debug'
 
-import * as configFunctions from './functions.config.js'
+import { getConfigProperty } from './functions.config.js'
 
 const debug = Debug('emile:functions.database')
 
 // Determine if test databases should be used
 
 export const useTestDatabases =
-  configFunctions.getConfigProperty('application.useTestDatabases') ||
+  getConfigProperty('application.useTestDatabases') ||
   process.env.TEST_DATABASES === 'true'
 
 if (useTestDatabases) {

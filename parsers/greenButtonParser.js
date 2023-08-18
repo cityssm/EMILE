@@ -83,13 +83,17 @@ export class GreenButtonParser extends BaseParser {
                     for (const intervalReading of intervalBlock.IntervalReading ?? []) {
                         if (intervalReading.timePeriod !== undefined &&
                             intervalReading.value !== undefined) {
+                            const powerOfTenMultiplier = readingType.content.ReadingType.powerOfTenMultiplier ?? '0';
                             addEnergyData({
                                 assetId,
                                 dataTypeId: energyDataType.dataTypeId,
                                 fileId: this.energyDataFile.fileId,
                                 timeSeconds: intervalReading.timePeriod?.start,
                                 durationSeconds: intervalReading.timePeriod?.duration,
-                                dataValue: intervalReading.value
+                                dataValue: intervalReading.value,
+                                powerOfTenMultiplier: typeof powerOfTenMultiplier === 'string'
+                                    ? Number.parseInt(powerOfTenMultiplier, 10)
+                                    : powerOfTenMultiplier
                             }, GreenButtonParser.parserUser);
                         }
                     }

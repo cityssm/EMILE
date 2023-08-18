@@ -1,94 +1,106 @@
 <%- include('_header'); -%>
 
-<nav class="level is-mobile">
-  <div class="level-left">
-    <div class="level-item">
-      <div id="dashboard--assetSelector">
-        <input id="dashboard--assetId" name="assetId" type="hidden" />
-        <input id="dashboard--groupId" name="groupId" type="hidden" />
-        <div class="field has-addons">
-          <div class="control">
-            <span class="button is-static">
-              <span class="icon">
-                <i class="fas fa-bolt" aria-hidden="true"></i>
-              </span>
-            </span>
-          </div>
-          <div class="control is-expanded">
-            <button
-              class="input"
-              type="button"
-              style="min-width: 300px"
-            >
-              (Select Assets)
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="level-right">
-    <%
-      const dateMax = dateTimeFunctions.dateToString(new Date())
-
-      const dateMin = (energyDataStatistics.timeSecondsMin ?? 0) === 0 
-        ? dateMax
-        : dateTimeFunctions.dateToString(new Date(energyDataStatistics.timeSecondsMin * 1000))
-    %>
-    <div class="level-item">
-      <div class="field has-addons">
-        <div class="control">
-          <label class="button is-static" for="dashboard--startDate">
-            <span class="icon">
-              <i class="fas fa-play" aria-hidden="true"></i>
-            </span>
-          </label>
-        </div>
-        <div class="control">
-          <input
-            class="input"
-            id="dashboard--startDate"
-            name="startDate"
-            type="date"
-            min="<%= dateMin %>"
-            max="<%= dateMax %>"
-            required
-          />
-        </div>
-      </div>
-    </div>
-    <div class="level-item">
-      <div class="field has-addons">
-        <div class="control">
-          <label class="button is-static">
-            <span class="icon">
-              <i class="fas fa-stop" aria-hidden="true"></i>
-            </span>
-          </label>
-        </div>
-        <div class="control">
-          <input
-            class="input"
-            id="dashboard--endDate"
-            name="endDate"
-            type="date"
-            min="<%= dateMin %>"
-            max="<%= dateMax %>"
-            required
-          />
-        </div>
-      </div>
-    </div>
-  </div>
-</nav>
-
 <h1 class="title is-1">
   <%= configFunctions.getConfigProperty("application.applicationName") %>
 </h1>
 
-<div class="message is-info">
-  <p class="message-body">Under Development</p>
+<div class="box has-background-white-ter">
+  <form id="form--dashboard">
+    <nav class="level is-mobile">
+      <div class="level-left">
+        <div class="level-item">
+          <div id="dashboard--assetSelector">
+            <input id="dashboard--assetId" name="assetId" type="hidden" />
+            <input id="dashboard--groupId" name="groupId" type="hidden" />
+            <div class="field has-addons">
+              <div class="control">
+                <span class="button is-static">
+                  <span class="icon">
+                    <i class="fas fa-bolt" aria-hidden="true"></i>
+                  </span>
+                </span>
+              </div>
+              <div class="control is-expanded">
+                <button
+                  class="input"
+                  type="button"
+                  style="min-width: 300px"
+                >
+                  (Select Assets)
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="level-right">
+        <%
+          const dateMax = new Date()
+          const dateMaxString = dateTimeFunctions.dateToString(dateMax)
+
+          const dateMin = (energyDataStatistics.timeSecondsMin ?? 0) === 0 
+            ? dateMax
+            : new Date(energyDataStatistics.timeSecondsMin * 1000)
+
+          const dateMinString = dateTimeFunctions.dateToString(dateMin)
+
+          const lastMonthDate = new Date()
+          lastMonthDate.setMonth(lastMonthDate.getMonth() - 1)
+
+          const startDateString = dateTimeFunctions.dateToString(new Date(Math.max(dateMin.getTime(), lastMonthDate.getTime())))
+        %>
+        <div class="level-item">
+          <div class="field has-addons">
+            <div class="control">
+              <label class="button is-static" for="dashboard--startDate">
+                <span class="icon">
+                  <i class="fas fa-play" aria-hidden="true"></i>
+                </span>
+              </label>
+            </div>
+            <div class="control">
+              <input
+                class="input"
+                id="dashboard--startDateString"
+                name="startDateString"
+                type="date"
+                value="<%= startDateString %>"
+                min="<%= dateMinString %>"
+                max="<%= dateMaxString %>"
+                required
+              />
+            </div>
+          </div>
+        </div>
+        <div class="level-item">
+          <div class="field has-addons">
+            <div class="control">
+              <label class="button is-static">
+                <span class="icon">
+                  <i class="fas fa-stop" aria-hidden="true"></i>
+                </span>
+              </label>
+            </div>
+            <div class="control">
+              <input
+                class="input"
+                id="dashboard--endDateString"
+                name="endDateString"
+                type="date"
+                value="<%= dateMaxString %>"
+                min="<%= dateMinString %>"
+                max="<%= dateMaxString %>"
+                required
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </form>
 </div>
+
+<div id="container--dashboard"></div>
 
 <%- include('_footerA'); -%>
 

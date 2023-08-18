@@ -151,10 +151,8 @@ export class GreenButtonParser extends BaseParser {
               usagePoint.content.UsagePoint.ServiceCategory?.kind.toString() ??
               '',
             unitId: readingType.content.ReadingType.uom?.toString() ?? '',
-            readingTypeId:
-              readingType.content.ReadingType.kind?.toString(),
-            commodityId:
-              readingType.content.ReadingType.commodity?.toString(),
+            readingTypeId: readingType.content.ReadingType.kind?.toString(),
+            commodityId: readingType.content.ReadingType.commodity?.toString(),
             accumulationBehaviourId:
               readingType.content.ReadingType.accumulationBehaviour?.toString()
           },
@@ -176,6 +174,9 @@ export class GreenButtonParser extends BaseParser {
               intervalReading.timePeriod !== undefined &&
               intervalReading.value !== undefined
             ) {
+              const powerOfTenMultiplier =
+                readingType.content.ReadingType.powerOfTenMultiplier ?? '0'
+
               addEnergyData(
                 {
                   assetId,
@@ -183,7 +184,11 @@ export class GreenButtonParser extends BaseParser {
                   fileId: this.energyDataFile.fileId,
                   timeSeconds: intervalReading.timePeriod?.start,
                   durationSeconds: intervalReading.timePeriod?.duration,
-                  dataValue: intervalReading.value
+                  dataValue: intervalReading.value,
+                  powerOfTenMultiplier:
+                    typeof powerOfTenMultiplier === 'string'
+                      ? Number.parseInt(powerOfTenMultiplier, 10)
+                      : powerOfTenMultiplier
                 },
                 GreenButtonParser.parserUser
               )

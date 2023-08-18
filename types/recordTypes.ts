@@ -161,6 +161,7 @@ export interface EnergyData
       durationSeconds: number
       endTimeSeconds?: number
       dataValue: number
+      powerOfTenMultiplier: number
     }
 
 /*

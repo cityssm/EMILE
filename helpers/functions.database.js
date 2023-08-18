@@ -1,7 +1,7 @@
 import Debug from 'debug';
-import * as configFunctions from './functions.config.js';
+import { getConfigProperty } from './functions.config.js';
 const debug = Debug('emile:functions.database');
-export const useTestDatabases = configFunctions.getConfigProperty('application.useTestDatabases') ||
+export const useTestDatabases = getConfigProperty('application.useTestDatabases') ||
     process.env.TEST_DATABASES === 'true';
 if (useTestDatabases) {
     debug('Using "-testing" databases.');

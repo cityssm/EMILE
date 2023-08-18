@@ -9,7 +9,32 @@ _Pronounced like Emily_
 
 A tool to aggregate energy consumption data across several municipal assets and report usage to monitor and manage emissions.
 
+## Inputs
+
+### Current
+
+- Green Button® formatted XML acquired manually through the [Download My Data (DMD) standard](https://www.greenbuttonalliance.org/green-button-download-my-data-dmd).
+
+### Anticipated
+
+- Green Button® formatted XML acquired automatically through the [Connect My Data (CMD) standard](https://www.greenbuttonalliance.org/green-button-connect-my-data-cmd).
+- CSV files.
+
+## Outputs
+
+### Current
+
+- Graphs.
+- CSV files.
+
+### Anticipated
+
+- [Energy Star Portfolio Manager](https://portfoliomanager.energystar.gov/pm/login) data.
+- [Partners for Climate Protection Milestone Tool](https://pcptool.ca/) data.
+
 ## About this Project
+
+![EMILE Dashboard](docs/images/dashboard.png)
 
 📘 **[User Documentation (In The Works)](https://cityssm.github.io/MonTY/docs/)**
 
@@ -32,3 +57,7 @@ for managing municipal operations.
 - **[Lottery Licence Manager](https://github.com/cityssm/lottery-licence-manager)** - An application for managing AGCO's municipal lottery licensing requirements in Ontario.
 
 [Browse our GitHub account](https://github.com/cityssm/) for more of the City's offerings.
+
+## Trademarks
+
+® GREEN BUTTON is a registered trademark owned by Departments of the U.S. Government.

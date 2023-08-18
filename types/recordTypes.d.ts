@@ -88,6 +88,7 @@ export interface EnergyData extends Partial<RecordUserNameDateTime>, Partial<Ass
     durationSeconds: number;
     endTimeSeconds?: number;
     dataValue: number;
+    powerOfTenMultiplier: number;
 }
 declare global {
     interface EmileUser extends Partial<RecordUserNameDateTime> {
