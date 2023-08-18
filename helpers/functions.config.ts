@@ -45,26 +45,30 @@ configFallbackValues.set('session.doKeepAlive', false)
  */
 
 export function getConfigProperty(
-  propertyName: 'application.applicationName'
+  propertyName:
+    | 'application.applicationName'
+    | 'application.backgroundURL'
+    | 'application.bigLogoURL'
+    | 'application.smallLogoURL'
+    | 'application.userDomain'
+    | 'reverseProxy.urlPrefix'
+    | 'session.cookieName'
+    | 'session.secret'
 ): string
 
 export function getConfigProperty(
-  propertyName: 'application.backgroundURL'
-): string
-export function getConfigProperty(
-  propertyName: 'application.bigLogoURL'
-): string
-export function getConfigProperty(
-  propertyName: 'application.smallLogoURL'
-): string
-
-export function getConfigProperty(propertyName: 'application.httpPort'): number
-export function getConfigProperty(
-  propertyName: 'application.userDomain'
-): string
+  propertyName:
+    | 'application.httpPort'
+    | 'application.maximumProcesses'
+    | 'session.maxAgeMillis'
+): number
 
 export function getConfigProperty(
-  propertyName: 'application.useTestDatabases'
+  propertyName:
+    | 'application.useTestDatabases'
+    | 'reverseProxy.disableCompression'
+    | 'reverseProxy.disableEtag'
+    | 'session.doKeepAlive'
 ): boolean
 
 export function getConfigProperty(
@@ -78,26 +82,6 @@ export function getConfigProperty(
 export function getConfigProperty(
   propertyName: 'adWebAuthConfig'
 ): ADWebAuthConfig | undefined
-
-export function getConfigProperty(
-  propertyName: 'application.maximumProcesses'
-): number
-
-export function getConfigProperty(
-  propertyName: 'reverseProxy.disableCompression'
-): boolean
-
-export function getConfigProperty(
-  propertyName: 'reverseProxy.disableEtag'
-): boolean
-export function getConfigProperty(
-  propertyName: 'reverseProxy.urlPrefix'
-): string
-
-export function getConfigProperty(propertyName: 'session.cookieName'): string
-export function getConfigProperty(propertyName: 'session.doKeepAlive'): boolean
-export function getConfigProperty(propertyName: 'session.maxAgeMillis'): number
-export function getConfigProperty(propertyName: 'session.secret'): string
 
 export function getConfigProperty(propertyName: string): unknown {
   const propertyNameSplit = propertyName.split('.')

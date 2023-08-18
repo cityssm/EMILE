@@ -1,24 +1,12 @@
 import './polyfills.js';
 import type { ADWebAuthConfig } from '@cityssm/ad-web-auth-connector/types.js';
 import type { ConfigActiveDirectory, ConfigTemporaryUserCredentials } from '../types/configTypes.js';
-export declare function getConfigProperty(propertyName: 'application.applicationName'): string;
-export declare function getConfigProperty(propertyName: 'application.backgroundURL'): string;
-export declare function getConfigProperty(propertyName: 'application.bigLogoURL'): string;
-export declare function getConfigProperty(propertyName: 'application.smallLogoURL'): string;
-export declare function getConfigProperty(propertyName: 'application.httpPort'): number;
-export declare function getConfigProperty(propertyName: 'application.userDomain'): string;
-export declare function getConfigProperty(propertyName: 'application.useTestDatabases'): boolean;
+export declare function getConfigProperty(propertyName: 'application.applicationName' | 'application.backgroundURL' | 'application.bigLogoURL' | 'application.smallLogoURL' | 'application.userDomain' | 'reverseProxy.urlPrefix' | 'session.cookieName' | 'session.secret'): string;
+export declare function getConfigProperty(propertyName: 'application.httpPort' | 'application.maximumProcesses' | 'session.maxAgeMillis'): number;
+export declare function getConfigProperty(propertyName: 'application.useTestDatabases' | 'reverseProxy.disableCompression' | 'reverseProxy.disableEtag' | 'session.doKeepAlive'): boolean;
 export declare function getConfigProperty(propertyName: 'tempUsers'): ConfigTemporaryUserCredentials[];
 export declare function getConfigProperty(propertyName: 'activeDirectory'): ConfigActiveDirectory | undefined;
 export declare function getConfigProperty(propertyName: 'adWebAuthConfig'): ADWebAuthConfig | undefined;
-export declare function getConfigProperty(propertyName: 'application.maximumProcesses'): number;
-export declare function getConfigProperty(propertyName: 'reverseProxy.disableCompression'): boolean;
-export declare function getConfigProperty(propertyName: 'reverseProxy.disableEtag'): boolean;
-export declare function getConfigProperty(propertyName: 'reverseProxy.urlPrefix'): string;
-export declare function getConfigProperty(propertyName: 'session.cookieName'): string;
-export declare function getConfigProperty(propertyName: 'session.doKeepAlive'): boolean;
-export declare function getConfigProperty(propertyName: 'session.maxAgeMillis'): number;
-export declare function getConfigProperty(propertyName: 'session.secret'): string;
 export declare const keepAliveMillis: number;
 declare const _default: {
     getConfigProperty: typeof getConfigProperty;
