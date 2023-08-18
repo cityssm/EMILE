@@ -36,7 +36,7 @@ A tool to aggregate energy consumption data across several municipal assets and 
 
 ![EMILE Dashboard](docs/images/dashboard.png)
 
-📘 **[User Documentation (In The Works)](https://cityssm.github.io/MonTY/docs/)**
+📘 **[User Documentation (In The Works)](https://cityssm.github.io/EMILE/docs/)**
 
 - [Code of Conduct](CODE_OF_CONDUCT.md)
 - [Contributing Guidelines](CONTRIBUTING.md)
