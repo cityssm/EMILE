@@ -1,0 +1,51 @@
+<%- include('_header'); -%>
+
+<nav class="breadcrumb has-succeeds-separator" aria-label="breadcrumbs">
+  <ul>
+    <li>
+      <a href="<%= urlPrefix %>/admin">
+        <span class="icon is-small">
+          <i class="fas fa-cog" aria-hidden="true"></i>
+        </span>
+        <span>Administrator Settings</span>
+      </a>
+    </li>
+    <li class="is-active">
+      <a href="<%= urlPrefix %>/admin/users" aria-current="page">
+        <span class="icon is-small">
+          <i class="fas fa-users" aria-hidden="true"></i>
+        </span>
+        <span>User Maintenance</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+
+<div class="level is-mobile">
+  <div class="level-left">
+    <div class="level-item">
+      <h1 class="title is-1">
+        User Maintenance
+      </h1>
+    </div>
+  </div>
+  <div class="level-right">
+    <div class="level-item">
+      <button class="button is-success is-add-user-button" type="button">
+        <span class="icon"><i class="fas fa-plus" aria-hidden="true"></i></span>
+        <span>Add User</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="container--users"></div>
+
+<%- include('_footerA'); -%>
+
+<script>
+  exports.users = <%- JSON.stringify(users) %>;
+</script>
+<script src="<%= urlPrefix %>/javascripts/adminUsers.min.js"></script>
+
+<%- include('_footerB'); -%>

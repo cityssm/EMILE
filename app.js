@@ -13,9 +13,10 @@ import rateLimit from 'express-rate-limit';
 import session from 'express-session';
 import createError from 'http-errors';
 import FileStore from 'session-file-store';
-import { updateGetHandler } from './handlers/permissions.js';
+import { adminGetHandler, updateGetHandler } from './handlers/permissions.js';
 import { getSafeRedirectURL } from './helpers/functions.authentication.js';
 import configFunctions, { getConfigProperty } from './helpers/functions.config.js';
+import routerAdmin from './routes/admin.js';
 import routerAssets from './routes/assets.js';
 import routerDashboard from './routes/dashboard.js';
 import routerData from './routes/data.js';
@@ -116,6 +117,7 @@ app.use(`${urlPrefix}/dashboard`, sessionChecker, routerDashboard);
 app.use(`${urlPrefix}/assets`, sessionChecker, routerAssets);
 app.use(`${urlPrefix}/data`, updateGetHandler, sessionChecker, routerData);
 app.use(`${urlPrefix}/reports`, sessionChecker, routerReports);
+app.use(`${urlPrefix}/admin`, adminGetHandler, routerAdmin);
 if (getConfigProperty('session.doKeepAlive')) {
     app.all(`${urlPrefix}/keepAlive`, (_request, response) => {
         response.json(true);

@@ -3,10 +3,11 @@
 /* eslint-disable @typescript-eslint/indent */
 Object.defineProperty(exports, "__esModule", { value: true });
 (() => {
-    var _a, _b;
     const Emile = exports.Emile;
     const dashboardContainer = document.querySelector('#container--dashboard');
     const dashboardFormElement = document.querySelector('#form--dashboard');
+    const startDateStringElement = dashboardFormElement.querySelector('#dashboard--startDateString');
+    const endDateStringElement = dashboardFormElement.querySelector('#dashboard--endDateString');
     let charts = {};
     function getChartKey(assetId, dataTypeId) {
         return `${assetId}_${dataTypeId}`;
@@ -32,6 +33,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
         (_d = table.querySelector('tbody')) === null || _d === void 0 ? void 0 : _d.append(rowElement);
     }
     function getEnergyData() {
+        if (startDateStringElement.value > endDateStringElement.value) {
+            dashboardContainer.innerHTML = `<div class="message is-warning">
+        <p class="message-body">The start date must be less than or equal to the end date.</p>
+        </div>`;
+            return;
+        }
         dashboardContainer.innerHTML = `<p class="has-text-centered has-text-grey">
       <i class="fas fa-pulse fa-spinner fa-4x" aria-hidden="true"></i><br />
       Loading data...
@@ -41,6 +48,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
             const responseJSON = rawResponseJSON;
             dashboardContainer.innerHTML = '';
             charts = {};
+            if (responseJSON.energyData.length === 0) {
+                dashboardContainer.innerHTML = `<div class="message is-info">
+            <p class="message-body">There is no energy data that meets your search criteria.</p>
+            </div>`;
+            }
             for (const dataItem of responseJSON.energyData) {
                 const chartKey = getChartKey(dataItem.assetId, dataItem.dataTypeId);
                 if (charts[chartKey] === undefined) {
@@ -59,7 +71,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
                 </div>
                 <div class="level-right">
                   <div class="level-item">
-                    <div class="tabs is-toggle is-toggle-rounded">
+                    <div class="tabs is-toggle is-toggle-rounded has-text-weight-normal">
                       <ul>
                         <li class="is-active">
                           <a href="#chartTab_${chartKey}">
@@ -155,10 +167,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
         assetSelectorElement: dashboardFormElement.querySelector('#dashboard--assetSelector'),
         callbackFunction: getEnergyData
     });
-    (_a = dashboardFormElement
-        .querySelector('#dashboard--startDateString')) === null || _a === void 0 ? void 0 : _a.addEventListener('change', getEnergyData);
-    (_b = dashboardFormElement
-        .querySelector('#dashboard--endDateString')) === null || _b === void 0 ? void 0 : _b.addEventListener('change', getEnergyData);
+    startDateStringElement.addEventListener('change', getEnergyData);
+    endDateStringElement.addEventListener('change', getEnergyData);
     dashboardFormElement.addEventListener('submit', (formEvent) => {
         formEvent.preventDefault();
         getEnergyData();

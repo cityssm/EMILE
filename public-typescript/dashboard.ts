@@ -27,6 +27,14 @@ declare const cityssm: cityssmGlobal
     '#form--dashboard'
   ) as HTMLFormElement
 
+  const startDateStringElement = dashboardFormElement.querySelector(
+    '#dashboard--startDateString'
+  ) as HTMLInputElement
+
+  const endDateStringElement = dashboardFormElement.querySelector(
+    '#dashboard--endDateString'
+  ) as HTMLInputElement
+
   let charts: Record<
     string,
     {
@@ -70,6 +78,14 @@ declare const cityssm: cityssmGlobal
   }
 
   function getEnergyData(): void {
+    if (startDateStringElement.value > endDateStringElement.value) {
+      dashboardContainer.innerHTML = `<div class="message is-warning">
+        <p class="message-body">The start date must be less than or equal to the end date.</p>
+        </div>`
+
+      return
+    }
+
     dashboardContainer.innerHTML = `<p class="has-text-centered has-text-grey">
       <i class="fas fa-pulse fa-spinner fa-4x" aria-hidden="true"></i><br />
       Loading data...
@@ -85,6 +101,12 @@ declare const cityssm: cityssmGlobal
 
         dashboardContainer.innerHTML = ''
         charts = {}
+
+        if (responseJSON.energyData.length === 0) {
+          dashboardContainer.innerHTML = `<div class="message is-info">
+            <p class="message-body">There is no energy data that meets your search criteria.</p>
+            </div>`
+        }
 
         for (const dataItem of responseJSON.energyData) {
           const chartKey = getChartKey(
@@ -111,7 +133,7 @@ declare const cityssm: cityssmGlobal
                 </div>
                 <div class="level-right">
                   <div class="level-item">
-                    <div class="tabs is-toggle is-toggle-rounded">
+                    <div class="tabs is-toggle is-toggle-rounded has-text-weight-normal">
                       <ul>
                         <li class="is-active">
                           <a href="#chartTab_${chartKey}">
@@ -246,13 +268,9 @@ declare const cityssm: cityssmGlobal
     callbackFunction: getEnergyData
   })
 
-  dashboardFormElement
-    .querySelector('#dashboard--startDateString')
-    ?.addEventListener('change', getEnergyData)
+  startDateStringElement.addEventListener('change', getEnergyData)
 
-  dashboardFormElement
-    .querySelector('#dashboard--endDateString')
-    ?.addEventListener('change', getEnergyData)
+  endDateStringElement.addEventListener('change', getEnergyData)
 
   dashboardFormElement.addEventListener('submit', (formEvent) => {
     formEvent.preventDefault()

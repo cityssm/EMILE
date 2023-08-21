@@ -60,7 +60,7 @@ export function getConfigProperty(
   propertyName:
     | 'application.httpPort'
     | 'application.maximumProcesses'
-    | 'session.maxAgeMillis'
+    | typeof property_session_maxAgeMillis
 ): number
 
 export function getConfigProperty(
