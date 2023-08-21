@@ -63,6 +63,7 @@ export function clearCacheByTableName(
       assetCategories = []
       break
     }
+    // no default
   }
 
   try {

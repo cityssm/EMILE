@@ -78,6 +78,7 @@ cluster.on('message', (worker, message: WorkerMessage) => {
         fileProcessorChildProcess.send(message)
       }
     }
+    // no default
   }
 })
 
