@@ -2,6 +2,123 @@
 
 <h1 class="title is-1">Reports</h1>
 
+<div class="columns">
+  <div class="column">
+    <div class="panel">
+      <h2 class="panel-heading">Asset Reports</h2>
+      <a class="panel-block" href="<%= urlPrefix %>/reports/assets-formatted" download>
+        <div class="media">
+          <div class="media-left">
+            <i class="fas fa-3x fa-file-csv" aria-hidden="true"></i>
+          </div>
+          <div class="media-content">
+            <h3 class="title is-5 mb-0">Assets</h3>
+            <p>
+              A formatted list of all assets tracked by
+              <%= configFunctions.getConfigProperty("application.applicationName") %>.
+            </p>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+  <div class="column">
+    <div class="panel">
+      <h2 class="panel-heading">Energy Data</h2>
+      <div class="panel-block is-block">
+        <form method="get" action="<%= urlPrefix %>/reports/energyData-formatted-filtered">
+          <div id="reports--assetSelector">
+            <input name="assetId" type="hidden" />
+            <input name="groupId" type="hidden" />
+            <strong class="label">Assets</strong>
+            <div class="field has-addons">
+              <div class="control">
+                <span class="button is-static">
+                  <span class="icon">
+                    <i class="fas fa-bolt" aria-hidden="true"></i>
+                  </span>
+                </span>
+              </div>
+              <div class="control is-expanded">
+                <button
+                  class="input is-justify-content-start"
+                  type="button"
+                >
+                  (All Assets)
+                </button>
+              </div>
+              <div class="control">
+                <button class="button is-clear-button has-tooltip-left" data-tooltip="Clear" type="button" aria-label="Clear">
+                  <i class="fas fa-broom" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="columns mt-1">
+            <div class="column">
+              <label class="label" for="reports--startDateString">
+                Start Date
+              </label>
+              <div class="field has-addons">
+                <div class="control">
+                  <span class="button is-static">
+                    <span class="icon">
+                      <i class="fas fa-play" aria-hidden="true"></i>
+                    </span>
+                  </span>
+                </div>
+                <div class="control is-expanded">
+                  <input
+                    class="input"
+                    id="reports--startDateString"
+                    name="startDateString"
+                    type="date"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="column">
+              <label class="label" for="reports--endDateString">
+                End Date
+              </label>
+              <div class="field has-addons">
+                <div class="control">
+                  <span class="button is-static">
+                    <span class="icon">
+                      <i class="fas fa-stop" aria-hidden="true"></i>
+                    </span>
+                  </span>
+                </div>
+                <div class="control is-expanded">
+                  <input
+                    class="input"
+                    id="reports--endDateString"
+                    name="endDateString"
+                    type="date"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="column is-narrow is-align-self-flex-end">
+              <button class="button is-primary" type="submit">
+                <span class="icon is-small"><i class="fas fa-file-csv" aria-hidden="true"></i></span>
+                <span>Export</span>
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 <%- include('_footerA'); -%>
+
+<script>
+  exports.Emile.assets = <%- JSON.stringify(assets) %>;
+  exports.Emile.assetGroups = <%- JSON.stringify(assetGroups) %>;
+  exports.Emile.assetCategories = <%- JSON.stringify(assetCategories) %>;
+</script>
+<script src="<%= urlPrefix %>/javascripts/reports.min.js"></script>
 
 <%- include('_footerB'); -%>

@@ -509,17 +509,20 @@ declare const cityssm: cityssmGlobal
         <td><strong data-field="originalFileName"></strong></td>
         <td data-field="results"></td>
         <td class="has-text-right">
-          <button class="button is-warning is-reprocess-button" type="button">
-            <span class="icon"><i class="fas fa-cogs" aria-hidden="true"></i></span>
-            <span>Process Again</span>
-          </button>
           ${
             dataFile.isFailed
               ? `<button class="button is-light is-danger is-delete-button" type="button">
                   <i class="fas fa-trash" aria-hidden="true"></i>
                   </button>`
-              : ''
+              : `<a class="button" href="${Emile.urlPrefix}/reports/energyData-formatted-filtered?fileId=${dataFile.fileId}" type="download">
+                  <span class="icon is-small"><i class="fas fa-file-csv" aria-hidden="true"></i></span>
+                  <span>Export</span>
+                </a>`
           }
+          <button class="button is-warning is-reprocess-button" type="button">
+            <span class="icon"><i class="fas fa-cogs" aria-hidden="true"></i></span>
+            <span>Process Again</span>
+          </button>
         </td>`
       ;(
         rowElement.querySelector(
