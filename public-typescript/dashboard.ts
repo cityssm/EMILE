@@ -32,6 +32,11 @@ declare const cityssm: cityssmGlobal
     {
       chart: Chart
       table: HTMLTableElement
+      exportLink: HTMLAnchorElement
+      assetId: number
+      dataTypeId: number
+      timeSecondsMin: number
+      timeSecondsMax: number
     }
   > = {}
 
@@ -123,6 +128,12 @@ declare const cityssm: cityssmGlobal
                       </ul>
                     </div>
                   </div>
+                  <div class="level-item">
+                    <a class="button is-export-link" download>
+                      <span class="icon is-small"><i class="fas fa-file-csv" aria-hidden="true"></i></span>
+                      <span class="has-text-weight-normal">Export</span>
+                    </a>
+                  </div>
                 </div>
               </div>
               </div>
@@ -183,7 +194,14 @@ declare const cityssm: cityssmGlobal
 
             charts[chartKey] = {
               chart,
-              table
+              table,
+              exportLink: dashboardContainer.querySelector(
+                '.is-export-link'
+              ) as HTMLAnchorElement,
+              assetId: dataItem.assetId as number,
+              dataTypeId: dataItem.dataTypeId as number,
+              timeSecondsMin: dataItem.timeSeconds,
+              timeSecondsMax: dataItem.timeSeconds
             }
 
             addDataToTable(table, dataItem)
@@ -195,11 +213,21 @@ declare const cityssm: cityssmGlobal
             )
 
             addDataToTable(charts[chartKey].table, dataItem)
+
+            charts[chartKey].timeSecondsMin = Math.min(
+              charts[chartKey].timeSecondsMin,
+              dataItem.timeSeconds
+            )
+            charts[chartKey].timeSecondsMax = Math.max(
+              charts[chartKey].timeSecondsMax,
+              dataItem.timeSeconds
+            )
           }
         }
 
         for (const chart of Object.values(charts)) {
           chart.chart.update()
+          chart.exportLink.href = `${Emile.urlPrefix}/reports/energyData-formatted-filtered/?assetId=${chart.assetId}&dataTypeId=${chart.dataTypeId}&timeSecondsMin=${chart.timeSecondsMin}&timeSecondsMax=${chart.timeSecondsMax}`
         }
 
         bulmaJS.init(dashboardContainer)

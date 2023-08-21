@@ -1,6 +1,7 @@
 import sqlite from 'better-sqlite3'
 
 import { databasePath } from '../helpers/functions.database.js'
+import { getEnergyData } from './getEnergyData.js'
 
 export type ReportParameters = Record<string, string | number>
 
@@ -8,15 +9,12 @@ export function getReportData(
   reportName: string,
   reportParameters: ReportParameters = {}
 ): unknown[] | undefined {
-  const emileDB = sqlite(databasePath, {
-    readonly: true
-  })
-
+  
   let sql = ''
 
   switch (reportName) {
     /*
-     * Employees
+     * Assets
      */
 
     case 'assets-all': {
@@ -35,6 +33,25 @@ export function getReportData(
     }
 
     /*
+     * Energy Data
+     */
+
+    case 'energyData-formatted-filtered': {
+      return getEnergyData({
+        assetId: reportParameters.assetId,
+        groupId: reportParameters.groupId,
+        dataTypeId: reportParameters.dataTypeId,
+        fileId: reportParameters.fileId,
+        startDateString: reportParameters.startDateString as string,
+        endDateString: reportParameters.endDateString as string,
+        timeSecondsMin: reportParameters.timeSecondsMin,
+        timeSecondsMax: reportParameters.timeSecondsMax
+      }, {
+        formatForExport: true
+      })
+    }
+
+    /*
      * Default
      */
 
@@ -42,6 +59,10 @@ export function getReportData(
       return undefined
     }
   }
+
+  const emileDB = sqlite(databasePath, {
+    readonly: true
+  })
 
   const resultRows = emileDB.prepare(sql).all()
 

@@ -76,6 +76,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
                       </ul>
                     </div>
                   </div>
+                  <div class="level-item">
+                    <a class="button is-export-link" download>
+                      <span class="icon is-small"><i class="fas fa-file-csv" aria-hidden="true"></i></span>
+                      <span class="has-text-weight-normal">Export</span>
+                    </a>
+                  </div>
                 </div>
               </div>
               </div>
@@ -119,17 +125,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
                     const table = panelElement.querySelector('table');
                     charts[chartKey] = {
                         chart,
-                        table
+                        table,
+                        exportLink: dashboardContainer.querySelector('.is-export-link'),
+                        assetId: dataItem.assetId,
+                        dataTypeId: dataItem.dataTypeId,
+                        timeSecondsMin: dataItem.timeSeconds,
+                        timeSecondsMax: dataItem.timeSeconds
                     };
                     addDataToTable(table, dataItem);
                 }
                 else {
                     addDataToChart(charts[chartKey].chart, formatDateLabel(dataItem.timeSeconds), dataItem.dataValue * Math.pow(10, dataItem.powerOfTenMultiplier));
                     addDataToTable(charts[chartKey].table, dataItem);
+                    charts[chartKey].timeSecondsMin = Math.min(charts[chartKey].timeSecondsMin, dataItem.timeSeconds);
+                    charts[chartKey].timeSecondsMax = Math.max(charts[chartKey].timeSecondsMax, dataItem.timeSeconds);
                 }
             }
             for (const chart of Object.values(charts)) {
                 chart.chart.update();
+                chart.exportLink.href = `${Emile.urlPrefix}/reports/energyData-formatted-filtered/?assetId=${chart.assetId}&dataTypeId=${chart.dataTypeId}&timeSecondsMin=${chart.timeSecondsMin}&timeSecondsMax=${chart.timeSecondsMax}`;
             }
             bulmaJS.init(dashboardContainer);
         });

@@ -1,9 +1,7 @@
 import sqlite from 'better-sqlite3';
 import { databasePath } from '../helpers/functions.database.js';
+import { getEnergyData } from './getEnergyData.js';
 export function getReportData(reportName, reportParameters = {}) {
-    const emileDB = sqlite(databasePath, {
-        readonly: true
-    });
     let sql = '';
     switch (reportName) {
         case 'assets-all': {
@@ -19,10 +17,27 @@ export function getReportData(reportName, reportParameters = {}) {
         order by a.assetName, c.category`;
             break;
         }
+        case 'energyData-formatted-filtered': {
+            return getEnergyData({
+                assetId: reportParameters.assetId,
+                groupId: reportParameters.groupId,
+                dataTypeId: reportParameters.dataTypeId,
+                fileId: reportParameters.fileId,
+                startDateString: reportParameters.startDateString,
+                endDateString: reportParameters.endDateString,
+                timeSecondsMin: reportParameters.timeSecondsMin,
+                timeSecondsMax: reportParameters.timeSecondsMax
+            }, {
+                formatForExport: true
+            });
+        }
         default: {
             return undefined;
         }
     }
+    const emileDB = sqlite(databasePath, {
+        readonly: true
+    });
     const resultRows = emileDB.prepare(sql).all();
     emileDB.close();
     return resultRows;

@@ -10,23 +10,47 @@ import type { EnergyData } from '../types/recordTypes.js'
 interface GetEnergyDataFilters {
   assetId?: number | string
   groupId?: number | string
+  dataTypeId?: number | string
   fileId?: number | string
   startDateString?: string
   endDateString?: string
+  timeSecondsMin?: number | string
+  timeSecondsMax?: number | string
 }
 
-export function getEnergyData(filters: GetEnergyDataFilters): EnergyData[] {
-  let sql = `select d.dataId,
-      d.assetId, a.assetName, c.category, c.fontAwesomeIconClasses,
-      d.dataTypeId,
-      t.serviceCategoryId, ts.serviceCategory,
-      t.unitId, tu.unit, tu.unitLong,
-      t.readingTypeId, tr.readingType,
-      t.commodityId, tc.commodity,
-      t.accumulationBehaviourId, ta.accumulationBehaviour,
-      d.fileId, f.originalFileName,
-      d.timeSeconds, d.durationSeconds, d.endTimeSeconds,
-      d.dataValue, d.powerOfTenMultiplier
+interface GetEnergyDataOptions {
+  formatForExport?: boolean
+}
+
+export function getEnergyData(
+  filters: GetEnergyDataFilters,
+  options?: GetEnergyDataOptions
+): EnergyData[] {
+  const columnNames =
+    options?.formatForExport ?? false
+      ? `d.dataId,
+        c.category, a.assetName, 
+        ts.serviceCategory,
+        tu.unit,
+        tr.readingType,
+        tc.commodity,
+        ta.accumulationBehaviour,
+        datetime(d.timeSeconds, 'unixepoch', 'localtime') as startDateTime,
+        d.durationSeconds,
+        d.dataValue, d.powerOfTenMultiplier`
+      : `d.dataId,
+        d.assetId, a.assetName, c.category, c.fontAwesomeIconClasses,
+        d.dataTypeId,
+        t.serviceCategoryId, ts.serviceCategory,
+        t.unitId, tu.unit, tu.unitLong,
+        t.readingTypeId, tr.readingType,
+        t.commodityId, tc.commodity,
+        t.accumulationBehaviourId, ta.accumulationBehaviour,
+        d.fileId, f.originalFileName,
+        d.timeSeconds, d.durationSeconds, d.endTimeSeconds,
+        d.dataValue, d.powerOfTenMultiplier`
+
+  let sql = `select ${columnNames}
     from EnergyData d
     left join Assets a
       on d.assetId = a.assetId
@@ -62,6 +86,11 @@ export function getEnergyData(filters: GetEnergyDataFilters): EnergyData[] {
     sqlParameters.push(filters.groupId)
   }
 
+  if ((filters.dataTypeId ?? '') !== '') {
+    sql += ' and d.dataTypeId = ?'
+    sqlParameters.push(filters.dataTypeId)
+  }
+
   if ((filters.fileId ?? '') !== '') {
     sql += ' and d.fileId = ?'
     sqlParameters.push(filters.fileId)
@@ -75,6 +104,12 @@ export function getEnergyData(filters: GetEnergyDataFilters): EnergyData[] {
     )
   }
 
+  if ((filters.timeSecondsMin ?? '') !== '') {
+    sql += ' and d.timeSeconds >= ?'
+
+    sqlParameters.push(filters.timeSecondsMin)
+  }
+
   if ((filters.endDateString ?? '') !== '') {
     sql += ' and d.timeSeconds <= ?'
 
@@ -82,6 +117,12 @@ export function getEnergyData(filters: GetEnergyDataFilters): EnergyData[] {
     endDate.setDate(endDate.getDate() + 1)
 
     sqlParameters.push(endDate.getTime() / 1000)
+  }
+
+  if ((filters.timeSecondsMax ?? '') !== '') {
+    sql += ' and d.timeSeconds <= ?'
+
+    sqlParameters.push(filters.timeSecondsMax)
   }
 
   sql += ' order by d.assetId, d.dataTypeId, d.timeSeconds'

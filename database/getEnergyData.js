@@ -1,18 +1,30 @@
 import { dateStringToDate } from '@cityssm/utils-datetime';
 import sqlite from 'better-sqlite3';
 import { databasePath } from '../helpers/functions.database.js';
-export function getEnergyData(filters) {
-    let sql = `select d.dataId,
-      d.assetId, a.assetName, c.category, c.fontAwesomeIconClasses,
-      d.dataTypeId,
-      t.serviceCategoryId, ts.serviceCategory,
-      t.unitId, tu.unit, tu.unitLong,
-      t.readingTypeId, tr.readingType,
-      t.commodityId, tc.commodity,
-      t.accumulationBehaviourId, ta.accumulationBehaviour,
-      d.fileId, f.originalFileName,
-      d.timeSeconds, d.durationSeconds, d.endTimeSeconds,
-      d.dataValue, d.powerOfTenMultiplier
+export function getEnergyData(filters, options) {
+    const columnNames = options?.formatForExport ?? false
+        ? `d.dataId,
+        c.category, a.assetName, 
+        ts.serviceCategory,
+        tu.unit,
+        tr.readingType,
+        tc.commodity,
+        ta.accumulationBehaviour,
+        datetime(d.timeSeconds, 'unixepoch', 'localtime') as startDateTime,
+        d.durationSeconds,
+        d.dataValue, d.powerOfTenMultiplier`
+        : `d.dataId,
+        d.assetId, a.assetName, c.category, c.fontAwesomeIconClasses,
+        d.dataTypeId,
+        t.serviceCategoryId, ts.serviceCategory,
+        t.unitId, tu.unit, tu.unitLong,
+        t.readingTypeId, tr.readingType,
+        t.commodityId, tc.commodity,
+        t.accumulationBehaviourId, ta.accumulationBehaviour,
+        d.fileId, f.originalFileName,
+        d.timeSeconds, d.durationSeconds, d.endTimeSeconds,
+        d.dataValue, d.powerOfTenMultiplier`;
+    let sql = `select ${columnNames}
     from EnergyData d
     left join Assets a
       on d.assetId = a.assetId
@@ -44,6 +56,10 @@ export function getEnergyData(filters) {
             ' and d.assetId in (select assetId from AssetGroupMembers where recordDelete_timeMillis is null and groupId = ?)';
         sqlParameters.push(filters.groupId);
     }
+    if ((filters.dataTypeId ?? '') !== '') {
+        sql += ' and d.dataTypeId = ?';
+        sqlParameters.push(filters.dataTypeId);
+    }
     if ((filters.fileId ?? '') !== '') {
         sql += ' and d.fileId = ?';
         sqlParameters.push(filters.fileId);
@@ -52,11 +68,19 @@ export function getEnergyData(filters) {
         sql += ' and d.timeSeconds >= ?';
         sqlParameters.push(dateStringToDate(filters.startDateString ?? '').getTime() / 1000);
     }
+    if ((filters.timeSecondsMin ?? '') !== '') {
+        sql += ' and d.timeSeconds >= ?';
+        sqlParameters.push(filters.timeSecondsMin);
+    }
     if ((filters.endDateString ?? '') !== '') {
         sql += ' and d.timeSeconds <= ?';
         const endDate = dateStringToDate(filters.endDateString ?? '');
         endDate.setDate(endDate.getDate() + 1);
         sqlParameters.push(endDate.getTime() / 1000);
+    }
+    if ((filters.timeSecondsMax ?? '') !== '') {
+        sql += ' and d.timeSeconds <= ?';
+        sqlParameters.push(filters.timeSecondsMax);
     }
     sql += ' order by d.assetId, d.dataTypeId, d.timeSeconds';
     const emileDB = sqlite(databasePath, {
