@@ -40,8 +40,6 @@ declare const cityssm: cityssmGlobal
     for (const dataset of chart.data.datasets) {
       dataset.data.push(newData)
     }
-
-    chart.update()
   }
 
   function getEnergyData(): void {
@@ -120,8 +118,7 @@ declare const cityssm: cityssmGlobal
                       data: [
                         dataItem.dataValue *
                           Math.pow(10, dataItem.powerOfTenMultiplier)
-                      ],
-                      borderWidth: 1
+                      ]
                     }
                   ]
                 }
@@ -136,6 +133,10 @@ declare const cityssm: cityssmGlobal
               dataItem.dataValue * Math.pow(10, dataItem.powerOfTenMultiplier)
             )
           }
+        }
+
+        for (const chart of Object.values(charts)) {
+          chart.update()
         }
       }
     )

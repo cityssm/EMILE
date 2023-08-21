@@ -19,7 +19,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
         for (const dataset of chart.data.datasets) {
             dataset.data.push(newData);
         }
-        chart.update();
     }
     function getEnergyData() {
         dashboardContainer.innerHTML = `<p class="has-text-centered has-text-grey">
@@ -70,8 +69,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
                                     data: [
                                         dataItem.dataValue *
                                             Math.pow(10, dataItem.powerOfTenMultiplier)
-                                    ],
-                                    borderWidth: 1
+                                    ]
                                 }
                             ]
                         }
@@ -81,6 +79,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
                 else {
                     addDataToChart(charts[chartKey], formatDateLabel(dataItem.timeSeconds), dataItem.dataValue * Math.pow(10, dataItem.powerOfTenMultiplier));
                 }
+            }
+            for (const chart of Object.values(charts)) {
+                chart.update();
             }
         });
     }
