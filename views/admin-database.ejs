@@ -25,6 +25,49 @@
   Database Maintenance
 </h1>
 
+<div class="tabs is-boxed">
+  <ul>
+    <li class="is-active">
+      <a href="#tab--backupDatabase">
+        <span class="icon is-small"
+          ><i class="fas fa-save" aria-hidden="true"></i
+        ></span>
+        <span>Backup Database</span>
+      </a>
+    </li>
+    <li>
+      <a href="#tab--cleanupDatabase">
+        <span class="icon is-small"
+          ><i class="fas fa-broom" aria-hidden="true"></i
+        ></span>
+        <span>Cleanup Database</span>
+      </a>
+    </li>
+  </ul>
+</div>
+
+<div class="tab-container">
+  <div class="tab-content" id="tab--backupDatabase">
+    <div class="columns">
+      <div class="column is-narrow">
+        <button class="button is-block is-success is-backup-button" type="button" style="height:auto">
+          <i class="fas fa-4x fa-save" aria-hidden="true"></i><br />
+          <span>Backup Database</span>
+        </button>
+      </div>
+      <div class="column">
+        <div id="container--backupFiles"></div>
+      </div>
+    </div>
+  </div>
+  <div class="tab-content is-hidden" id="tab--cleanupDatabase"></div>
+</div>
+
 <%- include('_footerA'); -%>
+
+<script>
+  exports.backupFiles = <%- JSON.stringify(backupFiles) %>;
+</script>
+<script src="<%= urlPrefix %>/javascripts/adminDatabase.min.js"></script>
 
 <%- include('_footerB'); -%>

@@ -12,4 +12,9 @@ export interface ClearCacheWorkerMessage extends WorkerMessage {
 export interface RunFileProcessorWorkerMessage extends WorkerMessage {
     messageType: 'runFileProcessor';
 }
+export interface DatabaseFile {
+    fileName: string;
+    sizeInMegabytes: number;
+    lastModifiedTime: string;
+}
 export {};

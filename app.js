@@ -115,9 +115,10 @@ app.get(`${urlPrefix}/`, sessionChecker, (_request, response) => {
 });
 app.use(`${urlPrefix}/dashboard`, sessionChecker, routerDashboard);
 app.use(`${urlPrefix}/assets`, sessionChecker, routerAssets);
-app.use(`${urlPrefix}/data`, updateGetHandler, sessionChecker, routerData);
+app.use(`${urlPrefix}/data`, sessionChecker, updateGetHandler, routerData);
 app.use(`${urlPrefix}/reports`, sessionChecker, routerReports);
-app.use(`${urlPrefix}/admin`, adminGetHandler, routerAdmin);
+app.use(`${urlPrefix}/admin`, sessionChecker, adminGetHandler, routerAdmin);
+app.use(`${urlPrefix}/backups`, sessionChecker, adminGetHandler, express.static(path.join('data', 'backups')));
 if (getConfigProperty('session.doKeepAlive')) {
     app.all(`${urlPrefix}/keepAlive`, (_request, response) => {
         response.json(true);

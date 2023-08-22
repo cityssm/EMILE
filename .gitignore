@@ -8,8 +8,8 @@ cypress/videos/
 
 data/sessions/
 
-data/*.db
-data/*.db-journal
+data/**/*.db
+data/**/*.db-journal
 
 data/config.d.ts
 data/config.js

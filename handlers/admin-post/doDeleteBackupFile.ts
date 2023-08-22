@@ -1,15 +1,20 @@
 import type { Request, Response } from 'express'
 
-import { getBackedUpDatabaseFiles } from '../../helpers/functions.database.js'
+import {
+  deleteDatabaseBackupFile,
+  getBackedUpDatabaseFiles
+} from '../../helpers/functions.database.js'
 
 export async function handler(
   request: Request,
   response: Response
 ): Promise<void> {
+  await deleteDatabaseBackupFile(request.body.fileName)
+
   const backupFiles = await getBackedUpDatabaseFiles()
 
-  response.render('admin-database', {
-    headTitle: 'Database Maintenance',
+  response.json({
+    success: true,
     backupFiles
   })
 }

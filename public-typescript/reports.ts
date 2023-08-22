@@ -3,7 +3,7 @@
 
 import type { Emile as EmileGlobal } from './globalTypes.js'
 
-(() => {
+;(() => {
   const Emile = exports.Emile as EmileGlobal
 
   Emile.initializeAssetSelector({
@@ -11,5 +11,4 @@ import type { Emile as EmileGlobal } from './globalTypes.js'
       '#reports--assetSelector'
     ) as HTMLElement
   })
-
 })()
