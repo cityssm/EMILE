@@ -39,12 +39,19 @@
   </div>
 </div>
 
+<div class="message is-info">
+  <p class="message-body">
+    Note that all user permission changes are saved automatically.
+  </p>
+</div>
+
 <div id="container--users"></div>
 
 <%- include('_footerA'); -%>
 
 <script>
   exports.users = <%- JSON.stringify(users) %>;
+  exports.userDomain = '<%= configFunctions.getConfigProperty("application.userDomain") %>';
 </script>
 <script src="<%= urlPrefix %>/javascripts/adminUsers.min.js"></script>
 

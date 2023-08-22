@@ -1,0 +1,41 @@
+<div class="modal" role="dialog" aria-label="Add a New User">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <div class="modal-card-head">
+      <h2 class="modal-card-title">Add a New User</h2>
+      <button
+        class="delete is-close-modal-button"
+        aria-label="close"
+        type="button"
+      ></button>
+    </div>
+    <section class="modal-card-body">
+      <form id="form--userAdd">
+        <label class="label" for="userAdd--userName">User Name</label>
+        <div class="field has-addons">
+          <div class="control">
+            <span class="button is-static" data-field="userDomain"></span>
+          </div>
+          <div class="control is-expanded">
+            <input
+              class="input"
+              id="userAdd--userName"
+              name="userName"
+              type="text"
+              maxlength="30"
+              autocomplete="off"
+              required
+            />
+          </div>
+        </div>
+      </form>
+    </section>
+    <div class="modal-card-foot is-justify-content-right">
+      <button class="button is-success" type="submit" form="form--userAdd">
+        <span class="icon"><i class="fas fa-plus" aria-hidden="true"></i></span>
+        <span>Add User</span>
+      </button>
+      <button class="button is-close-modal-button" type="button">Cancel</button>
+    </div>
+  </div>
+</div>
