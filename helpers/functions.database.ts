@@ -82,7 +82,9 @@ export async function getBackedUpDatabaseFiles(): Promise<DatabaseFile[]> {
 
   const fileNames = await fs.readdir(backupFolder)
 
-  for (const fileName of fileNames) {
+  for (let index = fileNames.length - 1; index >= 0; index -= 1) {
+    const fileName = fileNames[index]
+
     const fileStats = await fs.stat(path.join(backupFolder, fileName))
 
     if (fileStats.isFile() && fileName.endsWith('.db')) {
