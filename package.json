@@ -10,7 +10,13 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production node ./bin/www.js",
     "dev:live": "cross-env NODE_ENV=dev DEBUG=emile:* nodemon --inspect ./bin/www.js",
-    "dev:test": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true nodemon --inspect ./bin/www.js"
+    "dev:test": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true nodemon --inspect ./bin/www.js",
+    "cy:open": "cypress open --config-file cypress.config.js",
+    "cy:run": "cypress run --config-file cypress.config.js",
+    "cy:run:firefox": "cypress run --config-file cypress.config.js --browser firefox",
+    "test": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true mocha --timeout 30000 --exit",
+    "test:startup": "cross-env NODE_ENV=dev DEBUG=emile:* STARTUP_TEST=true node ./bin/www.js",
+    "coverage": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true c8 --reporter=lcov --reporter=text --reporter=text-summary mocha --timeout 30000 --exit"
   },
   "repository": {
     "type": "git",
@@ -61,6 +67,7 @@
     "@cityssm/bulma-a11y": "^0.4.0",
     "@cityssm/bulma-sticky-table": "^2.1.0",
     "@cityssm/fa-glow": "^0.1.0",
+    "@cypress/webpack-batteries-included-preprocessor": "^3.0.0",
     "@types/activedirectory2": "^1.2.3",
     "@types/better-sqlite3": "^7.6.4",
     "@types/compression": "^1.7.2",
@@ -75,12 +82,15 @@
     "@types/gulp-minify": "^3.1.2",
     "@types/gulp-sass": "^5.0.1",
     "@types/http-errors": "^2.0.1",
+    "@types/mocha": "^10.0.1",
     "@types/multer": "^1.4.7",
     "@types/node-windows": "^0.1.2",
     "@types/papaparse": "^5.3.8",
     "@types/session-file-store": "^1.2.2",
     "bulma": "^0.9.4",
     "bulma-tooltip": "^3.0.2",
+    "cypress": "^12.17.4",
+    "cypress-axe": "^1.4.0",
     "eslint": "^8.47.0",
     "eslint-config-cityssm": "^0.4.0",
     "gulp": "^4.0.2",
@@ -88,6 +98,7 @@
     "gulp-minify": "^3.1.0",
     "gulp-sass": "^5.1.0",
     "nodemon": "^3.0.1",
-    "sass": "^1.66.1"
+    "sass": "^1.66.1",
+    "webpack": "^5.88.2"
   }
 }

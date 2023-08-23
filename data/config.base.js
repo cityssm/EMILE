@@ -1,8 +1,6 @@
 export const config = {
     application: {},
-    reverseProxy: {
-        urlPrefix: '/emile'
-    },
+    reverseProxy: {},
     session: {}
 };
 export default config;

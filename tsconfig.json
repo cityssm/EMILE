@@ -20,6 +20,7 @@
   "include": [
     "*",
     "bin/*",
+    "cypress/**/*",
     "data/*",
     "database/*",
     "handlers/**/*",
@@ -27,6 +28,7 @@
     "parsers/*",
     "routes/*",
     "tasks/*",
+    "test/*",
     "types/*"
   ]
 }

@@ -32,7 +32,7 @@
             <h1 class="title is-3 has-text-centered">
               <%= configFunctions.getConfigProperty("application.applicationName") %>
             </h1>
-            <% if (configFunctions.getConfigProperty('application.allowTesting')) { %>
+            <% if (configFunctions.getConfigProperty('application.useTestDatabases')) { %>
               <div class="message is-warning is-small" data-cy="allowTesting">
                 <p class="message-body">Application is testing mode.</p>
               </div>
