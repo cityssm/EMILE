@@ -3,7 +3,7 @@ import fs from 'node:fs/promises';
 import { initializeDatabase } from '../database/initializeDatabase.js';
 import { databasePath, useTestDatabases } from '../helpers/functions.database.js';
 describe('Initialize Database', () => {
-    it('initializes a cemetery database', async () => {
+    it('initializes an EMILE database', async () => {
         if (!useTestDatabases) {
             assert.fail('Test database must be used!');
         }

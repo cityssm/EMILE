@@ -8,7 +8,7 @@ import {
 } from '../helpers/functions.database.js'
 
 describe('Initialize Database', () => {
-  it('initializes a cemetery database', async () => {
+  it('initializes an EMILE database', async () => {
     if (!useTestDatabases) {
       assert.fail('Test database must be used!')
     }
