@@ -6,6 +6,7 @@ import handler_tables from '../handlers/admin-get/tables.js'
 import handler_users from '../handlers/admin-get/users.js'
 import handler_doAddUser from '../handlers/admin-post/doAddUser.js'
 import handler_doBackupDatabase from '../handlers/admin-post/doBackupDatabase.js'
+import handler_doCleanupDatabase from '../handlers/admin-post/doCleanupDatabase.js'
 import handler_doDeleteBackupFile from '../handlers/admin-post/doDeleteBackupFile.js'
 import handler_doDeleteUser from '../handlers/admin-post/doDeleteUser.js'
 import handler_doUpdateUserCanLogin from '../handlers/admin-post/doUpdateUserCanLogin.js'
@@ -35,6 +36,7 @@ router.post('/doDeleteUser', handler_doDeleteUser)
 router.get('/database', handler_database as RequestHandler)
 
 router.post('/doBackupDatabase', handler_doBackupDatabase as RequestHandler)
+router.post('/doCleanupDatabase', handler_doCleanupDatabase)
 
 router.post('/doDeleteBackupFile', handler_doDeleteBackupFile as RequestHandler)
 

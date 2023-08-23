@@ -22,3 +22,28 @@ export function deleteAssetAlias(
 
   return result.changes > 0
 }
+
+export function deleteAssetAliasesByAssetId(
+  assetId: number | string,
+  sessionUser: EmileUser,
+  connectedEmileDB?: sqlite.Database
+): boolean {
+  const emileDB =
+    connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB
+
+  const result = emileDB
+    .prepare(
+      `update AssetAliases
+        set recordDelete_userName = ?,
+        recordDelete_timeMillis = ?
+        where recordDelete_timeMillis is null
+        and assetId = ?`
+    )
+    .run(sessionUser.userName, Date.now(), assetId)
+
+  if (connectedEmileDB === undefined) {
+    emileDB.close()
+  }
+
+  return result.changes > 0
+}

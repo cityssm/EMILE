@@ -15,7 +15,7 @@ declare const cityssm: cityssmGlobal
   const Emile = exports.Emile as EmileGlobal
 
   /*
-   * Backup Tab
+   * Backup
    */
 
   let backupFiles = exports.backupFiles as DatabaseFile[]
@@ -84,7 +84,7 @@ declare const cityssm: cityssmGlobal
 
     backupContainerElement.innerHTML = `<table class="table is-fullwidth is-striped is-hoverable has-sticky-header">
       <thead><tr>
-        <th>File Name</th>
+        <th>Backup File Name</th>
         <th>Last Modified</th>
         <th class="has-text-right">File Size</th>
         <th class="has-width-10"><span class="is-sr-only">Options</span></td>
@@ -123,37 +123,37 @@ declare const cityssm: cityssmGlobal
     }
   }
 
-  document.querySelector('.is-backup-button')?.addEventListener('click', () => {
-    function doBackup(): void {
-      cityssm.postJSON(
-        `${Emile.urlPrefix}/admin/doBackupDatabase`,
-        {},
-        (rawResponseJSON) => {
-          const responseJSON = rawResponseJSON as {
-            success: boolean
-            backupFiles: DatabaseFile[]
-          }
-
-          if (responseJSON.success) {
-            backupFiles = responseJSON.backupFiles
-
-            bulmaJS.alert({
-              message: 'Database backed up successfully.',
-              contextualColorName: 'success'
-            })
-
-            renderBackupFiles()
-          } else {
-            bulmaJS.alert({
-              title: 'Error Backing Up Database',
-              message: 'Please try again.',
-              contextualColorName: 'danger'
-            })
-          }
+  function doBackup(): void {
+    cityssm.postJSON(
+      `${Emile.urlPrefix}/admin/doBackupDatabase`,
+      {},
+      (rawResponseJSON) => {
+        const responseJSON = rawResponseJSON as {
+          success: boolean
+          backupFiles: DatabaseFile[]
         }
-      )
-    }
 
+        if (responseJSON.success) {
+          backupFiles = responseJSON.backupFiles
+
+          bulmaJS.alert({
+            message: 'Database backed up successfully.',
+            contextualColorName: 'success'
+          })
+
+          renderBackupFiles()
+        } else {
+          bulmaJS.alert({
+            title: 'Error Backing Up Database',
+            message: 'Please try again.',
+            contextualColorName: 'danger'
+          })
+        }
+      }
+    )
+  }
+
+  document.querySelector('.is-backup-button')?.addEventListener('click', () => {
     bulmaJS.confirm({
       title: 'Backup Database',
       message: "Are you sure you want to backup the application's database?",
@@ -166,14 +166,55 @@ declare const cityssm: cityssmGlobal
   })
 
   /*
-   * Cleanup Tab
+   * Cleanup
    */
+
+  function doCleanup(): void {
+    cityssm.postJSON(
+      `${Emile.urlPrefix}/admin/doCleanupDatabase`,
+      {},
+      (rawResponseJSON) => {
+        const responseJSON = rawResponseJSON as {
+          success: boolean
+          deleteCount: number
+        }
+
+        if (responseJSON.success) {
+          bulmaJS.alert({
+            title: 'Database Cleaned Up Successfully.',
+            message: `${responseJSON.deleteCount} record(s) permanently deleted.`,
+            contextualColorName: 'success'
+          })
+        } else {
+          bulmaJS.alert({
+            title: 'Error Cleaning Up Database',
+            message: 'Please try again.',
+            contextualColorName: 'danger'
+          })
+        }
+      }
+    )
+  }
+
+  document
+    .querySelector('.is-cleanup-button')
+    ?.addEventListener('click', () => {
+      bulmaJS.confirm({
+        title: 'Cleanup Database',
+        message: `<strong>Are you sure you want to cleanup the database?</strong><br />
+        The cleanup process may speed up the application by purging previously deleted records.`,
+        messageIsHtml: true,
+        contextualColorName: 'warning',
+        okButton: {
+          text: 'Yes, Cleanup Database',
+          callbackFunction: doCleanup
+        }
+      })
+    })
 
   /*
    * Initialize
    */
-
-  bulmaJS.init()
 
   renderBackupFiles()
 })()

@@ -3,10 +3,10 @@
 /* eslint-disable unicorn/prefer-module */
 Object.defineProperty(exports, "__esModule", { value: true });
 (() => {
-    var _a;
+    var _a, _b;
     const Emile = exports.Emile;
     /*
-     * Backup Tab
+     * Backup
      */
     let backupFiles = exports.backupFiles;
     function deleteBackupFile(clickEvent) {
@@ -56,7 +56,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         }
         backupContainerElement.innerHTML = `<table class="table is-fullwidth is-striped is-hoverable has-sticky-header">
       <thead><tr>
-        <th>File Name</th>
+        <th>Backup File Name</th>
         <th>Last Modified</th>
         <th class="has-text-right">File Size</th>
         <th class="has-width-10"><span class="is-sr-only">Options</span></td>
@@ -89,27 +89,27 @@ Object.defineProperty(exports, "__esModule", { value: true });
             (_b = backupContainerElement.querySelector('tbody')) === null || _b === void 0 ? void 0 : _b.append(rowElement);
         }
     }
+    function doBackup() {
+        cityssm.postJSON(`${Emile.urlPrefix}/admin/doBackupDatabase`, {}, (rawResponseJSON) => {
+            const responseJSON = rawResponseJSON;
+            if (responseJSON.success) {
+                backupFiles = responseJSON.backupFiles;
+                bulmaJS.alert({
+                    message: 'Database backed up successfully.',
+                    contextualColorName: 'success'
+                });
+                renderBackupFiles();
+            }
+            else {
+                bulmaJS.alert({
+                    title: 'Error Backing Up Database',
+                    message: 'Please try again.',
+                    contextualColorName: 'danger'
+                });
+            }
+        });
+    }
     (_a = document.querySelector('.is-backup-button')) === null || _a === void 0 ? void 0 : _a.addEventListener('click', () => {
-        function doBackup() {
-            cityssm.postJSON(`${Emile.urlPrefix}/admin/doBackupDatabase`, {}, (rawResponseJSON) => {
-                const responseJSON = rawResponseJSON;
-                if (responseJSON.success) {
-                    backupFiles = responseJSON.backupFiles;
-                    bulmaJS.alert({
-                        message: 'Database backed up successfully.',
-                        contextualColorName: 'success'
-                    });
-                    renderBackupFiles();
-                }
-                else {
-                    bulmaJS.alert({
-                        title: 'Error Backing Up Database',
-                        message: 'Please try again.',
-                        contextualColorName: 'danger'
-                    });
-                }
-            });
-        }
         bulmaJS.confirm({
             title: 'Backup Database',
             message: "Are you sure you want to backup the application's database?",
@@ -121,11 +121,43 @@ Object.defineProperty(exports, "__esModule", { value: true });
         });
     });
     /*
-     * Cleanup Tab
+     * Cleanup
      */
+    function doCleanup() {
+        cityssm.postJSON(`${Emile.urlPrefix}/admin/doCleanupDatabase`, {}, (rawResponseJSON) => {
+            const responseJSON = rawResponseJSON;
+            if (responseJSON.success) {
+                bulmaJS.alert({
+                    title: 'Database Cleaned Up Successfully.',
+                    message: `${responseJSON.deleteCount} record(s) permanently deleted.`,
+                    contextualColorName: 'success'
+                });
+            }
+            else {
+                bulmaJS.alert({
+                    title: 'Error Cleaning Up Database',
+                    message: 'Please try again.',
+                    contextualColorName: 'danger'
+                });
+            }
+        });
+    }
+    (_b = document
+        .querySelector('.is-cleanup-button')) === null || _b === void 0 ? void 0 : _b.addEventListener('click', () => {
+        bulmaJS.confirm({
+            title: 'Cleanup Database',
+            message: `<strong>Are you sure you want to cleanup the database?</strong><br />
+        The cleanup process may speed up the application by purging previously deleted records.`,
+            messageIsHtml: true,
+            contextualColorName: 'warning',
+            okButton: {
+                text: 'Yes, Cleanup Database',
+                callbackFunction: doCleanup
+            }
+        });
+    });
     /*
      * Initialize
      */
-    bulmaJS.init();
     renderBackupFiles();
 })();
