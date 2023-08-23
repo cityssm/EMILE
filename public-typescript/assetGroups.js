@@ -161,7 +161,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         function deleteAssetGroup(clickEvent) {
             clickEvent.preventDefault();
             function doDelete() {
-                cityssm.postJSON(Emile.urlPrefix + '/assets/doDeleteAssetGroup', {
+                cityssm.postJSON(`${Emile.urlPrefix}/assets/doDeleteAssetGroup`, {
                     groupId
                 }, (rawResponseJSON) => {
                     var _a;
@@ -256,9 +256,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
       <tbody></tbody>`;
         // eslint-disable-next-line no-labels
         assetGroupLoop: for (const assetGroup of Emile.assetGroups) {
-            const searchText = assetGroup.groupName.toLowerCase() +
-                ' ' +
-                ((_a = assetGroup.groupDescription) !== null && _a !== void 0 ? _a : '').toLowerCase();
+            const searchText = `${assetGroup.groupName} ${(_a = assetGroup.groupDescription) !== null && _a !== void 0 ? _a : ''}`.toLowerCase();
             for (const searchPiece of searchPieces) {
                 if (!searchText.includes(searchPiece)) {
                     // eslint-disable-next-line no-labels
@@ -301,7 +299,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         let addAssetGroupCloseModalFunction;
         function doAddAssetGroup(formEvent) {
             formEvent.preventDefault();
-            cityssm.postJSON(Emile.urlPrefix + '/assets/doAddAssetGroup', formEvent.currentTarget, (rawResponseJSON) => {
+            cityssm.postJSON(`${Emile.urlPrefix}/assets/doAddAssetGroup`, formEvent.currentTarget, (rawResponseJSON) => {
                 const responseJSON = rawResponseJSON;
                 if (responseJSON.success) {
                     Emile.assetGroups = responseJSON.assetGroups;

@@ -293,7 +293,7 @@ interface ErrorResponse {
 
       function doDelete(): void {
         cityssm.postJSON(
-          Emile.urlPrefix + '/assets/doDeleteAssetGroup',
+          `${Emile.urlPrefix}/assets/doDeleteAssetGroup`,
           {
             groupId
           },
@@ -422,10 +422,9 @@ interface ErrorResponse {
 
     // eslint-disable-next-line no-labels
     assetGroupLoop: for (const assetGroup of Emile.assetGroups) {
-      const searchText =
-        assetGroup.groupName.toLowerCase() +
-        ' ' +
-        (assetGroup.groupDescription ?? '').toLowerCase()
+      const searchText = `${assetGroup.groupName} ${
+        assetGroup.groupDescription ?? ''
+      }`.toLowerCase()
 
       for (const searchPiece of searchPieces) {
         if (!searchText.includes(searchPiece)) {
@@ -487,7 +486,7 @@ interface ErrorResponse {
         formEvent.preventDefault()
 
         cityssm.postJSON(
-          Emile.urlPrefix + '/assets/doAddAssetGroup',
+          `${Emile.urlPrefix}/assets/doAddAssetGroup`,
           formEvent.currentTarget,
           (rawResponseJSON) => {
             const responseJSON = rawResponseJSON as

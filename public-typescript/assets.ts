@@ -286,7 +286,7 @@ interface ErrorResponse {
 
       function doDelete(): void {
         cityssm.postJSON(
-          Emile.urlPrefix + '/assets/doDeleteAsset',
+          `${Emile.urlPrefix}/assets/doDeleteAsset`,
           {
             assetId
           },
@@ -436,10 +436,9 @@ interface ErrorResponse {
         continue
       }
 
-      const searchText =
-        asset.assetName.toLowerCase() +
-        ' ' +
-        (asset.category ?? '').toLowerCase()
+      const searchText = `${asset.assetName} ${
+        asset.category ?? ''
+      }`.toLowerCase()
 
       for (const searchPiece of searchPieces) {
         if (!searchText.includes(searchPiece)) {
@@ -509,7 +508,7 @@ interface ErrorResponse {
       formEvent.preventDefault()
 
       cityssm.postJSON(
-        Emile.urlPrefix + '/assets/doAddAsset',
+        `${Emile.urlPrefix}/assets/doAddAsset`,
         formEvent.currentTarget,
         (rawResponseJSON) => {
           const responseJSON = rawResponseJSON as
