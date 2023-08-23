@@ -4,6 +4,7 @@
 
 [![DeepSource](https://app.deepsource.com/gh/cityssm/EMILE.svg/?label=active+issues&show_trend=true&token=AT4qy65eeZIecqOz7zA-UKo8)](https://app.deepsource.com/gh/cityssm/EMILE/?ref=repository-badge)
 [![Maintainability](https://api.codeclimate.com/v1/badges/0908ba3507dfddc4408b/maintainability)](https://codeclimate.com/github/cityssm/EMILE/maintainability)
+[![EMILE](https://img.shields.io/endpoint?url=https://cloud.cypress.io/badge/simple/6u22zp/main&style=flat&logo=cypress)](https://cloud.cypress.io/projects/6u22zp/runs)
 
 _Pronounced like Emily_
 
