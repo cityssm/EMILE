@@ -6,20 +6,24 @@ import type { AssetAliasType } from '../types/recordTypes.js'
 export function getAssetAliasTypeByAliasTypeKey(
   aliasTypeKey: string
 ): AssetAliasType | undefined {
-  const emileDB = sqlite(databasePath, {
-    readonly: true
-  })
+  try {
+    const emileDB = sqlite(databasePath, {
+      readonly: true
+    })
 
-  const assetAliasType = emileDB
-    .prepare(
-      `select aliasTypeId, aliasType, regularExpression, aliasTypeKey
+    const assetAliasType = emileDB
+      .prepare(
+        `select aliasTypeId, aliasType, regularExpression, aliasTypeKey
         from AssetAliasTypes
         where recordDelete_timeMillis is null
         and aliasTypeKey = ?`
-    )
-    .get(aliasTypeKey) as AssetAliasType | undefined
+      )
+      .get(aliasTypeKey) as AssetAliasType | undefined
 
-  emileDB.close()
+    emileDB.close()
 
-  return assetAliasType
+    return assetAliasType
+  } catch {
+    return undefined
+  }
 }

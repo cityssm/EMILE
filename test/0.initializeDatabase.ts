@@ -13,7 +13,11 @@ describe('Initialize Database', () => {
       assert.fail('Test database must be used!')
     }
 
-    await fs.unlink(databasePath)
+    try {
+      await fs.unlink(databasePath)
+    } catch {
+      // ignore
+    }
 
     initializeDatabase()
 

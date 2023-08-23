@@ -7,7 +7,11 @@ describe('Initialize Database', () => {
         if (!useTestDatabases) {
             assert.fail('Test database must be used!');
         }
-        await fs.unlink(databasePath);
+        try {
+            await fs.unlink(databasePath);
+        }
+        catch {
+        }
         initializeDatabase();
         assert.ok(true);
     });
