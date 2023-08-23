@@ -13,6 +13,7 @@ import rateLimit from 'express-rate-limit';
 import session from 'express-session';
 import createError from 'http-errors';
 import FileStore from 'session-file-store';
+import { initializeDatabase } from './database/initializeDatabase.js';
 import { adminGetHandler, updateGetHandler } from './handlers/permissions.js';
 import { getSafeRedirectURL } from './helpers/functions.authentication.js';
 import configFunctions, { getConfigProperty } from './helpers/functions.config.js';
@@ -24,6 +25,9 @@ import routerLogin from './routes/login.js';
 import routerReports from './routes/reports.js';
 import { version } from './version.js';
 const debug = Debug(`emile:app:${process.pid}`);
+if (getConfigProperty('application.useTestDatabases')) {
+    initializeDatabase();
+}
 if (getConfigProperty('tempUsers').length > 0) {
     debug('Temporary user accounts currently active!');
 }

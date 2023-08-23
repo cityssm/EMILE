@@ -19,6 +19,7 @@ import session from 'express-session'
 import createError from 'http-errors'
 import FileStore from 'session-file-store'
 
+import { initializeDatabase } from './database/initializeDatabase.js'
 import { adminGetHandler, updateGetHandler } from './handlers/permissions.js'
 import { getSafeRedirectURL } from './helpers/functions.authentication.js'
 import configFunctions, {
@@ -37,6 +38,10 @@ const debug = Debug(`emile:app:${process.pid}`)
 /*
  * INITIALIZE APP
  */
+
+if (getConfigProperty('application.useTestDatabases')) {
+  initializeDatabase()
+}
 
 if (getConfigProperty('tempUsers').length > 0) {
   debug('Temporary user accounts currently active!')
