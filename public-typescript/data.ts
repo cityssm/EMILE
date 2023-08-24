@@ -17,7 +17,8 @@ declare const cityssm: cityssmGlobal
 ;(() => {
   const Emile = exports.Emile as EmileGlobal
 
-  const parserClasses = exports.parserClasses as string[]
+  const parserClassesAndConfigurations =
+    exports.parserClassesAndConfigurations as string[]
 
   /*
    * Pending Files
@@ -109,18 +110,31 @@ declare const cityssm: cityssmGlobal
           ).textContent = pendingFile.assetName ?? ''
         }
 
+        /*
+         * Parser Class Dropdown
+         */
+
         const parserClassSelectElement = modalElement.querySelector(
           '#energyDataFileEdit--parserClass'
         ) as HTMLSelectElement
 
         let parserClassFound = false
 
-        for (const parserClass of parserClasses) {
-          const optionElement = document.createElement('option')
-          optionElement.value = parserClass
-          optionElement.textContent = parserClass
+        const pendingFileParserClassAndConfiguration =
+          (pendingFile.parserProperties?.parserClass ?? '') +
+          (pendingFile.parserProperties?.parserConfig === undefined
+            ? ''
+            : '::' + pendingFile.parserProperties.parserConfig)
 
-          if (parserClass === pendingFile.parserProperties?.parserClass) {
+        for (const parserClassAndConfiguration of parserClassesAndConfigurations) {
+          const optionElement = document.createElement('option')
+          optionElement.value = parserClassAndConfiguration
+          optionElement.textContent = parserClassAndConfiguration
+
+          if (
+            parserClassAndConfiguration ===
+            pendingFileParserClassAndConfiguration
+          ) {
             optionElement.selected = true
             parserClassFound = true
           }
@@ -134,8 +148,9 @@ declare const cityssm: cityssmGlobal
           pendingFile.parserProperties.parserClass !== undefined
         ) {
           const optionElement = document.createElement('option')
-          optionElement.value = pendingFile.parserProperties.parserClass
-          optionElement.textContent = pendingFile.parserProperties.parserClass
+          optionElement.value = pendingFileParserClassAndConfiguration
+          optionElement.textContent =
+            pendingFileParserClassAndConfiguration + ' (Unavailable)'
           optionElement.selected = true
           parserClassSelectElement.append(optionElement)
         }
@@ -304,13 +319,21 @@ declare const cityssm: cityssmGlobal
                 }" aria-hidden="true"></i> <span data-field="assetName"></span>`
           }</span><br />
           <span>
-            <i class="fas fa-fw fa-cog" aria-hidden="true"></i>
+            <i class="fas fa-fw fa-book-open" aria-hidden="true"></i>
             ${
               (pendingFile.parserProperties?.parserClass ?? '') === ''
                 ? 'No Parser Selected'
                 : pendingFile.parserProperties?.parserClass ?? ''
             }
-          </span>
+          </span><br />
+          ${
+            (pendingFile.parserProperties?.parserConfig ?? '') === ''
+              ? ''
+              : `<span>
+                <i class="fas fa-fw fa-cog" aria-hidden="true"></i>
+                ${pendingFile.parserProperties?.parserConfig ?? ''}
+              </span>`
+          }
         </td>
         <td class="has-text-right">
           <button class="button is-info is-settings-button" type="button">

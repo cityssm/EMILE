@@ -99,7 +99,7 @@ export interface AssetAlias
 export interface Asset
   extends Partial<RecordUserNameDateTime>,
     Partial<AssetCategory> {
-  assetId: number
+  assetId: number | null
   assetName: string
   latitude?: number | null
   longitude?: number | null
@@ -156,13 +156,13 @@ export interface EnergyData
     Partial<Asset>,
     Partial<EnergyDataType>,
     Partial<EnergyDataFile> {
-      dataId: number
-      timeSeconds: number
-      durationSeconds: number
-      endTimeSeconds?: number
-      dataValue: number
-      powerOfTenMultiplier: number
-    }
+  dataId: number
+  timeSeconds: number
+  durationSeconds: number
+  endTimeSeconds?: number
+  dataValue: number
+  powerOfTenMultiplier: number
+}
 
 /*
  * USER TYPES

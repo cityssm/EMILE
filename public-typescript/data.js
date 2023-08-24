@@ -14,7 +14,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 (() => {
     var _a, _b;
     const Emile = exports.Emile;
-    const parserClasses = exports.parserClasses;
+    const parserClassesAndConfigurations = exports.parserClassesAndConfigurations;
     let pendingFiles = exports.pendingFiles;
     delete exports.pendingFiles;
     function updatePendingEnergyDataFile(formEvent) {
@@ -47,7 +47,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         });
         cityssm.openHtmlModal('data-parserSettings', {
             onshow(modalElement) {
-                var _a, _b, _c, _d, _e, _f, _g;
+                var _a, _b, _c, _d, _e, _f, _g, _h, _j;
                 ;
                 modalElement.querySelector('#energyDataFileEdit--fileId').value = (_b = (_a = pendingFile.fileId) === null || _a === void 0 ? void 0 : _a.toString()) !== null && _b !== void 0 ? _b : '';
                 modalElement.querySelector('[data-field="originalFileName"]').textContent = pendingFile.originalFileName;
@@ -57,13 +57,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
                     modalElement.querySelector('#energyDataFileEdit--assetSelector .icon').innerHTML = `<i class="${(_e = pendingFile.fontAwesomeIconClasses) !== null && _e !== void 0 ? _e : 'fas fa-bolt'}" aria-hidden="true"></i>`;
                     modalElement.querySelector('#energyDataFileEdit--assetSelector button').textContent = (_f = pendingFile.assetName) !== null && _f !== void 0 ? _f : '';
                 }
+                /*
+                 * Parser Class Dropdown
+                 */
                 const parserClassSelectElement = modalElement.querySelector('#energyDataFileEdit--parserClass');
                 let parserClassFound = false;
-                for (const parserClass of parserClasses) {
+                const pendingFileParserClassAndConfiguration = ((_h = (_g = pendingFile.parserProperties) === null || _g === void 0 ? void 0 : _g.parserClass) !== null && _h !== void 0 ? _h : '') +
+                    (((_j = pendingFile.parserProperties) === null || _j === void 0 ? void 0 : _j.parserConfig) === undefined
+                        ? ''
+                        : '::' + pendingFile.parserProperties.parserConfig);
+                for (const parserClassAndConfiguration of parserClassesAndConfigurations) {
                     const optionElement = document.createElement('option');
-                    optionElement.value = parserClass;
-                    optionElement.textContent = parserClass;
-                    if (parserClass === ((_g = pendingFile.parserProperties) === null || _g === void 0 ? void 0 : _g.parserClass)) {
+                    optionElement.value = parserClassAndConfiguration;
+                    optionElement.textContent = parserClassAndConfiguration;
+                    if (parserClassAndConfiguration ===
+                        pendingFileParserClassAndConfiguration) {
                         optionElement.selected = true;
                         parserClassFound = true;
                     }
@@ -73,8 +81,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
                     pendingFile.parserProperties !== undefined &&
                     pendingFile.parserProperties.parserClass !== undefined) {
                     const optionElement = document.createElement('option');
-                    optionElement.value = pendingFile.parserProperties.parserClass;
-                    optionElement.textContent = pendingFile.parserProperties.parserClass;
+                    optionElement.value = pendingFileParserClassAndConfiguration;
+                    optionElement.textContent =
+                        pendingFileParserClassAndConfiguration + ' (Unavailable)';
                     optionElement.selected = true;
                     parserClassSelectElement.append(optionElement);
                 }
@@ -167,7 +176,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         });
     }
     function renderPendingFiles() {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s;
         const pendingFilesCountElement = document.querySelector('#count--pendingFiles');
         const pendingFilesContainerElement = document.querySelector('#container--pendingFiles');
         pendingFilesCountElement.textContent = pendingFiles.length.toString();
@@ -199,18 +208,24 @@ Object.defineProperty(exports, "__esModule", { value: true });
                 ? '<i class="fas fa-fw fa-hat-wizard" aria-hidden="true"></i> Detect Asset from File'
                 : `<i class="fa-fw ${(_b = pendingFile.fontAwesomeIconClasses) !== null && _b !== void 0 ? _b : 'fas fa-bolt'}" aria-hidden="true"></i> <span data-field="assetName"></span>`}</span><br />
           <span>
-            <i class="fas fa-fw fa-cog" aria-hidden="true"></i>
+            <i class="fas fa-fw fa-book-open" aria-hidden="true"></i>
             ${((_d = (_c = pendingFile.parserProperties) === null || _c === void 0 ? void 0 : _c.parserClass) !== null && _d !== void 0 ? _d : '') === ''
                 ? 'No Parser Selected'
                 : (_f = (_e = pendingFile.parserProperties) === null || _e === void 0 ? void 0 : _e.parserClass) !== null && _f !== void 0 ? _f : ''}
-          </span>
+          </span><br />
+          ${((_h = (_g = pendingFile.parserProperties) === null || _g === void 0 ? void 0 : _g.parserConfig) !== null && _h !== void 0 ? _h : '') === ''
+                ? ''
+                : `<span>
+                <i class="fas fa-fw fa-cog" aria-hidden="true"></i>
+                ${(_k = (_j = pendingFile.parserProperties) === null || _j === void 0 ? void 0 : _j.parserConfig) !== null && _k !== void 0 ? _k : ''}
+              </span>`}
         </td>
         <td class="has-text-right">
           <button class="button is-info is-settings-button" type="button">
             <span class="icon"><i class="fas fa-pencil-alt" aria-hidden="true"></i></span>
             <span>Settings</span>
           </button>
-          <button class="button is-success is-parse-button" type="button" ${((_h = (_g = pendingFile.parserProperties) === null || _g === void 0 ? void 0 : _g.parserClass) !== null && _h !== void 0 ? _h : '') === ''
+          <button class="button is-success is-parse-button" type="button" ${((_m = (_l = pendingFile.parserProperties) === null || _l === void 0 ? void 0 : _l.parserClass) !== null && _m !== void 0 ? _m : '') === ''
                 ? 'disabled'
                 : ''}>
             <span class="icon"><i class="fas fa-cogs" aria-hidden="true"></i></span>
@@ -222,17 +237,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
         </td>`;
             if (pendingFile.assetId !== null) {
                 ;
-                rowElement.querySelector('[data-field="assetName"]').textContent = (_j = pendingFile.assetName) !== null && _j !== void 0 ? _j : '';
+                rowElement.querySelector('[data-field="assetName"]').textContent = (_o = pendingFile.assetName) !== null && _o !== void 0 ? _o : '';
             }
             ;
             rowElement.querySelector('[data-field="originalFileName"]').textContent = pendingFile.originalFileName;
-            (_k = rowElement
-                .querySelector('.is-settings-button')) === null || _k === void 0 ? void 0 : _k.addEventListener('click', openPendingDataFileSettings);
-            (_l = rowElement
-                .querySelector('.is-parse-button')) === null || _l === void 0 ? void 0 : _l.addEventListener('click', confirmProcessPendingDataFile);
-            (_m = rowElement
-                .querySelector('.is-delete-button')) === null || _m === void 0 ? void 0 : _m.addEventListener('click', confirmDeletePendingDataFile);
-            (_o = tableElement.querySelector('tbody')) === null || _o === void 0 ? void 0 : _o.append(rowElement);
+            (_p = rowElement
+                .querySelector('.is-settings-button')) === null || _p === void 0 ? void 0 : _p.addEventListener('click', openPendingDataFileSettings);
+            (_q = rowElement
+                .querySelector('.is-parse-button')) === null || _q === void 0 ? void 0 : _q.addEventListener('click', confirmProcessPendingDataFile);
+            (_r = rowElement
+                .querySelector('.is-delete-button')) === null || _r === void 0 ? void 0 : _r.addEventListener('click', confirmDeletePendingDataFile);
+            (_s = tableElement.querySelector('tbody')) === null || _s === void 0 ? void 0 : _s.append(rowElement);
         }
         pendingFilesContainerElement.innerHTML = '';
         pendingFilesContainerElement.append(tableElement);

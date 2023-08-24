@@ -17,6 +17,7 @@ configFallbackValues.set('session.cookieName', 'emile-user-sid');
 configFallbackValues.set('session.secret', 'cityssm/emile');
 configFallbackValues.set(property_session_maxAgeMillis, 60 * 60 * 1000);
 configFallbackValues.set('session.doKeepAlive', false);
+configFallbackValues.set('parserConfigs', {});
 export function getConfigProperty(propertyName) {
     const propertyNameSplit = propertyName.split('.');
     let currentObject = config;

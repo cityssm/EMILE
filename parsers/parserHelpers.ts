@@ -1,17 +1,20 @@
-import {
-  CsvParser,
-  type CsvParserProperties
-} from './csvParser.js'
+import { getExcelDateFromJs, getJsDateFromExcel } from 'excel-date-to-js'
+import { getConfigProperty } from '../helpers/functions.config.js'
+
 import {
   GreenButtonParser,
   type GreenButtonParserProperties
 } from './greenButtonParser.js'
+import { SheetParser, type SheetParserProperties } from './sheetParser.js'
+import e from 'express'
 
 /*
  * Parser Types
  */
 
-export type ParserProperties = GreenButtonParserProperties | CsvParserProperties
+export type ParserProperties =
+  | GreenButtonParserProperties
+  | SheetParserProperties
 
 /*
  * File Extensions
@@ -19,7 +22,7 @@ export type ParserProperties = GreenButtonParserProperties | CsvParserProperties
 
 const _fileExtensions: string[] = []
 _fileExtensions.push(
-  ...CsvParser.fileExtensions,
+  ...SheetParser.fileExtensions,
   ...GreenButtonParser.fileExtensions
 )
 
@@ -34,20 +37,36 @@ export function getDefaultParserPropertiesByFileName(
 
   if (GreenButtonParser.fileExtensions.includes(fileExtension)) {
     return {
-      parserClass: 'GreenButtonParser'
+      parserClass: 'GreenButtonParser',
+      parserConfig: ''
     } satisfies GreenButtonParserProperties
-  } else if (CsvParser.fileExtensions.includes(fileExtension)) {
-    return {
-      parserClass: 'CsvParser'
-    } satisfies CsvParserProperties
   }
 
   return undefined
 }
 
 const parserClasses: string[] = []
-parserClasses.push(GreenButtonParser.name, CsvParser.name)
+parserClasses.push(GreenButtonParser.name, SheetParser.name)
 
 export function getParserClasses(): string[] {
   return parserClasses
+}
+
+const parserClassesAndConfigurations: string[] = []
+parserClassesAndConfigurations.push(GreenButtonParser.name)
+
+for (const [parserConfigName, parserConfig] of Object.entries(
+  getConfigProperty('parserConfigs')
+)) {
+  parserClassesAndConfigurations.push(
+    `${parserConfig.parserClass}::${parserConfigName}`
+  )
+}
+
+export function getParserClassesAndConfigurations(): string[] {
+  return parserClassesAndConfigurations
+}
+
+export function excelDateToDate(excelDate: number): Date {
+  return getJsDateFromExcel(excelDate)
 }

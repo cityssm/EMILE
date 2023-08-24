@@ -51,7 +51,7 @@ export interface AssetAlias extends Partial<RecordUserNameDateTime>, Partial<Ass
     assetAlias: string;
 }
 export interface Asset extends Partial<RecordUserNameDateTime>, Partial<AssetCategory> {
-    assetId: number;
+    assetId: number | null;
     assetName: string;
     latitude?: number | null;
     longitude?: number | null;

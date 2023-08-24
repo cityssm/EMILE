@@ -8,14 +8,15 @@ import { addAssetAlias } from '../database/addAssetAlias.js'
 import { addEnergyData } from '../database/addEnergyData.js'
 import { getAssetByAssetAlias } from '../database/getAsset.js'
 import { getAssetAliasTypeByAliasTypeKey } from '../database/getAssetAliasType.js'
+import { getAssetCategories } from '../database/getAssetCategories.js'
 import { getEnergyDataTypeByGreenButtonIds } from '../database/getEnergyDataType.js'
 import { updateEnergyDataFileAsProcessed } from '../database/updateEnergyDataFile.js'
-import { getAssetCategories } from '../helpers/functions.cache.js'
 
 import { BaseParser } from './baseParser.js'
 
 export interface GreenButtonParserProperties {
   parserClass: 'GreenButtonParser'
+  parserConfig: ''
 }
 
 export class GreenButtonParser extends BaseParser {
@@ -60,19 +61,15 @@ export class GreenButtonParser extends BaseParser {
          * Ensure an assetId is available
          */
 
-        const assetAlias = intervalBlockEntry.links.self
-
-        if (assetAlias === undefined) {
-          throw new Error('No asset alias available on IntervalBlock entry.')
-        }
-
         let assetId = this.energyDataFile.assetId
 
-        /*
-         * Detect asset if not set
-         */
-
         if ((assetId ?? '') === '') {
+          const assetAlias = intervalBlockEntry.links.self
+
+          if (assetAlias === undefined) {
+            throw new Error('No asset alias available on IntervalBlock entry.')
+          }
+
           console.log(`assetAlias: ${assetAlias}`)
 
           const asset = getAssetByAssetAlias(

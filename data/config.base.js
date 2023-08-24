@@ -1,6 +1,7 @@
 export const config = {
     application: {},
     reverseProxy: {},
-    session: {}
+    session: {},
+    parserConfigs: {}
 };
 export default config;

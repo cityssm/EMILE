@@ -5,9 +5,9 @@ import exitHook from 'exit-hook';
 import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async';
 import { getEnergyDataFilesToProcess } from '../database/getEnergyDataFiles.js';
 import { updateEnergyDataFileAsFailed } from '../database/updateEnergyDataFile.js';
-import { CsvParser } from '../parsers/csvParser.js';
 import { GreenButtonParser } from '../parsers/greenButtonParser.js';
 import { getParserClasses } from '../parsers/parserHelpers.js';
+import { SheetParser } from '../parsers/sheetParser.js';
 const debug = Debug('emile:tasks:energyDataFilesProcessor');
 const processorUser = {
     userName: 'system.fileProcessor',
@@ -63,8 +63,8 @@ async function processFiles() {
                 parser = new GreenButtonParser(dataFile);
                 break;
             }
-            case 'CsvParser': {
-                parser = new CsvParser(dataFile);
+            case 'SheetParser': {
+                parser = new SheetParser(dataFile);
                 break;
             }
             default: {

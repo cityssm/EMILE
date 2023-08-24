@@ -6,9 +6,9 @@ import { addAssetAlias } from '../database/addAssetAlias.js';
 import { addEnergyData } from '../database/addEnergyData.js';
 import { getAssetByAssetAlias } from '../database/getAsset.js';
 import { getAssetAliasTypeByAliasTypeKey } from '../database/getAssetAliasType.js';
+import { getAssetCategories } from '../database/getAssetCategories.js';
 import { getEnergyDataTypeByGreenButtonIds } from '../database/getEnergyDataType.js';
 import { updateEnergyDataFileAsProcessed } from '../database/updateEnergyDataFile.js';
-import { getAssetCategories } from '../helpers/functions.cache.js';
 import { BaseParser } from './baseParser.js';
 export class GreenButtonParser extends BaseParser {
     static fileExtensions = ['xml'];
@@ -29,12 +29,12 @@ export class GreenButtonParser extends BaseParser {
                 throw new Error('File contains no IntervalBlock entries.');
             }
             for (const intervalBlockEntry of intervalBlockEntries) {
-                const assetAlias = intervalBlockEntry.links.self;
-                if (assetAlias === undefined) {
-                    throw new Error('No asset alias available on IntervalBlock entry.');
-                }
                 let assetId = this.energyDataFile.assetId;
                 if ((assetId ?? '') === '') {
+                    const assetAlias = intervalBlockEntry.links.self;
+                    if (assetAlias === undefined) {
+                        throw new Error('No asset alias available on IntervalBlock entry.');
+                    }
                     console.log(`assetAlias: ${assetAlias}`);
                     const asset = getAssetByAssetAlias(assetAlias, GreenButtonParser.assetAliasType?.aliasTypeId);
                     if (asset === undefined) {

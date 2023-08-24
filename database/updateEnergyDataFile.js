@@ -16,10 +16,17 @@ export function updateEnergyDataFileAsFailed(energyDataFile, sessionUser) {
     return result.changes > 0;
 }
 export function updatePendingEnergyDataFile(energyDataFile, sessionUser) {
+    let parserClass = energyDataFile.parserClass;
+    let parserConfig = '';
+    if (parserClass.includes('::')) {
+        parserConfig = parserClass.slice(Math.max(0, parserClass.indexOf('::') + 2));
+        parserClass = parserClass.slice(0, Math.max(0, parserClass.indexOf('::')));
+    }
     const parserPropertiesJson = energyDataFile.parserClass === ''
         ? '{}'
         : JSON.stringify({
-            parserClass: energyDataFile.parserClass
+            parserClass,
+            parserConfig
         });
     const emileDB = sqlite(databasePath);
     const result = emileDB

@@ -363,6 +363,22 @@ export function initializeDatabase(): void {
       },
       initializeDatabaseUser
     )
+
+    addAssetAliasType(
+      {
+        aliasType: 'Electricity Account Number',
+        aliasTypeKey: 'accountNumber.electricity'
+      },
+      initializeDatabaseUser
+    )
+
+    addAssetAliasType(
+      {
+        aliasType: 'Gas Account Number',
+        aliasTypeKey: 'accountNumber.gas'
+      },
+      initializeDatabaseUser
+    )
   }
 
   /*

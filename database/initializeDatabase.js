@@ -217,6 +217,14 @@ export function initializeDatabase() {
             aliasType: 'Green Button Interval Block Link',
             aliasTypeKey: 'GreenButtonParser.IntervalBlock.link'
         }, initializeDatabaseUser);
+        addAssetAliasType({
+            aliasType: 'Electricity Account Number',
+            aliasTypeKey: 'accountNumber.electricity'
+        }, initializeDatabaseUser);
+        addAssetAliasType({
+            aliasType: 'Gas Account Number',
+            aliasTypeKey: 'accountNumber.gas'
+        }, initializeDatabaseUser);
     }
     emileDB
         .prepare(`create table if not exists AssetAliases (

@@ -9,6 +9,7 @@ import type { ADWebAuthConfig } from '@cityssm/ad-web-auth-connector/types.js'
 import { config } from '../data/config.js'
 import type {
   ConfigActiveDirectory,
+  ConfigParserConfiguration,
   ConfigTemporaryUserCredentials
 } from '../types/configTypes.js'
 
@@ -39,6 +40,8 @@ configFallbackValues.set('session.cookieName', 'emile-user-sid')
 configFallbackValues.set('session.secret', 'cityssm/emile')
 configFallbackValues.set(property_session_maxAgeMillis, 60 * 60 * 1000)
 configFallbackValues.set('session.doKeepAlive', false)
+
+configFallbackValues.set('parserConfigs', {})
 
 /*
  * Set up function overloads
@@ -82,6 +85,10 @@ export function getConfigProperty(
 export function getConfigProperty(
   propertyName: 'adWebAuthConfig'
 ): ADWebAuthConfig | undefined
+
+export function getConfigProperty(
+  propertyName: 'parserConfigs'
+): Record<string, ConfigParserConfiguration>
 
 export function getConfigProperty(propertyName: string): unknown {
   const propertyNameSplit = propertyName.split('.')

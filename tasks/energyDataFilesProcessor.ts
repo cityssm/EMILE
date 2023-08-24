@@ -8,9 +8,9 @@ import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async'
 import { getEnergyDataFilesToProcess } from '../database/getEnergyDataFiles.js'
 import { updateEnergyDataFileAsFailed } from '../database/updateEnergyDataFile.js'
 import type { BaseParser } from '../parsers/baseParser.js'
-import { CsvParser } from '../parsers/csvParser.js'
 import { GreenButtonParser } from '../parsers/greenButtonParser.js'
 import { getParserClasses } from '../parsers/parserHelpers.js'
+import { SheetParser } from '../parsers/sheetParser.js'
 import type { RunFileProcessorWorkerMessage } from '../types/applicationTypes.js'
 
 const debug = Debug('emile:tasks:energyDataFilesProcessor')
@@ -71,7 +71,7 @@ async function processFiles(): Promise<void> {
 
       updateEnergyDataFileAsFailed(
         {
-          fileId: dataFile.fileId as number,
+          fileId: dataFile.fileId,
           processedTimeMillis: Date.now(),
           processedMessage: 'File access error.'
         },
@@ -90,7 +90,7 @@ async function processFiles(): Promise<void> {
     ) {
       updateEnergyDataFileAsFailed(
         {
-          fileId: dataFile.fileId as number,
+          fileId: dataFile.fileId,
           processedTimeMillis: Date.now(),
           processedMessage: `Selected parser not found: ${
             dataFile.parserProperties?.parserClass ?? ''
@@ -113,14 +113,14 @@ async function processFiles(): Promise<void> {
         parser = new GreenButtonParser(dataFile)
         break
       }
-      case 'CsvParser': {
-        parser = new CsvParser(dataFile)
+      case 'SheetParser': {
+        parser = new SheetParser(dataFile)
         break
       }
       default: {
         updateEnergyDataFileAsFailed(
           {
-            fileId: dataFile.fileId as number,
+            fileId: dataFile.fileId,
             processedTimeMillis: Date.now(),
             processedMessage: `Selected parser not implemented: ${
               (dataFile.parserProperties?.parserClass as string) ?? ''
@@ -142,7 +142,7 @@ async function processFiles(): Promise<void> {
     } catch {
       updateEnergyDataFileAsFailed(
         {
-          fileId: dataFile.fileId as number,
+          fileId: dataFile.fileId,
           processedTimeMillis: Date.now(),
           processedMessage: `Error parsing file: ${
             (dataFile.parserProperties?.parserClass as string) ?? ''
