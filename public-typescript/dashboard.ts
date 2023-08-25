@@ -71,7 +71,7 @@ declare const cityssm: cityssmGlobal
     rowElement.innerHTML = `<td>${formatDateLabel(data.timeSeconds)}</td>
       <td>${data.readingType ?? ''}</td>
       <td>${data.commodity ?? ''}</td>
-      <td class="has-text-right">${data.dataValue}</td>
+      <td class="has-text-right">${data.dataValue * Math.pow(10, data.powerOfTenMultiplier)}</td>
       <td>${data.unit ?? ''}</td>`
 
     table.querySelector('tbody')?.append(rowElement)

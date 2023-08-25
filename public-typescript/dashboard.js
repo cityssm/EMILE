@@ -28,7 +28,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         rowElement.innerHTML = `<td>${formatDateLabel(data.timeSeconds)}</td>
       <td>${(_a = data.readingType) !== null && _a !== void 0 ? _a : ''}</td>
       <td>${(_b = data.commodity) !== null && _b !== void 0 ? _b : ''}</td>
-      <td class="has-text-right">${data.dataValue}</td>
+      <td class="has-text-right">${data.dataValue * Math.pow(10, data.powerOfTenMultiplier)}</td>
       <td>${(_c = data.unit) !== null && _c !== void 0 ? _c : ''}</td>`;
         (_d = table.querySelector('tbody')) === null || _d === void 0 ? void 0 : _d.append(rowElement);
     }
