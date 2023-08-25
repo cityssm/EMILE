@@ -10,11 +10,11 @@ import { getAssetByAssetAlias } from '../database/getAsset.js'
 import { getAssetAliasTypeByAliasTypeKey } from '../database/getAssetAliasType.js'
 import { getAssetCategories } from '../database/getAssetCategories.js'
 import { getEnergyDataTypeByNames } from '../database/getEnergyDataType.js'
+import { updateEnergyDataFileAsProcessed } from '../database/updateEnergyDataFile.js'
 import { getConfigProperty } from '../helpers/functions.config.js'
 import type { ConfigParserDataField } from '../types/configTypes.js'
 
 import { BaseParser } from './baseParser.js'
-import { updateEnergyDataFileAsProcessed } from '../database/updateEnergyDataFile.js'
 
 const debug = Debug('emile:parsers:sheetParser')
 

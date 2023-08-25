@@ -513,7 +513,10 @@ declare const cityssm: cityssmGlobal
     tableElement.innerHTML = `<thead><tr>
       <th class="has-width-10"><span class="is-sr-only">Processed Status</span></th>
       <th>Processed File</th>
-      <th>Results</th>
+      <th>From</th>
+      <th>To</th>
+      <th class="has-text-right">Data Points</th>
+      <th class="has-text-right">Assets</th>
       <th><span class="is-sr-only">Options</span></th>
       </tr></thead>
       <tbody></tbody>`
@@ -530,7 +533,23 @@ declare const cityssm: cityssmGlobal
         }
         </td>
         <td><strong data-field="originalFileName"></strong></td>
-        <td data-field="results"></td>
+        ${
+          dataFile.isFailed
+            ? '<td data-field="processedMessage" colspan="4"></td>'
+            : `<td>${new Date(
+                (dataFile.timeSecondsMin ?? 0) * 1000
+              ).toLocaleString()}</td>
+              <td>${new Date(
+                (dataFile.endTimeSecondsMax ?? 0) * 1000
+              ).toLocaleString()}</td>
+              <td class="has-text-right">
+                ${dataFile.energyDataCount ?? 0}
+              </td>
+              <td class="has-text-right">
+                ${dataFile.assetIdCount ?? 0}
+              </td>`
+        }
+        
         <td class="has-text-right">
           ${
             dataFile.isFailed
@@ -552,11 +571,14 @@ declare const cityssm: cityssmGlobal
           '[data-field="originalFileName"]'
         ) as HTMLElement
       ).textContent = dataFile.originalFileName
-      ;(
-        rowElement.querySelector('[data-field="results"]') as HTMLElement
-      ).textContent = dataFile.isFailed
-        ? dataFile.processedMessage ?? ''
-        : `${dataFile.energyDataCount ?? 0} data points`
+
+      if (dataFile.isFailed) {
+        ;(
+          rowElement.querySelector(
+            '[data-field="processedMessage"]'
+          ) as HTMLElement
+        ).textContent = dataFile.processedMessage ?? ''
+      }
 
       rowElement
         .querySelector('.is-reprocess-button')

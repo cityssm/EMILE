@@ -78,6 +78,9 @@ export interface EnergyDataFile extends Partial<RecordUserNameDateTime>, Partial
     isFailed: boolean;
     processedMessage?: string;
     energyDataCount?: number;
+    assetIdCount?: number;
+    timeSecondsMin?: number;
+    endTimeSecondsMax?: number;
 }
 export interface EnergyDataType extends Partial<RecordUserNameDateTime>, Partial<EnergyServiceCategory>, Partial<EnergyUnit>, Partial<EnergyReadingType>, Partial<EnergyCommodity>, Partial<EnergyAccumulationBehaviour> {
     dataTypeId?: number;
@@ -89,6 +92,7 @@ export interface EnergyData extends Partial<RecordUserNameDateTime>, Partial<Ass
     endTimeSeconds?: number;
     dataValue: number;
     powerOfTenMultiplier: number;
+    powerOfTenMultiplierName?: string;
 }
 declare global {
     interface EmileUser extends Partial<RecordUserNameDateTime> {

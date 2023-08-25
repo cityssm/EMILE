@@ -61,10 +61,10 @@
 
           const dateMinString = dateTimeFunctions.dateToString(dateMin)
 
-          const lastMonthDate = new Date(dateMax.getTime())
-          lastMonthDate.setMonth(lastMonthDate.getMonth() - 1)
+          const monthsAgoDate = new Date(dateMax.getTime())
+          monthsAgoDate.setMonth(monthsAgoDate.getMonth() - 6)
 
-          const startDateString = dateTimeFunctions.dateToString(new Date(Math.max(dateMin.getTime(), lastMonthDate.getTime())))
+          const startDateString = dateTimeFunctions.dateToString(new Date(Math.max(dateMin.getTime(), monthsAgoDate.getTime())))
         %>
         <div class="level-item">
           <div class="field has-addons">

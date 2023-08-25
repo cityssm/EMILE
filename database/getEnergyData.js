@@ -1,12 +1,19 @@
+import { powerOfTenMultipliers } from '@cityssm/green-button-parser/lookups.js';
 import { dateStringToDate } from '@cityssm/utils-datetime';
 import sqlite from 'better-sqlite3';
 import { databasePath } from '../helpers/functions.database.js';
+function userFunction_getPowerOfTenMultiplierName(powerOfTenMultiplier) {
+    if (powerOfTenMultiplier === 0) {
+        return '';
+    }
+    return powerOfTenMultipliers[powerOfTenMultiplier] ?? powerOfTenMultiplier.toString();
+}
 export function getEnergyData(filters, options) {
     const columnNames = options?.formatForExport ?? false
         ? `d.dataId,
         c.category, a.assetName, 
         ts.serviceCategory,
-        tu.unit,
+        userFunction_getPowerOfTenMultiplierName(d.powerOfTenMultiplier) as powerOfTenMultiplierName, tu.unit,
         tr.readingType,
         tc.commodity,
         ta.accumulationBehaviour,
@@ -18,6 +25,7 @@ export function getEnergyData(filters, options) {
         d.dataTypeId,
         t.serviceCategoryId, ts.serviceCategory,
         t.unitId, tu.unit, tu.unitLong,
+        userFunction_getPowerOfTenMultiplierName(d.powerOfTenMultiplier) as powerOfTenMultiplierName,
         t.readingTypeId, tr.readingType,
         t.commodityId, tc.commodity,
         t.accumulationBehaviourId, ta.accumulationBehaviour,
@@ -86,6 +94,7 @@ export function getEnergyData(filters, options) {
     const emileDB = sqlite(databasePath, {
         readonly: true
     });
+    emileDB.function('userFunction_getPowerOfTenMultiplierName', userFunction_getPowerOfTenMultiplierName);
     const data = emileDB.prepare(sql).all(sqlParameters);
     emileDB.close();
     return data;

@@ -13,7 +13,10 @@ function getEnergyDataFiles(filters, options) {
     processedTimeMillis, isFailed, processedMessage,
     f.recordCreate_timeMillis, f.recordUpdate_timeMillis`;
     let sql = `select ${groupByColumnNames},
-    count(d.dataId) as energyDataCount
+    count(d.dataId) as energyDataCount,
+    count(distinct d.assetId) as assetIdCount,
+    min(d.timeSeconds) as timeSecondsMin,
+    max(d.endTimeSeconds) as endTimeSecondsMax
     from EnergyDataFiles f
     left join Assets a on f.assetId = a.assetId
     left join AssetCategories c on a.categoryId = c.categoryId

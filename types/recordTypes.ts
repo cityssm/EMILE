@@ -139,6 +139,9 @@ export interface EnergyDataFile
   processedMessage?: string
 
   energyDataCount?: number
+  assetIdCount?: number
+  timeSecondsMin?: number
+  endTimeSecondsMax?: number
 }
 
 export interface EnergyDataType
@@ -162,6 +165,7 @@ export interface EnergyData
   endTimeSeconds?: number
   dataValue: number
   powerOfTenMultiplier: number
+  powerOfTenMultiplierName?: string
 }
 
 /*

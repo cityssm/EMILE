@@ -23,14 +23,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
         }
     }
     function addDataToTable(table, data) {
-        var _a, _b, _c, _d;
+        var _a, _b, _c, _d, _e;
         const rowElement = document.createElement('tr');
         rowElement.innerHTML = `<td>${formatDateLabel(data.timeSeconds)}</td>
       <td>${(_a = data.readingType) !== null && _a !== void 0 ? _a : ''}</td>
       <td>${(_b = data.commodity) !== null && _b !== void 0 ? _b : ''}</td>
-      <td class="has-text-right">${data.dataValue * Math.pow(10, data.powerOfTenMultiplier)}</td>
-      <td>${(_c = data.unit) !== null && _c !== void 0 ? _c : ''}</td>`;
-        (_d = table.querySelector('tbody')) === null || _d === void 0 ? void 0 : _d.append(rowElement);
+      <td class="has-text-right">${data.dataValue}</td>
+      <td>${(_c = data.powerOfTenMultiplierName) !== null && _c !== void 0 ? _c : ''}</td>
+      <td>${(_d = data.unit) !== null && _d !== void 0 ? _d : ''}</td>`;
+        (_e = table.querySelector('tbody')) === null || _e === void 0 ? void 0 : _e.append(rowElement);
     }
     function getEnergyData() {
         if (startDateStringElement.value > endDateStringElement.value) {
@@ -109,7 +110,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
                         <th>Reading Type</th>
                         <th>Commodity</th>
                         <th class="has-text-right">Value</th>
-                        <th>Unit</th>
+                        <th colspan="2">Unit</th>
                       </tr>
                     </thead>
                     <tbody></tbody>

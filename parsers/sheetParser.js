@@ -8,9 +8,9 @@ import { getAssetByAssetAlias } from '../database/getAsset.js';
 import { getAssetAliasTypeByAliasTypeKey } from '../database/getAssetAliasType.js';
 import { getAssetCategories } from '../database/getAssetCategories.js';
 import { getEnergyDataTypeByNames } from '../database/getEnergyDataType.js';
+import { updateEnergyDataFileAsProcessed } from '../database/updateEnergyDataFile.js';
 import { getConfigProperty } from '../helpers/functions.config.js';
 import { BaseParser } from './baseParser.js';
-import { updateEnergyDataFileAsProcessed } from '../database/updateEnergyDataFile.js';
 const debug = Debug('emile:parsers:sheetParser');
 function getDataFieldValue(row, dataField) {
     if (dataField !== undefined) {

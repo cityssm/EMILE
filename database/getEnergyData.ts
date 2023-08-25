@@ -1,6 +1,7 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable @typescript-eslint/indent */
 
+import { powerOfTenMultipliers } from '@cityssm/green-button-parser/lookups.js'
 import { dateStringToDate } from '@cityssm/utils-datetime'
 import sqlite from 'better-sqlite3'
 
@@ -22,6 +23,15 @@ interface GetEnergyDataOptions {
   formatForExport?: boolean
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
+function userFunction_getPowerOfTenMultiplierName (powerOfTenMultiplier: number): string {
+  if (powerOfTenMultiplier === 0) {
+    return ''
+  }
+
+  return powerOfTenMultipliers[powerOfTenMultiplier] ?? powerOfTenMultiplier.toString()
+}
+
 export function getEnergyData(
   filters: GetEnergyDataFilters,
   options?: GetEnergyDataOptions
@@ -31,7 +41,7 @@ export function getEnergyData(
       ? `d.dataId,
         c.category, a.assetName, 
         ts.serviceCategory,
-        tu.unit,
+        userFunction_getPowerOfTenMultiplierName(d.powerOfTenMultiplier) as powerOfTenMultiplierName, tu.unit,
         tr.readingType,
         tc.commodity,
         ta.accumulationBehaviour,
@@ -43,6 +53,7 @@ export function getEnergyData(
         d.dataTypeId,
         t.serviceCategoryId, ts.serviceCategory,
         t.unitId, tu.unit, tu.unitLong,
+        userFunction_getPowerOfTenMultiplierName(d.powerOfTenMultiplier) as powerOfTenMultiplierName,
         t.readingTypeId, tr.readingType,
         t.commodityId, tc.commodity,
         t.accumulationBehaviourId, ta.accumulationBehaviour,
@@ -130,6 +141,8 @@ export function getEnergyData(
   const emileDB = sqlite(databasePath, {
     readonly: true
   })
+
+  emileDB.function('userFunction_getPowerOfTenMultiplierName', userFunction_getPowerOfTenMultiplierName)
 
   const data = emileDB.prepare(sql).all(sqlParameters) as EnergyData[]
 

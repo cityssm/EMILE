@@ -332,7 +332,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         });
     }
     function renderProcessedFiles() {
-        var _a, _b, _c, _d, _e, _f;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
         const containerElement = document.querySelector('#container--processedFiles');
         const tableElement = document.createElement('table');
         tableElement.className =
@@ -340,7 +340,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
         tableElement.innerHTML = `<thead><tr>
       <th class="has-width-10"><span class="is-sr-only">Processed Status</span></th>
       <th>Processed File</th>
-      <th>Results</th>
+      <th>From</th>
+      <th>To</th>
+      <th class="has-text-right">Data Points</th>
+      <th class="has-text-right">Assets</th>
       <th><span class="is-sr-only">Options</span></th>
       </tr></thead>
       <tbody></tbody>`;
@@ -353,7 +356,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
                 : '<i class="fas fa-check-circle has-text-success" aria-hidden="true"></i>'}
         </td>
         <td><strong data-field="originalFileName"></strong></td>
-        <td data-field="results"></td>
+        ${dataFile.isFailed
+                ? '<td data-field="processedMessage" colspan="4"></td>'
+                : `<td>${new Date(((_b = dataFile.timeSecondsMin) !== null && _b !== void 0 ? _b : 0) * 1000).toLocaleString()}</td>
+              <td>${new Date(((_c = dataFile.endTimeSecondsMax) !== null && _c !== void 0 ? _c : 0) * 1000).toLocaleString()}</td>
+              <td class="has-text-right">
+                ${(_d = dataFile.energyDataCount) !== null && _d !== void 0 ? _d : 0}
+              </td>
+              <td class="has-text-right">
+                ${(_e = dataFile.assetIdCount) !== null && _e !== void 0 ? _e : 0}
+              </td>`}
+        
         <td class="has-text-right">
           ${dataFile.isFailed
                 ? `<button class="button is-light is-danger is-delete-button" type="button">
@@ -369,14 +382,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
           </button>
         </td>`;
             rowElement.querySelector('[data-field="originalFileName"]').textContent = dataFile.originalFileName;
-            rowElement.querySelector('[data-field="results"]').textContent = dataFile.isFailed
-                ? (_b = dataFile.processedMessage) !== null && _b !== void 0 ? _b : ''
-                : `${(_c = dataFile.energyDataCount) !== null && _c !== void 0 ? _c : 0} data points`;
-            (_d = rowElement
-                .querySelector('.is-reprocess-button')) === null || _d === void 0 ? void 0 : _d.addEventListener('click', confirmReprocessProcessedDataFile);
-            (_e = rowElement
-                .querySelector('.is-delete-button')) === null || _e === void 0 ? void 0 : _e.addEventListener('click', confirmDeleteProcessedDataFile);
-            (_f = tableElement.querySelector('tbody')) === null || _f === void 0 ? void 0 : _f.append(rowElement);
+            if (dataFile.isFailed) {
+                ;
+                rowElement.querySelector('[data-field="processedMessage"]').textContent = (_f = dataFile.processedMessage) !== null && _f !== void 0 ? _f : '';
+            }
+            (_g = rowElement
+                .querySelector('.is-reprocess-button')) === null || _g === void 0 ? void 0 : _g.addEventListener('click', confirmReprocessProcessedDataFile);
+            (_h = rowElement
+                .querySelector('.is-delete-button')) === null || _h === void 0 ? void 0 : _h.addEventListener('click', confirmDeleteProcessedDataFile);
+            (_j = tableElement.querySelector('tbody')) === null || _j === void 0 ? void 0 : _j.append(rowElement);
         }
         if (processedFiles.length === 0) {
             containerElement.innerHTML = `<div class="message is-info">
