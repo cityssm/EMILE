@@ -3,15 +3,18 @@ import path from 'node:path'
 import Debug from 'debug'
 import XLSX from 'xlsx'
 
+import { addAsset } from '../database/addAsset.js'
+import { addAssetAlias } from '../database/addAssetAlias.js'
+import { addEnergyData } from '../database/addEnergyData.js'
 import { getAssetByAssetAlias } from '../database/getAsset.js'
 import { getAssetAliasTypeByAliasTypeKey } from '../database/getAssetAliasType.js'
+import { getAssetCategories } from '../database/getAssetCategories.js'
+import { getEnergyDataTypeByNames } from '../database/getEnergyDataType.js'
 import { getConfigProperty } from '../helpers/functions.config.js'
 import type { ConfigParserDataField } from '../types/configTypes.js'
 
 import { BaseParser } from './baseParser.js'
-import { getAssetCategories } from '../database/getAssetCategories.js'
-import { addAsset } from '../database/addAsset.js'
-import { addAssetAlias } from '../database/addAssetAlias.js'
+import { updateEnergyDataFileAsProcessed } from '../database/updateEnergyDataFile.js'
 
 const debug = Debug('emile:parsers:sheetParser')
 
@@ -154,9 +157,95 @@ export class SheetParser extends BaseParser {
             assetId = asset.assetId
           }
         }
+
+        /*
+         * Ensure a dataTypeId is available
+         */
+
+        const serviceCategoryName = (getDataFieldValue(
+          row,
+          parserConfig.columns.dataType.serviceCategory
+        ) ?? '') as string
+
+        const unitName = (getDataFieldValue(
+          row,
+          parserConfig.columns.dataType.unit
+        ) ?? '') as string
+
+        const readingTypeName = (getDataFieldValue(
+          row,
+          parserConfig.columns.dataType.readingType
+        ) ?? '') as string
+
+        const commodityName = (getDataFieldValue(
+          row,
+          parserConfig.columns.dataType.commodity
+        ) ?? '') as string
+
+        const accumulationBehaviourName = (getDataFieldValue(
+          row,
+          parserConfig.columns.dataType.accumulationBehaviour
+        ) ?? '') as string
+
+        const energyDataType = getEnergyDataTypeByNames(
+          {
+            serviceCategory: serviceCategoryName,
+            unit: unitName,
+            readingType: readingTypeName,
+            commodity: commodityName,
+            accumulationBehaviour: accumulationBehaviourName
+          },
+          SheetParser.parserUser,
+          true
+        )
+
+        if (energyDataType === undefined) {
+          throw new Error('Unable to retrieve EnergyDataType.')
+        }
+
+        const timeSeconds = getDataFieldValue(
+          row,
+          parserConfig.columns.timeSeconds
+        ) as number
+
+        const durationSeconds = getDataFieldValue(
+          row,
+          parserConfig.columns.durationSeconds
+        ) as number
+
+        const dataValue = getDataFieldValue(
+          row,
+          parserConfig.columns.dataValue
+        ) as number
+
+        const powerOfTenMultiplier = (getDataFieldValue(
+          row,
+          parserConfig.columns.powerOfTenMultiplier
+        ) ?? 0) as number
+
+        if (dataValue === undefined || Number.isNaN(dataValue) || dataValue.toString() === '') {
+          debug(`Skipping data value for asset ${assetId ?? ''}: '${dataValue}'`)
+          continue
+        }
+
+        addEnergyData(
+          {
+            assetId,
+            dataTypeId: energyDataType.dataTypeId,
+            fileId: this.energyDataFile.fileId,
+            timeSeconds,
+            durationSeconds,
+            dataValue,
+            powerOfTenMultiplier
+          },
+          SheetParser.parserUser
+        )
       }
 
-      throw new Error('Parser not fully implemented')
+      updateEnergyDataFileAsProcessed(
+        this.energyDataFile.fileId,
+        SheetParser.parserUser
+      )
     } catch (error) {
       this.handleParseFileError(error)
       return false

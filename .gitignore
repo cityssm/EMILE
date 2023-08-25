@@ -20,4 +20,6 @@ data/files/imported/*
 data/files/uploads/*
 !data/files/uploads/README.md
 
+temp/*.csv
+
 node_modules/

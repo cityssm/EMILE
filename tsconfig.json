@@ -28,6 +28,7 @@
     "parsers/*",
     "routes/*",
     "tasks/*",
+    "temp/*",
     "test/*",
     "types/*"
   ]

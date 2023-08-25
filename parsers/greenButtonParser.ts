@@ -109,7 +109,7 @@ export class GreenButtonParser extends BaseParser {
         }
 
         /*
-         * Ensure a dataTypeId is avaialble
+         * Ensure a dataTypeId is available
          */
 
         const meterReadingEntry =

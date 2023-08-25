@@ -16,7 +16,9 @@
     "cy:run:firefox": "cypress run --config-file cypress.config.js --browser firefox",
     "test": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true mocha --timeout 30000 --exit",
     "test:startup": "cross-env NODE_ENV=dev DEBUG=emile:* STARTUP_TEST=true node ./bin/www.js",
-    "coverage": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true c8 --reporter=lcov --reporter=text --reporter=text-summary mocha --timeout 30000 --exit"
+    "coverage": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true c8 --reporter=lcov --reporter=text --reporter=text-summary mocha --timeout 30000 --exit",
+
+    "temp:updateSsmPucAssetNames": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true node ./temp/updateSsmPucAssetNames.js"
   },
   "repository": {
     "type": "git",
