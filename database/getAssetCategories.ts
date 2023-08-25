@@ -3,10 +3,13 @@ import sqlite from 'better-sqlite3'
 import { databasePath } from '../helpers/functions.database.js'
 import type { AssetCategory } from '../types/recordTypes.js'
 
-export function getAssetCategories(): AssetCategory[] {
-  const emileDB = sqlite(databasePath, {
-    readonly: true
-  })
+export function getAssetCategories(
+  connectedEmileDB?: sqlite.Database
+): AssetCategory[] {
+  const emileDB =
+    connectedEmileDB === undefined
+      ? sqlite(databasePath, { readonly: true })
+      : connectedEmileDB
 
   const assetCategories = emileDB
     .prepare(
@@ -17,7 +20,9 @@ export function getAssetCategories(): AssetCategory[] {
     )
     .all() as AssetCategory[]
 
-  emileDB.close()
+  if (connectedEmileDB === undefined) {
+    emileDB.close()
+  }
 
   return assetCategories
 }
