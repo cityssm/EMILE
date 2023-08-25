@@ -181,12 +181,28 @@ export function initializeDatabase() {
             fontAwesomeIconClasses: 'far fa-building'
         }, initializeDatabaseUser, emileDB);
         addAssetCategory({
-            category: 'Streetlight',
+            category: 'Street Light',
             fontAwesomeIconClasses: 'far fa-lightbulb'
         }, initializeDatabaseUser, emileDB);
         addAssetCategory({
-            category: 'Vehicle',
-            fontAwesomeIconClasses: 'fas fa-car-side'
+            category: 'Traffic Light',
+            fontAwesomeIconClasses: 'fas fa-traffic-light'
+        }, initializeDatabaseUser, emileDB);
+        addAssetCategory({
+            category: 'Outdoor Lighting',
+            fontAwesomeIconClasses: 'fas fa-sun'
+        }, initializeDatabaseUser, emileDB);
+        addAssetCategory({
+            category: 'Outdoor Pool',
+            fontAwesomeIconClasses: 'fas fa-swimming-pool'
+        }, initializeDatabaseUser, emileDB);
+        addAssetCategory({
+            category: 'Parking Lot',
+            fontAwesomeIconClasses: 'fas fa-parking'
+        }, initializeDatabaseUser, emileDB);
+        addAssetCategory({
+            category: 'Pump Station',
+            fontAwesomeIconClasses: 'fas fa-tint'
         }, initializeDatabaseUser, emileDB);
     }
     emileDB
