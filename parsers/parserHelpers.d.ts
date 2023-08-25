@@ -5,4 +5,3 @@ export declare const fileExtensions: Set<string>;
 export declare function getDefaultParserPropertiesByFileName(fileName: string): ParserProperties | undefined;
 export declare function getParserClasses(): string[];
 export declare function getParserClassesAndConfigurations(): string[];
-export declare function excelDateToDate(excelDate: number): Date;

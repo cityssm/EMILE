@@ -1,4 +1,4 @@
-import { dateStringToDate } from '@cityssm/utils-datetime';
+import { excelDateToDate } from '../parsers/parserTools.js';
 import baseConfig from './config.base.js';
 export const config = Object.assign({}, baseConfig);
 config.parserConfigs = config.parserConfigs ?? {};
@@ -24,15 +24,15 @@ config.parserConfigs.ssmPuc = {
         timeSeconds: {
             dataType: 'function',
             dataFunction: (dataObject) => {
-                const startDate = dateStringToDate(dataObject.BillPeriodStart);
-                return startDate.getTime() / 1000;
+                const startDate = excelDateToDate(dataObject.BillPeriodStart);
+                return (startDate.getTime() / 1000) + (startDate.getTimezoneOffset() * 60);
             }
         },
         durationSeconds: {
             dataType: 'function',
             dataFunction: (dataObject) => {
-                const startDate = dateStringToDate(dataObject.BillPeriodStart);
-                const endDate = dateStringToDate(dataObject.BillPeriodEnd);
+                const startDate = excelDateToDate(dataObject.BillPeriodStart);
+                const endDate = excelDateToDate(dataObject.BillPeriodEnd);
                 return (endDate.getTime() - startDate.getTime()) / 1000;
             }
         },

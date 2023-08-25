@@ -1,4 +1,3 @@
-import { getExcelDateFromJs, getJsDateFromExcel } from 'excel-date-to-js'
 import { getConfigProperty } from '../helpers/functions.config.js'
 
 import {
@@ -6,7 +5,6 @@ import {
   type GreenButtonParserProperties
 } from './greenButtonParser.js'
 import { SheetParser, type SheetParserProperties } from './sheetParser.js'
-import e from 'express'
 
 /*
  * Parser Types
@@ -65,8 +63,4 @@ for (const [parserConfigName, parserConfig] of Object.entries(
 
 export function getParserClassesAndConfigurations(): string[] {
   return parserClassesAndConfigurations
-}
-
-export function excelDateToDate(excelDate: number): Date {
-  return getJsDateFromExcel(excelDate)
 }
