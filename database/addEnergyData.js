@@ -6,11 +6,11 @@ export function addEnergyData(data, sessionUser) {
     const result = emileDB
         .prepare(`insert into EnergyData (
         assetId, dataTypeId, fileId,
-        timeSeconds, durationSeconds, dataValue,
+        timeSeconds, durationSeconds, dataValue, powerOfTenMultiplier,
         recordCreate_userName, recordCreate_timeMillis,
         recordUpdate_userName, recordUpdate_timeMillis)
-        values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
-        .run(data.assetId, data.dataTypeId, data.fileId, data.timeSeconds, data.durationSeconds, data.dataValue, sessionUser.userName, rightNowMillis, sessionUser.userName, rightNowMillis);
+        values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+        .run(data.assetId, data.dataTypeId, data.fileId, data.timeSeconds, data.durationSeconds, data.dataValue, data.powerOfTenMultiplier ?? 0, sessionUser.userName, rightNowMillis, sessionUser.userName, rightNowMillis);
     emileDB.close();
     return result.lastInsertRowid;
 }

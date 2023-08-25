@@ -15,10 +15,10 @@ export function addEnergyData(
     .prepare(
       `insert into EnergyData (
         assetId, dataTypeId, fileId,
-        timeSeconds, durationSeconds, dataValue,
+        timeSeconds, durationSeconds, dataValue, powerOfTenMultiplier,
         recordCreate_userName, recordCreate_timeMillis,
         recordUpdate_userName, recordUpdate_timeMillis)
-        values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .run(
       data.assetId,
@@ -27,6 +27,7 @@ export function addEnergyData(
       data.timeSeconds,
       data.durationSeconds,
       data.dataValue,
+      data.powerOfTenMultiplier ?? 0,
       sessionUser.userName,
       rightNowMillis,
       sessionUser.userName,
