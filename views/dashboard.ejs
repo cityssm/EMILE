@@ -49,7 +49,10 @@
       </div>
       <div class="level-right">
         <%
-          const dateMax = new Date()
+          const dateMax = (energyDataStatistics.endTimeSecondsMax ?? 0) === 0
+            ? new Date()
+            : new Date(energyDataStatistics.endTimeSecondsMax * 1000)
+
           const dateMaxString = dateTimeFunctions.dateToString(dateMax)
 
           const dateMin = (energyDataStatistics.timeSecondsMin ?? 0) === 0 
@@ -58,7 +61,7 @@
 
           const dateMinString = dateTimeFunctions.dateToString(dateMin)
 
-          const lastMonthDate = new Date()
+          const lastMonthDate = new Date(dateMax.getTime())
           lastMonthDate.setMonth(lastMonthDate.getMonth() - 1)
 
           const startDateString = dateTimeFunctions.dateToString(new Date(Math.max(dateMin.getTime(), lastMonthDate.getTime())))
