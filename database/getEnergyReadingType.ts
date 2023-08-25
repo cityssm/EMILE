@@ -32,3 +32,30 @@ export function getEnergyReadingTypeByGreenButtonId(
 
   return readingType
 }
+
+export function getEnergyReadingTypeByName(
+  readingTypeName: string,
+  connectedEmileDB?: sqlite.Database
+): EnergyReadingType | undefined {
+  const emileDB =
+    connectedEmileDB === undefined
+      ? sqlite(databasePath, {
+          readonly: true
+        })
+      : connectedEmileDB
+
+  const readingType = emileDB
+    .prepare(
+      `select readingTypeId, readingType, greenButtonId
+        from EnergyReadingTypes
+        where recordDelete_timeMillis is null
+        and readingType = ?`
+    )
+    .get(readingTypeName) as EnergyReadingType
+
+  if (connectedEmileDB === undefined) {
+    emileDB.close()
+  }
+
+  return readingType
+}

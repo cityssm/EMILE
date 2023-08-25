@@ -32,3 +32,30 @@ export function getEnergyUnitByGreenButtonId(
 
   return unit
 }
+
+export function getEnergyUnitByName(
+  unitName: string,
+  connectedEmileDB?: sqlite.Database
+): EnergyUnit | undefined {
+  const emileDB =
+    connectedEmileDB === undefined
+      ? sqlite(databasePath, {
+          readonly: true
+        })
+      : connectedEmileDB
+
+  const unit = emileDB
+    .prepare(
+      `select unitId, unit, unitLong, greenButtonId
+        from EnergyUnits
+        where recordDelete_timeMillis is null
+        and (unit = ? or unitLong = ?)`
+    )
+    .get(unitName, unitName) as EnergyUnit
+
+  if (connectedEmileDB === undefined) {
+    emileDB.close()
+  }
+
+  return unit
+}

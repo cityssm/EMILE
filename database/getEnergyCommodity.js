@@ -17,3 +17,20 @@ export function getEnergyCommodityByGreenButtonId(commodityGreenButtonId, connec
     }
     return commodity;
 }
+export function getEnergyCommodityByName(commodityName, connectedEmileDB) {
+    const emileDB = connectedEmileDB === undefined
+        ? sqlite(databasePath, {
+            readonly: true
+        })
+        : connectedEmileDB;
+    const commodity = emileDB
+        .prepare(`select commodityId, commodity, greenButtonId
+        from EnergyCommodities
+        where recordDelete_timeMillis is null
+        and commodity = ?`)
+        .get(commodityName);
+    if (connectedEmileDB === undefined) {
+        emileDB.close();
+    }
+    return commodity;
+}

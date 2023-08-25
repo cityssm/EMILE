@@ -32,3 +32,30 @@ export function getEnergyCommodityByGreenButtonId(
 
   return commodity
 }
+
+export function getEnergyCommodityByName(
+  commodityName: string,
+  connectedEmileDB?: sqlite.Database
+): EnergyCommodity | undefined {
+  const emileDB =
+    connectedEmileDB === undefined
+      ? sqlite(databasePath, {
+          readonly: true
+        })
+      : connectedEmileDB
+
+  const commodity = emileDB
+    .prepare(
+      `select commodityId, commodity, greenButtonId
+        from EnergyCommodities
+        where recordDelete_timeMillis is null
+        and commodity = ?`
+    )
+    .get(commodityName) as EnergyCommodity
+
+  if (connectedEmileDB === undefined) {
+    emileDB.close()
+  }
+
+  return commodity
+}

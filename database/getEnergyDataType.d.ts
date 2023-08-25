@@ -8,3 +8,10 @@ export declare function getEnergyDataTypeByGreenButtonIds(greenButtonIds: {
     commodityId?: string;
     accumulationBehaviourId?: string;
 }, sessionUser: EmileUser, createIfUnavailable?: boolean): EnergyDataType | undefined;
+export declare function getEnergyDataTypeByNames(names: {
+    serviceCategory: string;
+    unit: string;
+    readingType: string | '';
+    commodity: string | '';
+    accumulationBehaviour: string | '';
+}, sessionUser: EmileUser, createIfUnavailable?: boolean): EnergyDataType | undefined;

@@ -32,3 +32,30 @@ export function getEnergyAccumulationBehaviourByGreenButtonId(
 
   return accumulationBehaviour
 }
+
+export function getEnergyAccumulationBehaviourByName(
+  accumulationBehaviourName: string,
+  connectedEmileDB?: sqlite.Database
+): EnergyAccumulationBehaviour | undefined {
+  const emileDB =
+    connectedEmileDB === undefined
+      ? sqlite(databasePath, {
+          readonly: true
+        })
+      : connectedEmileDB
+
+  const accumulationBehaviour = emileDB
+    .prepare(
+      `select accumulationBehaviourId, accumulationBehaviour, greenButtonId
+        from EnergyAccumulationBehaviours
+        where recordDelete_timeMillis is null
+        and accumulationBehaviour = ?`
+    )
+    .get(accumulationBehaviourName) as EnergyAccumulationBehaviour
+
+  if (connectedEmileDB === undefined) {
+    emileDB.close()
+  }
+
+  return accumulationBehaviour
+}

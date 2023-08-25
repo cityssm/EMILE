@@ -17,3 +17,20 @@ export function getEnergyAccumulationBehaviourByGreenButtonId(accumulationBehavi
     }
     return accumulationBehaviour;
 }
+export function getEnergyAccumulationBehaviourByName(accumulationBehaviourName, connectedEmileDB) {
+    const emileDB = connectedEmileDB === undefined
+        ? sqlite(databasePath, {
+            readonly: true
+        })
+        : connectedEmileDB;
+    const accumulationBehaviour = emileDB
+        .prepare(`select accumulationBehaviourId, accumulationBehaviour, greenButtonId
+        from EnergyAccumulationBehaviours
+        where recordDelete_timeMillis is null
+        and accumulationBehaviour = ?`)
+        .get(accumulationBehaviourName);
+    if (connectedEmileDB === undefined) {
+        emileDB.close();
+    }
+    return accumulationBehaviour;
+}
