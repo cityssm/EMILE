@@ -17,7 +17,6 @@
     "test": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true mocha --timeout 30000 --exit",
     "test:startup": "cross-env NODE_ENV=dev DEBUG=emile:* STARTUP_TEST=true node ./bin/www.js",
     "coverage": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true c8 --reporter=lcov --reporter=text --reporter=text-summary mocha --timeout 30000 --exit",
-
     "temp:updateSsmPucAssetNames": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true node ./temp/updateSsmPucAssetNames.js"
   },
   "repository": {
@@ -40,6 +39,7 @@
     "@cityssm/bulma-webapp-js": "^1.5.0",
     "@cityssm/express-abuse-points": "^1.1.0",
     "@cityssm/expressjs-server-js": "^2.3.3",
+    "@cityssm/font-awesome-v5-iconclasses": "^0.1.0",
     "@cityssm/green-button-parser": "^0.6.1",
     "@cityssm/green-button-subscriber": "^0.3.0",
     "@cityssm/utils-datetime": "^0.1.1",

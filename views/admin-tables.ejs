@@ -25,6 +25,105 @@
   Table Maintenance
 </h1>
 
+<div class="box has-background-white-ter">
+  <div class="level">
+    <div class="level-left">
+      <div class="level-item">
+        <div class="field has-addons">
+          <div class="control">
+            <span class="button is-static">
+              <span class="icon">
+                <i class="fas fa-table" aria-hidden="true"></i>
+              </span>
+              <span>Table Name</span>
+            </span>
+          </div>
+          <div class="control is-expanded">
+            <div class="select">
+              <select id="tables--tableName" name="tableName">
+                <option value="assetCategories">Asset Categories</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="tableContainers">
+  <div id="tableContainer--assetCategories">
+    <table class="table is-fullwidth is-striped is-hoverable">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Icon</th>
+          <th colspan="3" class="has-width-10">
+            <span class="is-sr-only">Options</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <div class="field">
+              <div class="control">
+                <input class="input" id="assetCategoryAdd--category" name="category" form="form--assetCategoryAdd" placeholder="New Category Name" maxlength="100" required />
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="field has-addons">
+              <div class="control">
+                <div class="select">
+                  <select id="assetCategoryAdd--fontAwesomeIconClass-style" name="fontAwesomeIconClass-style" form="form--assetCategoryAdd" required>
+                    <option value="fas">Solid</option>
+                    <option value="far">Regular</option>
+                  </select>
+                </div>
+              </div>
+              <div class="control is-expanded">
+                <input class="input" id="assetCategoryAdd--fontAwesomeIconClass-className" name="fontAwesomeIconClass-className" form="form--assetCategoryAdd" list="datalist--iconClasses-fas" value="building" maxlength="43" required />
+              </div>
+              <div class="control">
+                <span class="button is-static">
+                  <span class="icon"></span>
+                </span>
+              </div>
+            </div>
+          </td>
+          <td colspan="3">
+            <form id="form--assetCategoryAdd">
+              <button class="button is-success" type="submit">
+                <span class="icon"><i class="fas fa-plus" aria-hidden="true"></i></span>
+                <span>Add Category</span>
+              </button>
+            </form>
+          </td>
+        </tr>
+      </tbody>
+      <tbody id="tbody--assetCategories"></tbody>
+    </table>
+  </div>
+</div>
+
+<datalist id="datalist--iconClasses-fas">
+  <% for (const solidClassName of faSolidClassNames) { %>
+    <option value="<%= solidClassName %>"></option>
+  <% } %>
+</datalist>
+
+<datalist id="datalist--iconClasses-far">
+  <% for (const regularClassName of faRegularClassNames) { %>
+    <option value="<%= regularClassName %>"></option>
+  <% } %>
+</datalist>
+
 <%- include('_footerA'); -%>
+
+<script>
+  exports.assetCategories = <%- JSON.stringify(assetCategories) %>;
+</script>
+<script src="<%= urlPrefix %>/javascripts/adminTables.min.js"></script>
 
 <%- include('_footerB'); -%>

@@ -33,7 +33,7 @@ export function getAsset(
   if (asset !== undefined) {
     asset.assetAliases = getAssetAliases(
       {
-        assetId: asset.assetId
+        assetId: asset.assetId as number
       },
       emileDB
     )
