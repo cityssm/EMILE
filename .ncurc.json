@@ -1,3 +1,3 @@
 {
-  "reject": ["@fortawesome/fontawesome-free"]
+  "reject": ["@fortawesome/fontawesome-free", "exit-hook"]
 }
