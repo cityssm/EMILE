@@ -74,7 +74,7 @@
     "@cypress/webpack-batteries-included-preprocessor": "^3.0.2",
     "@types/activedirectory2": "^1.2.3",
     "@types/better-sqlite3": "^7.6.4",
-    "@types/compression": "^1.7.2",
+    "@types/compression": "^1.7.3",
     "@types/cookie-parser": "^1.4.3",
     "@types/csurf": "^1.11.2",
     "@types/debug": "^4.1.8",
