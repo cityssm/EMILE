@@ -75,7 +75,7 @@
     "@types/activedirectory2": "^1.2.3",
     "@types/better-sqlite3": "^7.6.4",
     "@types/compression": "^1.7.2",
-    "@types/cookie-parser": "^1.4.3",
+    "@types/cookie-parser": "^1.4.4",
     "@types/csurf": "^1.11.2",
     "@types/debug": "^4.1.8",
     "@types/ejs": "^3.1.2",
