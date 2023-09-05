@@ -65,7 +65,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
                 const pendingFileParserClassAndConfiguration = ((_h = (_g = pendingFile.parserProperties) === null || _g === void 0 ? void 0 : _g.parserClass) !== null && _h !== void 0 ? _h : '') +
                     (((_j = pendingFile.parserProperties) === null || _j === void 0 ? void 0 : _j.parserConfig) === undefined
                         ? ''
-                        : '::' + pendingFile.parserProperties.parserConfig);
+                        : `::${pendingFile.parserProperties.parserConfig}`);
                 for (const parserClassAndConfiguration of parserClassesAndConfigurations) {
                     const optionElement = document.createElement('option');
                     optionElement.value = parserClassAndConfiguration;
@@ -82,8 +82,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
                     pendingFile.parserProperties.parserClass !== undefined) {
                     const optionElement = document.createElement('option');
                     optionElement.value = pendingFileParserClassAndConfiguration;
-                    optionElement.textContent =
-                        pendingFileParserClassAndConfiguration + ' (Unavailable)';
+                    optionElement.textContent = `${pendingFileParserClassAndConfiguration} (Unavailable)`;
                     optionElement.selected = true;
                     parserClassSelectElement.append(optionElement);
                 }

@@ -20,18 +20,19 @@ declare const cityssm: cityssmGlobal
   function refreshIconByElement(element: HTMLElement): void {
     const iconFieldElement = element.closest('.field') as HTMLElement
 
-    const iconClass =
+    const iconClass = `${
       (
         iconFieldElement.querySelector(
           'select[name="fontAwesomeIconClass-style"]'
         ) as HTMLSelectElement
-      ).value +
-      ' fa-' +
+      ).value
+    } fa-${
       (
         iconFieldElement.querySelector(
           'input[name="fontAwesomeIconClass-className'
         ) as HTMLInputElement
       ).value
+    }`
 
     ;(
       iconFieldElement.querySelector('.icon') as HTMLElement
@@ -108,11 +109,11 @@ declare const cityssm: cityssmGlobal
     const categoryId = tableRowElement?.dataset.categoryId
 
     cityssm.postJSON(
-      Emile.urlPrefix +
-        '/admin/' +
-        (buttonElement.dataset.direction === 'up'
+      `${Emile.urlPrefix}/admin/${
+        buttonElement.dataset.direction === 'up'
           ? 'doMoveAssetCategoryUp'
-          : 'doMoveAssetCategoryDown'),
+          : 'doMoveAssetCategoryDown'
+      }`,
       {
         categoryId,
         moveToEnd: clickEvent.shiftKey ? '1' : '0'
@@ -168,7 +169,7 @@ declare const cityssm: cityssmGlobal
 
     bulmaJS.confirm({
       title: 'Delete Asset Category',
-      message: 'Are you sure ytou want to delete this category?',
+      message: 'Are you sure you want to delete this category?',
       contextualColorName: 'warning',
       okButton: {
         text: 'Yes, Delete Category',
@@ -316,7 +317,7 @@ declare const cityssm: cityssmGlobal
       const formElement = formEvent.currentTarget as HTMLFormElement
 
       cityssm.postJSON(
-        Emile.urlPrefix + '/admin/doAddAssetCategory',
+        `${Emile.urlPrefix}/admin/doAddAssetCategory`,
         formEvent.currentTarget,
         (rawResponseJSON) => {
           const responseJSON = rawResponseJSON as AssetCategoriesResponseJSON

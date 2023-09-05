@@ -7,9 +7,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
     const Emile = exports.Emile;
     function refreshIconByElement(element) {
         const iconFieldElement = element.closest('.field');
-        const iconClass = iconFieldElement.querySelector('select[name="fontAwesomeIconClass-style"]').value +
-            ' fa-' +
-            iconFieldElement.querySelector('input[name="fontAwesomeIconClass-className').value;
+        const iconClass = `${iconFieldElement.querySelector('select[name="fontAwesomeIconClass-style"]').value} fa-${iconFieldElement.querySelector('input[name="fontAwesomeIconClass-className').value}`;
         iconFieldElement.querySelector('.icon').innerHTML = `<i class="${iconClass}" aria-hidden="true"></i>`;
     }
     function refreshIconByStyleEvent(changeEvent) {
@@ -48,11 +46,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
         const buttonElement = clickEvent.currentTarget;
         const tableRowElement = buttonElement.closest('tr');
         const categoryId = tableRowElement === null || tableRowElement === void 0 ? void 0 : tableRowElement.dataset.categoryId;
-        cityssm.postJSON(Emile.urlPrefix +
-            '/admin/' +
-            (buttonElement.dataset.direction === 'up'
-                ? 'doMoveAssetCategoryUp'
-                : 'doMoveAssetCategoryDown'), {
+        cityssm.postJSON(`${Emile.urlPrefix}/admin/${buttonElement.dataset.direction === 'up'
+            ? 'doMoveAssetCategoryUp'
+            : 'doMoveAssetCategoryDown'}`, {
             categoryId,
             moveToEnd: clickEvent.shiftKey ? '1' : '0'
         }, (rawResponseJSON) => {
@@ -99,7 +95,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         }
         bulmaJS.confirm({
             title: 'Delete Asset Category',
-            message: 'Are you sure ytou want to delete this category?',
+            message: 'Are you sure you want to delete this category?',
             contextualColorName: 'warning',
             okButton: {
                 text: 'Yes, Delete Category',
@@ -206,7 +202,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         .querySelector('#form--assetCategoryAdd')) === null || _c === void 0 ? void 0 : _c.addEventListener('submit', (formEvent) => {
         formEvent.preventDefault();
         const formElement = formEvent.currentTarget;
-        cityssm.postJSON(Emile.urlPrefix + '/admin/doAddAssetCategory', formEvent.currentTarget, (rawResponseJSON) => {
+        cityssm.postJSON(`${Emile.urlPrefix}/admin/doAddAssetCategory`, formEvent.currentTarget, (rawResponseJSON) => {
             var _a;
             const responseJSON = rawResponseJSON;
             if (responseJSON.success) {

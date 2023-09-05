@@ -124,7 +124,7 @@ declare const cityssm: cityssmGlobal
           (pendingFile.parserProperties?.parserClass ?? '') +
           (pendingFile.parserProperties?.parserConfig === undefined
             ? ''
-            : '::' + pendingFile.parserProperties.parserConfig)
+            : `::${pendingFile.parserProperties.parserConfig}`)
 
         for (const parserClassAndConfiguration of parserClassesAndConfigurations) {
           const optionElement = document.createElement('option')
@@ -149,8 +149,7 @@ declare const cityssm: cityssmGlobal
         ) {
           const optionElement = document.createElement('option')
           optionElement.value = pendingFileParserClassAndConfiguration
-          optionElement.textContent =
-            pendingFileParserClassAndConfiguration + ' (Unavailable)'
+          optionElement.textContent = `${pendingFileParserClassAndConfiguration} (Unavailable)`
           optionElement.selected = true
           parserClassSelectElement.append(optionElement)
         }
