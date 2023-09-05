@@ -9,7 +9,8 @@
     "removeComments": false,
     "allowUnreachableCode": false,
     "skipLibCheck": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "esModuleInterop": true
   },
   "include": ["public-typescript/*"],
   "exclude": ["data/*", "database/*", "helpers/*", "parsers/*"],

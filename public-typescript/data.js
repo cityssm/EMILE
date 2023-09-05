@@ -12,7 +12,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 (() => {
-    var _a, _b;
+    var _a, _b, _c;
     const Emile = exports.Emile;
     const parserClassesAndConfigurations = exports.parserClassesAndConfigurations;
     let pendingFiles = exports.pendingFiles;
@@ -252,6 +252,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
         pendingFilesContainerElement.innerHTML = '';
         pendingFilesContainerElement.append(tableElement);
     }
+    (_a = document
+        .querySelector('.is-refresh-button')) === null || _a === void 0 ? void 0 : _a.addEventListener('click', () => {
+        cityssm.postJSON(`${Emile.urlPrefix}/data/doGetPendingFiles`, {}, (rawResponseJSON) => {
+            var _a;
+            const responseJSON = rawResponseJSON;
+            if (responseJSON.success) {
+                pendingFiles = responseJSON.pendingFiles;
+                renderPendingFiles();
+                processedFiles = (_a = responseJSON.processedFiles) !== null && _a !== void 0 ? _a : [];
+                renderProcessedFiles();
+            }
+        });
+    });
     renderPendingFiles();
     let processedFiles = exports.processedFiles;
     delete exports.processedFiles;
@@ -406,8 +419,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
     /*
      * Upload Handling
      */
-    const csrfToken = (_b = (_a = document
-        .querySelector("meta[name='csrf-token']")) === null || _a === void 0 ? void 0 : _a.getAttribute('content')) !== null && _b !== void 0 ? _b : '';
+    const csrfToken = (_c = (_b = document
+        .querySelector("meta[name='csrf-token']")) === null || _b === void 0 ? void 0 : _b.getAttribute('content')) !== null && _c !== void 0 ? _c : '';
     const uploadDropZoneElement = document.querySelector('#upload--dropZone');
     const dragOverClasses = ['has-background-success-light', 'has-text-success'];
     uploadDropZoneElement.addEventListener('dragover', (dragEvent) => {
@@ -456,6 +469,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
                 renderPendingFiles();
                 processedFiles = (_a = responseJSON.processedFiles) !== null && _a !== void 0 ? _a : [];
                 renderProcessedFiles();
+                document.querySelector('#container--pendingFiles').insertAdjacentHTML('afterbegin', `<div class="message is-info">
+                <p class="message-body">
+                  <strong>Refresh the list below to see the newly uploaded files.</strong><br />
+                  If the files don't appear in the list, switch to the Processed Files tab to check for errors.
+                </p>
+              </div>`);
             }
             return responseJSON.success;
         })

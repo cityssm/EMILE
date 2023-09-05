@@ -3,6 +3,7 @@ import { Router } from 'express'
 import handler_data from '../handlers/data-get/data.js'
 import handler_doDeletePendingEnergyDataFile from '../handlers/data-post/doDeletePendingEnergyDataFile.js'
 import handler_doDeleteProcessedEnergyDataFile from '../handlers/data-post/doDeleteProcessedEnergyDataFile.js'
+import handler_doGetPendingFiles from '../handlers/data-post/doGetPendingFiles.js'
 import handler_doProcessPendingEnergyDataFile from '../handlers/data-post/doProcessPendingEnergyDataFile.js'
 import handler_doReprocessProcessedEnergyDataFile from '../handlers/data-post/doReprocessProcessedEnergyDataFile.js'
 import handler_doUpdatePendingEnergyDataFile from '../handlers/data-post/doUpdatePendingEnergyDataFile.js'
@@ -21,6 +22,11 @@ router.post(
 router.post(
   '/doUpdatePendingEnergyDataFile',
   handler_doUpdatePendingEnergyDataFile
+)
+
+router.post(
+  '/doGetPendingFiles',
+  handler_doGetPendingFiles
 )
 
 router.post(

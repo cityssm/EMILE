@@ -384,6 +384,26 @@ declare const cityssm: cityssmGlobal
     pendingFilesContainerElement.append(tableElement)
   }
 
+  document
+    .querySelector('.is-refresh-button')
+    ?.addEventListener('click', () => {
+      cityssm.postJSON(
+        `${Emile.urlPrefix}/data/doGetPendingFiles`,
+        {},
+        (rawResponseJSON) => {
+          const responseJSON = rawResponseJSON as PendingFilesResponseJSON
+
+          if (responseJSON.success) {
+            pendingFiles = responseJSON.pendingFiles
+            renderPendingFiles()
+
+            processedFiles = responseJSON.processedFiles ?? []
+            renderProcessedFiles()
+          }
+        }
+      )
+    })
+
   renderPendingFiles()
 
   /*
@@ -667,6 +687,17 @@ declare const cityssm: cityssmGlobal
 
           processedFiles = responseJSON.processedFiles ?? []
           renderProcessedFiles()
+          ;(
+            document.querySelector('#container--pendingFiles') as HTMLElement
+          ).insertAdjacentHTML(
+            'afterbegin',
+            `<div class="message is-info">
+                <p class="message-body">
+                  <strong>Refresh the list below to see the newly uploaded files.</strong><br />
+                  If the files don't appear in the list, switch to the Processed Files tab to check for errors.
+                </p>
+              </div>`
+          )
         }
 
         return responseJSON.success
