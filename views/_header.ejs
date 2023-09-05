@@ -23,7 +23,7 @@
 
 <body>
   <div class="columns is-mobile mb-0">
-    <div class="column mt-3 ml-3 is-hidden-print" style="flex:none;width:250px">
+    <div class="column mt-3 ml-3 has-background-info-light is-hidden-print" style="flex:none;width:250px">
       <div style="position:sticky;top:12px">
         <header class="is-flex mb-3">
           <img class="ml-1 mr-2" src="<%= urlPrefix + configFunctions.getConfigProperty('application.smallLogoURL') %>" alt="" style="max-height:32px" />
@@ -33,7 +33,7 @@
           <ul class="menu-list">
             <li>
               <a
-                class="<%= (headTitle === 'Dashboard' ? 'is-active' : '') %>"
+                class="<%= (menuItem === 'Dashboard' ? 'is-active' : '') %>"
                 href="<%= urlPrefix %>/dashboard">
                 <span class="icon"><i class="fas fa-chart-area" aria-hidden="true"></i></span>
                 <span>Dashboard</span>
@@ -41,7 +41,7 @@
             </li>
             <li>
               <a
-                class="<%= (headTitle === 'Assets' ? 'is-active' : '') %>"
+                class="<%= (menuItem === 'Assets' ? 'is-active' : '') %>"
                 href="<%= urlPrefix %>/assets">
                 <span class="icon"><i class="fas fa-bolt" aria-hidden="true"></i></span>
                 <span>Assets</span>
@@ -50,7 +50,7 @@
             <% if (user.canUpdate) { %>
               <li>
                 <a
-                  class="<%= (headTitle === 'Data' ? 'is-active' : '') %>"
+                  class="<%= (menuItem === 'Data' ? 'is-active' : '') %>"
                   href="<%= urlPrefix %>/data">
                   <span class="icon"><i class="fas fa-table" aria-hidden="true"></i></span>
                   <span>Data</span>
@@ -59,7 +59,7 @@
             <% } %>
             <li>
               <a
-                class="<%= (headTitle === 'Reports' ? 'is-active' : '') %>"
+                class="<%= (menuItem === 'Reports' ? 'is-active' : '') %>"
                 href="<%= urlPrefix %>/reports">
                 <span class="icon"><i class="fas fa-file" aria-hidden="true"></i></span>
                 <span>Reports</span>
@@ -73,7 +73,7 @@
             <% if (user.isAdmin) { %>
               <li>
                 <a
-                  class="<%= (headTitle === 'Settings' ? 'is-active' : '') %>"
+                  class="<%= (menuItem === 'Settings' ? 'is-active' : '') %>"
                   href="<%= urlPrefix %>/admin">
                   <span class="icon"><i class="fas fa-cog" aria-hidden="true"></i></span>
                   <span>Settings</span>

@@ -8,6 +8,7 @@ export function handler(request, response) {
     const assetAliasTypes = request.session.user?.canUpdate ?? false ? getAssetAliasTypes() : [];
     response.render('assets', {
         headTitle: 'Assets',
+        menuItem: 'Assets',
         assets,
         assetGroups,
         assetCategories,

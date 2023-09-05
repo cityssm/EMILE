@@ -14,6 +14,8 @@ export function handler(request: Request, response: Response): void {
 
   response.render('dashboard', {
     headTitle: 'Dashboard',
+    menuItem: 'Dashboard',
+
     assets,
     assetGroups,
     assetCategories,

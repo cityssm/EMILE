@@ -3,6 +3,7 @@ export function handler(request, response) {
     const users = getUsers();
     response.render('admin-users', {
         headTitle: 'User Maintenance',
+        menuItem: 'Settings',
         users
     });
 }

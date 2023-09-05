@@ -9,6 +9,7 @@ export function handler(request, response) {
     const energyDataStatistics = getEnergyDataStatistics();
     response.render('dashboard', {
         headTitle: 'Dashboard',
+        menuItem: 'Dashboard',
         assets,
         assetGroups,
         assetCategories,

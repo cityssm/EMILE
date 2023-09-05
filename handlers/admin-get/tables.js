@@ -6,6 +6,7 @@ export async function handler(request, response) {
     const faRegularClassNames = await getRegularIconClasses();
     response.render('admin-tables', {
         headTitle: 'Table Maintenance',
+        menuItem: 'Settings',
         assetCategories,
         faSolidClassNames,
         faRegularClassNames

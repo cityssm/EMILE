@@ -8,6 +8,7 @@ export function handler(request, response) {
     const parserClassesAndConfigurations = getParserClassesAndConfigurations();
     response.render('data', {
         headTitle: 'Data',
+        menuItem: 'Data',
         pendingFiles,
         processedFiles,
         assets,

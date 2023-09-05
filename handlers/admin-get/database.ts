@@ -10,6 +10,7 @@ export async function handler(
 
   response.render('admin-database', {
     headTitle: 'Database Maintenance',
+    menuItem: 'Settings',
     backupFiles
   })
 }

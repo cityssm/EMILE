@@ -17,6 +17,7 @@ export async function handler(
 
   response.render('admin-tables', {
     headTitle: 'Table Maintenance',
+    menuItem: 'Settings',
     assetCategories,
 
     faSolidClassNames,

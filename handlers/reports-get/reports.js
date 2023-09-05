@@ -6,7 +6,8 @@ export function handler(request, response) {
     const assetGroups = getAssetGroups(request.session.user);
     const assetCategories = getAssetCategories();
     response.render('reports', {
-        headTitle: 'Report Library',
+        headTitle: 'Reports',
+        menuItem: 'Reports',
         assets,
         assetGroups,
         assetCategories

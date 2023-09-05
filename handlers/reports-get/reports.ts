@@ -10,7 +10,9 @@ export function handler(request: Request, response: Response): void {
   const assetCategories = getAssetCategories()
 
   response.render('reports', {
-    headTitle: 'Report Library',
+    headTitle: 'Reports',
+    menuItem: 'Reports',
+
     assets,
     assetGroups,
     assetCategories

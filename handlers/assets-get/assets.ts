@@ -17,6 +17,8 @@ export function handler(request: Request, response: Response): void {
 
   response.render('assets', {
     headTitle: 'Assets',
+    menuItem: 'Assets',
+
     assets,
     assetGroups,
     assetCategories,

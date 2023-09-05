@@ -7,6 +7,7 @@ export function handler(request: Request, response: Response): void {
 
   response.render('admin-users', {
     headTitle: 'User Maintenance',
+    menuItem: 'Settings',
     users
   })
 }

@@ -17,6 +17,8 @@ export function handler(request: Request, response: Response): void {
 
   response.render('data', {
     headTitle: 'Data',
+    menuItem: 'Data',
+
     pendingFiles,
     processedFiles,
     assets,
