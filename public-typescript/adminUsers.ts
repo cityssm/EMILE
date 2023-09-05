@@ -151,7 +151,7 @@ declare const cityssm: cityssmGlobal
             </div>
             <div class="control is-expanded">
               <div class="select is-fullwidth">
-                <select data-action="doUpdateUserCanLogin">
+                <select data-action="doUpdateUserCanLogin" aria-label="Can Login">
                   <option value="0">Access Denied</option>
                   <option value="1" ${
                     user.canLogin ? ' selected' : ''
@@ -174,7 +174,7 @@ declare const cityssm: cityssmGlobal
             </div>
             <div class="control is-expanded">
               <div class="select is-fullwidth">
-                <select data-action="doUpdateUserCanUpdate">
+                <select data-action="doUpdateUserCanUpdate" aria-label="Can Update Records">
                   <option value="0">Read Only</option>
                   <option value="1" ${
                     user.canUpdate ? ' selected' : ''
@@ -197,7 +197,7 @@ declare const cityssm: cityssmGlobal
             </div>
             <div class="control is-expanded">
               <div class="select is-fullwidth">
-                <select data-action="doUpdateUserIsAdmin">
+                <select data-action="doUpdateUserIsAdmin" aria-label="Can Access Admin Areas">
                   <option value="0">No Admin Permissions</option>
                   <option value="1" ${
                     user.isAdmin ? ' selected' : ''

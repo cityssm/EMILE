@@ -2,13 +2,13 @@ import { testAdmin } from '../../../test/_globals.js'
 import type { ConfigTemporaryUserCredentials } from '../../../types/configTypes.js'
 import { logout, login } from '../../support/index.js'
 
-describe('Admin - Table Maintenance', () => {
+describe('Admin - User Maintenance', () => {
   beforeEach('Loads page', () => {
     logout()
     login(testAdmin as ConfigTemporaryUserCredentials)
     cy.get('aside.menu a[href$="/admin"]').click()
-    cy.get('main a[href$="/admin/tables"]').click()
-    cy.location('pathname').should('equal', '/admin/tables')
+    cy.get('main a[href$="/admin/users"]').click()
+    cy.location('pathname').should('equal', '/admin/users')
   })
 
   afterEach(logout)
