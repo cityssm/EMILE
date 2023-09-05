@@ -96,7 +96,7 @@ interface ErrorResponse {
     for (const groupMember of groupMembers) {
       const rowElement = document.createElement('tr')
       rowElement.dataset.groupId = groupId
-      rowElement.dataset.assetId = groupMember.assetId.toString()
+      rowElement.dataset.assetId = (groupMember.assetId as number).toString()
 
       rowElement.innerHTML = `<td data-field="category"></td>
         <td data-field="assetName"></td>
@@ -142,7 +142,7 @@ interface ErrorResponse {
         }
 
         const optionElement = document.createElement('option')
-        optionElement.value = asset.assetId.toString()
+        optionElement.value = (asset.assetId as number).toString()
         optionElement.textContent = asset.assetName
 
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion

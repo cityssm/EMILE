@@ -56,8 +56,7 @@ declare const cityssm: cityssmGlobal
     return new Date(timeSeconds * 1000).toLocaleString()
   }
 
-  function formatDurationSeconds (durationSeconds: number): string {
-
+  function formatDurationSeconds(durationSeconds: number): string {
     let currentDuration = durationSeconds
     let currentUnit = 's'
 
