@@ -56,6 +56,36 @@ declare const cityssm: cityssmGlobal
     return new Date(timeSeconds * 1000).toLocaleString()
   }
 
+  function formatDurationSeconds (durationSeconds: number): string {
+
+    let currentDuration = durationSeconds
+    let currentUnit = 's'
+
+    // to minutes
+    if (currentDuration >= 60) {
+      currentDuration = currentDuration / 60
+      currentUnit = 'min'
+    } else {
+      return `${currentDuration} ${currentUnit}`
+    }
+
+    // to hours
+    if (currentDuration >= 60) {
+      currentDuration = currentDuration / 60
+      currentUnit = 'hr'
+    } else {
+      return `${currentDuration} ${currentUnit}`
+    }
+
+    // to days
+    if (currentDuration >= 24) {
+      currentDuration = currentDuration / 24
+      currentUnit = 'days'
+    }
+
+    return `${currentDuration} ${currentUnit}`
+  }
+
   function addDataToChart(chart: Chart, label: unknown, newData: number): void {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     chart.data.labels!.push(label)
@@ -69,6 +99,7 @@ declare const cityssm: cityssmGlobal
     const rowElement = document.createElement('tr')
 
     rowElement.innerHTML = `<td>${formatDateLabel(data.timeSeconds)}</td>
+      <td>${formatDurationSeconds(data.durationSeconds)}</td>
       <td>${data.readingType ?? ''}</td>
       <td>${data.commodity ?? ''}</td>
       <td class="has-text-right">${data.dataValue}</td>
@@ -169,6 +200,7 @@ declare const cityssm: cityssmGlobal
                     <thead>
                       <tr>
                         <th>Time</th>
+                        <th>Duration</th>
                         <th>Reading Type</th>
                         <th>Commodity</th>
                         <th class="has-text-right">Value</th>

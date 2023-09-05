@@ -15,6 +15,32 @@ Object.defineProperty(exports, "__esModule", { value: true });
     function formatDateLabel(timeSeconds) {
         return new Date(timeSeconds * 1000).toLocaleString();
     }
+    function formatDurationSeconds(durationSeconds) {
+        let currentDuration = durationSeconds;
+        let currentUnit = 's';
+        // to minutes
+        if (currentDuration >= 60) {
+            currentDuration = currentDuration / 60;
+            currentUnit = 'min';
+        }
+        else {
+            return `${currentDuration} ${currentUnit}`;
+        }
+        // to hours
+        if (currentDuration >= 60) {
+            currentDuration = currentDuration / 60;
+            currentUnit = 'hr';
+        }
+        else {
+            return `${currentDuration} ${currentUnit}`;
+        }
+        // to days
+        if (currentDuration >= 24) {
+            currentDuration = currentDuration / 24;
+            currentUnit = 'days';
+        }
+        return `${currentDuration} ${currentUnit}`;
+    }
     function addDataToChart(chart, label, newData) {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         chart.data.labels.push(label);
@@ -26,6 +52,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         var _a, _b, _c, _d, _e;
         const rowElement = document.createElement('tr');
         rowElement.innerHTML = `<td>${formatDateLabel(data.timeSeconds)}</td>
+      <td>${formatDurationSeconds(data.durationSeconds)}</td>
       <td>${(_a = data.readingType) !== null && _a !== void 0 ? _a : ''}</td>
       <td>${(_b = data.commodity) !== null && _b !== void 0 ? _b : ''}</td>
       <td class="has-text-right">${data.dataValue}</td>
@@ -107,6 +134,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
                     <thead>
                       <tr>
                         <th>Time</th>
+                        <th>Duration</th>
                         <th>Reading Type</th>
                         <th>Commodity</th>
                         <th class="has-text-right">Value</th>
