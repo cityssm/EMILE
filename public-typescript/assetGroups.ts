@@ -412,7 +412,7 @@ interface ErrorResponse {
       .split(' ')
 
     const tableElement = document.createElement('table')
-    tableElement.className = 'table is-fullwidth is-striped has-sticky-header'
+    tableElement.className = 'table is-fullwidth is-striped has-sticky-header is-fade-hoverable'
     tableElement.innerHTML = `<thead><tr>
       <th>Group</th>
       <th class="has-text-right">Members</th>
