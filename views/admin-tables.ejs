@@ -31,12 +31,12 @@
       <div class="level-item">
         <div class="field has-addons">
           <div class="control">
-            <span class="button is-static">
+            <label class="button is-static" for="tables--tableName">
               <span class="icon">
                 <i class="fas fa-table" aria-hidden="true"></i>
               </span>
               <span>Table Name</span>
-            </span>
+            </label>
           </div>
           <div class="control is-expanded">
             <div class="select">
@@ -76,14 +76,14 @@
             <div class="field has-addons">
               <div class="control">
                 <div class="select">
-                  <select id="assetCategoryAdd--fontAwesomeIconClass-style" name="fontAwesomeIconClass-style" form="form--assetCategoryAdd" required>
+                  <select id="assetCategoryAdd--fontAwesomeIconClass-style" name="fontAwesomeIconClass-style" form="form--assetCategoryAdd" aria-label="Font Awesome Style" required>
                     <option value="fas">Solid</option>
                     <option value="far">Regular</option>
                   </select>
                 </div>
               </div>
               <div class="control is-expanded">
-                <input class="input" id="assetCategoryAdd--fontAwesomeIconClass-className" name="fontAwesomeIconClass-className" form="form--assetCategoryAdd" list="datalist--iconClasses-fas" value="building" maxlength="43" required />
+                <input class="input" id="assetCategoryAdd--fontAwesomeIconClass-className" name="fontAwesomeIconClass-className" form="form--assetCategoryAdd" list="datalist--iconClasses-fas" aria-label="Font Awesome Class Name" value="building" maxlength="43" required />
               </div>
               <div class="control">
                 <span class="button is-static">

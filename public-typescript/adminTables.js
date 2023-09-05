@@ -123,14 +123,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
           <div class="field has-addons">
             <div class="control">
               <div class="select">
-                <select name="fontAwesomeIconClass-style" form="${formId}" required>
+                <select name="fontAwesomeIconClass-style" form="${formId}" aria-label="Font Awesome Style" required>
                   <option value="fas">Solid</option>
                   <option value="far">Regular</option>
                 </select>
               </div>
             </div>
             <div class="control is-expanded">
-              <input class="input" name="fontAwesomeIconClass-className" form="${formId}" list="datalist--iconClasses-${fontAwesomeIconClasses[0]}" maxlength="43" required />
+              <input class="input" name="fontAwesomeIconClass-className" form="${formId}" list="datalist--iconClasses-${fontAwesomeIconClasses[0]}" aria-label="Font Awesome Class Name" maxlength="43" required />
             </div>
             <div class="control">
               <span class="button is-static">
@@ -152,13 +152,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
           <div class="field has-addons">
             <div class="control">
               <button class="button is-move-button" data-direction="up" type="button">
+                <span class="is-sr-only">Move Category Up</span>
                 <span class="icon">
-                  <i class="fas fa-arrow-up" aria-hidden="true"></i>
+                <i class="fas fa-arrow-up" aria-hidden="true"></i>
                 </span>
               </button>
             </div>
             <div class="control">
               <button class="button is-move-button" data-direction="down" type="button">
+                <span class="is-sr-only">Move Category Down</span>
                 <span class="icon">
                   <i class="fas fa-arrow-down" aria-hidden="true"></i>
                 </span>
@@ -168,6 +170,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         </td>
         <td class="has-width-10">
           <button class="button is-light is-danger is-delete-button" type="button">
+            <span class="is-sr-only">Delete Category</span>
             <span class="icon">
               <i class="fas fa-trash" aria-hidden="true"></i>
             </span>
