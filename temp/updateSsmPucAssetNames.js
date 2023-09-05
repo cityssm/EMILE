@@ -9,8 +9,8 @@ async function updateSsmPucAssetNames() {
         header: true,
         skipEmptyLines: true
     });
+    const assetCategories = getAssetCategories();
     const emileDB = sqlite(databasePath);
-    const assetCategories = getAssetCategories(emileDB);
     for (const assetRow of assetRows.data) {
         const assetCategory = assetCategories.find((possibleCategory) => {
             return possibleCategory.category === assetRow.category.trim();

@@ -22,9 +22,9 @@ async function updateSsmPucAssetNames(): Promise<void> {
     skipEmptyLines: true
   }) as papaparse.ParseResult<AssetRow>
 
-  const emileDB = sqlite(databasePath)
+  const assetCategories = getAssetCategories()
 
-  const assetCategories = getAssetCategories(emileDB)
+  const emileDB = sqlite(databasePath)
 
   for (const assetRow of assetRows.data) {
     const assetCategory = assetCategories.find((possibleCategory) => {
