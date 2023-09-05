@@ -47,6 +47,10 @@ cluster.on('message', (worker, message) => {
             else {
                 fileProcessorChildProcess.send(message);
             }
+            break;
+        }
+        default: {
+            debug(`Ignoring unknown message type: ${message.messageType}`);
         }
     }
 });

@@ -77,8 +77,13 @@ cluster.on('message', (worker, message: WorkerMessage) => {
       } else {
         fileProcessorChildProcess.send(message)
       }
+
+      break
     }
-    // no default
+    default: {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      debug(`Ignoring unknown message type: ${message.messageType}`)
+    }
   }
 })
 

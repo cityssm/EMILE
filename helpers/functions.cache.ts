@@ -63,7 +63,10 @@ export function clearCacheByTableName(
       assetCategories = []
       break
     }
-    // no default
+    default: {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      debug(`Ignoring clear cache for unknown table: ${tableName}`)
+    }
   }
 
   try {

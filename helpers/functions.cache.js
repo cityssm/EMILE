@@ -29,6 +29,9 @@ export function clearCacheByTableName(tableName, relayMessage = true) {
             assetCategories = [];
             break;
         }
+        default: {
+            debug(`Ignoring clear cache for unknown table: ${tableName}`);
+        }
     }
     try {
         if (relayMessage && cluster.isWorker && process.send !== undefined) {

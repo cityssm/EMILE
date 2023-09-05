@@ -35,6 +35,10 @@ function getDataFieldValue(
       case 'function': {
         return dataField.dataFunction(row)
       }
+      default: {
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        debug(`Configuration error, unknown data type: ${dataField.dataType}`)
+      }
     }
   }
   return undefined
@@ -223,8 +227,14 @@ export class SheetParser extends BaseParser {
           parserConfig.columns.powerOfTenMultiplier
         ) ?? 0) as number
 
-        if (dataValue === undefined || Number.isNaN(dataValue) || dataValue.toString() === '') {
-          debug(`Skipping data value for asset ${assetId ?? ''}: '${dataValue}'`)
+        if (
+          dataValue === undefined ||
+          Number.isNaN(dataValue) ||
+          dataValue.toString() === ''
+        ) {
+          debug(
+            `Skipping data value for asset ${assetId ?? ''}: '${dataValue}'`
+          )
           continue
         }
 

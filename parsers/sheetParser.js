@@ -24,6 +24,9 @@ function getDataFieldValue(row, dataField) {
             case 'function': {
                 return dataField.dataFunction(row);
             }
+            default: {
+                debug(`Configuration error, unknown data type: ${dataField.dataType}`);
+            }
         }
     }
     return undefined;
@@ -105,7 +108,9 @@ export class SheetParser extends BaseParser {
                 const durationSeconds = getDataFieldValue(row, parserConfig.columns.durationSeconds);
                 const dataValue = getDataFieldValue(row, parserConfig.columns.dataValue);
                 const powerOfTenMultiplier = (getDataFieldValue(row, parserConfig.columns.powerOfTenMultiplier) ?? 0);
-                if (dataValue === undefined || Number.isNaN(dataValue) || dataValue.toString() === '') {
+                if (dataValue === undefined ||
+                    Number.isNaN(dataValue) ||
+                    dataValue.toString() === '') {
                     debug(`Skipping data value for asset ${assetId ?? ''}: '${dataValue}'`);
                     continue;
                 }
