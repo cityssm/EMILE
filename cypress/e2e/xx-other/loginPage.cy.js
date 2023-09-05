@@ -1,4 +1,4 @@
-import { testUser } from '../../../test/_globals.js';
+import { testUpdateUser } from '../../../test/_globals.js';
 import { logout } from '../../support/index.js';
 describe('Login Page', () => {
     beforeEach(logout);
@@ -32,11 +32,11 @@ describe('Login Page', () => {
         cy.location('pathname').should('contain', '/login');
     });
     it('Redirects to login when invalid credentials are used', () => {
-        if (testUser === undefined) {
-            throw new Error('testUser not available');
+        if (testUpdateUser === undefined) {
+            throw new Error('testUpdateUser not available');
         }
-        cy.get("form [name='userName']").type(testUser.user.userName);
-        cy.get("form [name='password']").type(testUser.password).type('extraJunk');
+        cy.get("form [name='userName']").type(testUpdateUser.user.userName);
+        cy.get("form [name='password']").type(testUpdateUser.password).type('extraJunk');
         cy.get('form').submit();
         cy.location('pathname').should('contain', '/login');
         cy.get('form').contains('Login Failed', {
