@@ -100,7 +100,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
                 <div class="level-right">
                   <div class="level-item">
                     <div class="tabs is-toggle is-toggle-rounded has-text-weight-normal">
-                      <ul>
+                      <ul role="presentation">
                         <li class="is-active">
                           <a href="#chartTab_${chartKey}">
                             <span class="icon is-small"><i class="fas fa-chart-bar" aria-hidden="true"></i></span>

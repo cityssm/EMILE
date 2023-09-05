@@ -17,7 +17,7 @@
 </div>
 
 <div class="tabs is-boxed">
-  <ul>
+  <ul role="presentation">
     <li class="is-active">
       <a href="#tab--assets">
         <span class="icon is-small"
@@ -46,7 +46,7 @@
           <div class="level-item">
             <div class="control has-icons-left">
               <div class="select">
-                <select id="filter--categoryId">
+                <select id="filter--categoryId" aria-label="Filter Asset Category">
                   <option value="">(All Categories)</option>
                   <% for (const category of assetCategories) { %>
                   <option value="<%= category.categoryId %>">
@@ -66,8 +66,8 @@
                 class="input"
                 id="filter--assets"
                 type="text"
-                placeholder="Filter assets"
-                aria-label="Filter assets"
+                placeholder="Filter Assets"
+                aria-label="Filter Assets"
               />
               <span class="icon is-small is-left">
                 <i class="fas fa-search" aria-hidden="true"></i>
@@ -93,6 +93,7 @@
             <button
               class="button is-success"
               id="button--addAsset"
+              data-cy="add"
               type="button"
             >
               <span class="icon">
@@ -132,6 +133,7 @@
             <button
               class="button is-success"
               id="button--addAssetGroup"
+              data-cy="add"
               type="button"
             >
               <span class="icon">

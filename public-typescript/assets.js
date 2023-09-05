@@ -258,7 +258,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         const tableElement = document.createElement('table');
         tableElement.className = 'table is-fullwidth is-striped has-sticky-header';
         tableElement.innerHTML = `<thead><tr>
-      <th class="has-width-10"></th>
+      <th class="has-width-10"><span class="is-sr-only">Icon</span></th>
       <th>Category</th>
       <th>Asset</th>
       <th class="has-text-centered has-width-10">
