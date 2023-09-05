@@ -7,7 +7,16 @@ config.application.useTestDatabases = true
 config.tempUsers = [
   {
     user: {
-      userName: '~~testUser',
+      userName: '~~testReadOnlyUser',
+      canLogin: true,
+      canUpdate: false,
+      isAdmin: false
+    },
+    password: 'p@ssw0rd'
+  },
+  {
+    user: {
+      userName: '~~testUpdateUser',
       canLogin: true,
       canUpdate: true,
       isAdmin: false
