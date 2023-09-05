@@ -1,9 +1,10 @@
 # EMILE (Energy Monitoring in Less Effort)
 
-<img src="public/images/logo.svg" alt="Monty" align="right" style="height:250px" />
+<img src="public/images/logo.svg" alt="Emile" align="right" style="height:250px" />
 
 [![DeepSource](https://app.deepsource.com/gh/cityssm/EMILE.svg/?label=active+issues&show_trend=true&token=AT4qy65eeZIecqOz7zA-UKo8)](https://app.deepsource.com/gh/cityssm/EMILE/?ref=repository-badge)
 [![Maintainability](https://api.codeclimate.com/v1/badges/0908ba3507dfddc4408b/maintainability)](https://codeclimate.com/github/cityssm/EMILE/maintainability)
+[![codecov](https://codecov.io/gh/cityssm/EMILE/graph/badge.svg?token=6SJNVR7IJO)](https://codecov.io/gh/cityssm/EMILE)
 [![EMILE](https://img.shields.io/endpoint?url=https://cloud.cypress.io/badge/simple/6u22zp/main&style=flat&logo=cypress)](https://cloud.cypress.io/projects/6u22zp/runs)
 
 _Pronounced like Emily_
@@ -12,26 +13,16 @@ A tool to aggregate energy consumption data across several municipal assets and 
 
 ## Inputs
 
-### Current
-
-- Green Button® formatted XML acquired manually through the [Download My Data (DMD) standard](https://www.greenbuttonalliance.org/green-button-download-my-data-dmd).
-
-### Anticipated
-
-- Green Button® formatted XML acquired automatically through the [Connect My Data (CMD) standard](https://www.greenbuttonalliance.org/green-button-connect-my-data-cmd).
-- CSV files.
+- ✔️ Green Button® formatted XML acquired manually through the [Download My Data (DMD) standard](https://www.greenbuttonalliance.org/green-button-download-my-data-dmd).
+- ✔️ CSV files.
+- ✏️ Green Button® formatted XML acquired automatically through the [Connect My Data (CMD) standard](https://www.greenbuttonalliance.org/green-button-connect-my-data-cmd).
 
 ## Outputs
 
-### Current
-
-- Graphs.
-- CSV files.
-
-### Anticipated
-
-- [Energy Star Portfolio Manager](https://portfoliomanager.energystar.gov/pm/login) data.
-- [Partners for Climate Protection Milestone Tool](https://pcptool.ca/) data.
+- ✔️ Graphs.
+- ✔️ CSV files.
+- ✏️ [Energy Star Portfolio Manager](https://portfoliomanager.energystar.gov/pm/login) data.
+- ✏️ [Partners for Climate Protection Milestone Tool](https://pcptool.ca/) data.
 
 ## About this Project
 
@@ -39,10 +30,10 @@ A tool to aggregate energy consumption data across several municipal assets and 
 
 📘 **[User Documentation (In The Works)](https://cityssm.github.io/EMILE/docs/)**
 
-- [Code of Conduct](CODE_OF_CONDUCT.md)
-- [Contributing Guidelines](CONTRIBUTING.md)
-- [Security Policy](SECURITY.md)
-- [MIT Licence](LICENSE.md)
+- 🤗 [Code of Conduct](CODE_OF_CONDUCT.md)
+- 🥰 [Contributing Guidelines](CONTRIBUTING.md)
+- 🛡️ [Security Policy](SECURITY.md)
+- 📃 [MIT Licence](LICENSE.md)
 
 Although the system is quite niche, it's being released in an open source environment in hopes to pool developer resources from other municipalities looking to solve the same problems
 and move away from older, legacy systems.
@@ -59,8 +50,8 @@ The City of Sault Ste. Marie has
 [several other open source applications](https://cityssm.github.io/)
 available for managing municipal operations as well.
 
-- **[General Licence Manager](https://github.com/cityssm/general-licence-manager)** - An application built to manage the general licences issued by municipalities.
-- **[Lottery Licence Manager](https://github.com/cityssm/lottery-licence-manager)** - An application for managing AGCO's municipal lottery licensing requirements in Ontario.
+- 💡 **[General Licence Manager](https://github.com/cityssm/general-licence-manager)** - An application built to manage the general licences issued by municipalities.
+- 💡 **[Lottery Licence Manager](https://github.com/cityssm/lottery-licence-manager)** - An application for managing AGCO's municipal lottery licensing requirements in Ontario.
 
 [Browse our GitHub account](https://github.com/cityssm/) for more of the City's offerings.
 
