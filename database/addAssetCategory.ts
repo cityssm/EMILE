@@ -1,5 +1,6 @@
 import sqlite from 'better-sqlite3'
 
+import { clearCacheByTableName } from '../helpers/functions.cache.js'
 import { databasePath } from '../helpers/functions.database.js'
 import type { AssetCategory } from '../types/recordTypes.js'
 
@@ -24,7 +25,7 @@ export function addAssetCategory(
     .run(
       category.category,
       category.fontAwesomeIconClasses ?? 'fas fa-bolt',
-      category.orderNumber ?? 0,
+      category.orderNumber ?? -1,
       sessionUser.userName,
       rightNowMillis,
       sessionUser.userName,
@@ -34,6 +35,8 @@ export function addAssetCategory(
   if (connectedEmileDB === undefined) {
     emileDB.close()
   }
+
+  clearCacheByTableName('AssetCategories')
 
   return result.lastInsertRowid as number
 }

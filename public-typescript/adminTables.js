@@ -1,6 +1,6 @@
 "use strict";
 // eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable unicorn/prefer-module */
+/* eslint-disable @typescript-eslint/indent */
 Object.defineProperty(exports, "__esModule", { value: true });
 (() => {
     var _a, _b, _c;
@@ -20,13 +20,95 @@ Object.defineProperty(exports, "__esModule", { value: true });
     function refreshIconByClassNameEvent(changeEvent) {
         refreshIconByElement(changeEvent.currentTarget);
     }
-    /*
-     * Asset Categories
-     */
     // New Category Form
     let assetCategories = exports.assetCategories;
+    function updateAssetCategory(formEvent) {
+        formEvent.preventDefault();
+        cityssm.postJSON(`${Emile.urlPrefix}/admin/doUpdateAssetCategory`, formEvent.currentTarget, (rawResponseJSON) => {
+            var _a;
+            const responseJSON = rawResponseJSON;
+            if (responseJSON.success) {
+                bulmaJS.alert({
+                    message: 'Category updated successfully.',
+                    contextualColorName: 'success'
+                });
+                assetCategories = responseJSON.assetCategories;
+                renderAssetCategories();
+            }
+            else {
+                bulmaJS.alert({
+                    title: 'Error Updating Category',
+                    message: (_a = responseJSON.errorMessage) !== null && _a !== void 0 ? _a : 'Please try again.',
+                    contextualColorName: 'danger'
+                });
+            }
+        });
+    }
+    function moveAssetCategory(clickEvent) {
+        const buttonElement = clickEvent.currentTarget;
+        const tableRowElement = buttonElement.closest('tr');
+        const categoryId = tableRowElement === null || tableRowElement === void 0 ? void 0 : tableRowElement.dataset.categoryId;
+        cityssm.postJSON(Emile.urlPrefix +
+            '/admin/' +
+            (buttonElement.dataset.direction === 'up'
+                ? 'doMoveAssetCategoryUp'
+                : 'doMoveAssetCategoryDown'), {
+            categoryId,
+            moveToEnd: clickEvent.shiftKey ? '1' : '0'
+        }, (rawResponseJSON) => {
+            var _a;
+            const responseJSON = rawResponseJSON;
+            if (responseJSON.success) {
+                assetCategories = responseJSON.assetCategories;
+                renderAssetCategories();
+            }
+            else {
+                bulmaJS.alert({
+                    title: 'Error Moving Category',
+                    message: (_a = responseJSON.errorMessage) !== null && _a !== void 0 ? _a : 'Please try again.',
+                    contextualColorName: 'danger'
+                });
+            }
+        });
+    }
+    function deleteAssetCategory(clickEvent) {
+        var _a;
+        const categoryId = (_a = clickEvent.currentTarget.closest('tr')) === null || _a === void 0 ? void 0 : _a.dataset.categoryId;
+        function doDelete() {
+            cityssm.postJSON(`${Emile.urlPrefix}/admin/doDeleteAssetCategory`, {
+                categoryId
+            }, (rawResponseJSON) => {
+                var _a;
+                const responseJSON = rawResponseJSON;
+                if (responseJSON.success) {
+                    bulmaJS.alert({
+                        message: 'Category deleted successfully.',
+                        contextualColorName: 'success'
+                    });
+                    assetCategories = responseJSON.assetCategories;
+                    renderAssetCategories();
+                }
+                else {
+                    bulmaJS.alert({
+                        title: 'Error Deleting Category',
+                        message: (_a = responseJSON.errorMessage) !== null && _a !== void 0 ? _a : 'Please try again.',
+                        contextualColorName: 'danger'
+                    });
+                }
+            });
+        }
+        bulmaJS.confirm({
+            title: 'Delete Asset Category',
+            message: 'Are you sure ytou want to delete this category?',
+            contextualColorName: 'warning',
+            okButton: {
+                text: 'Yes, Delete Category',
+                callbackFunction: doDelete
+            }
+        });
+    }
     function renderAssetCategories() {
-        var _a, _b;
+        var _a, _b, _c, _d;
         const tbodyElement = document.querySelector('#tbody--assetCategories');
         tbodyElement.innerHTML = '';
         for (const assetCategory of assetCategories) {
@@ -73,14 +155,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
         <td class="has-width-10">
           <div class="field has-addons">
             <div class="control">
-              <button class="button is-move-up-button" type="button">
+              <button class="button is-move-button" data-direction="up" type="button">
                 <span class="icon">
                   <i class="fas fa-arrow-up" aria-hidden="true"></i>
                 </span>
               </button>
             </div>
             <div class="control">
-              <button class="button is-move-down-button" type="button">
+              <button class="button is-move-button" data-direction="down" type="button">
                 <span class="icon">
                   <i class="fas fa-arrow-down" aria-hidden="true"></i>
                 </span>
@@ -103,6 +185,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
             classNameElement.value = fontAwesomeIconClasses[1].slice(3);
             classNameElement.addEventListener('keyup', refreshIconByClassNameEvent);
             refreshIconByElement(classNameElement);
+            (_c = rowElement
+                .querySelector(`#${formId}`)) === null || _c === void 0 ? void 0 : _c.addEventListener('submit', updateAssetCategory);
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+            const moveButtonElements = rowElement.querySelectorAll('.is-move-button');
+            for (const moveButtonElement of moveButtonElements) {
+                moveButtonElement.addEventListener('click', moveAssetCategory);
+            }
+            (_d = rowElement
+                .querySelector('.is-delete-button')) === null || _d === void 0 ? void 0 : _d.addEventListener('click', deleteAssetCategory);
             tbodyElement.append(rowElement);
         }
     }
@@ -114,7 +205,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
     (_c = document
         .querySelector('#form--assetCategoryAdd')) === null || _c === void 0 ? void 0 : _c.addEventListener('submit', (formEvent) => {
         formEvent.preventDefault();
-        cityssm.postJSON(Emile.urlPrefix + '/admin/doAddAssetCategory', formEvent.currentTarget, (rawResponseJSON) => { });
+        const formElement = formEvent.currentTarget;
+        cityssm.postJSON(Emile.urlPrefix + '/admin/doAddAssetCategory', formEvent.currentTarget, (rawResponseJSON) => {
+            var _a;
+            const responseJSON = rawResponseJSON;
+            if (responseJSON.success) {
+                assetCategories = (_a = responseJSON.assetCategories) !== null && _a !== void 0 ? _a : [];
+                renderAssetCategories();
+                formElement.reset();
+            }
+        });
     });
     renderAssetCategories();
 })();

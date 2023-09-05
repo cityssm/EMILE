@@ -1,4 +1,5 @@
 import sqlite from 'better-sqlite3';
+import { clearCacheByTableName } from '../helpers/functions.cache.js';
 import { databasePath } from '../helpers/functions.database.js';
 export function addAssetCategory(category, sessionUser, connectedEmileDB) {
     const emileDB = connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB;
@@ -9,9 +10,10 @@ export function addAssetCategory(category, sessionUser, connectedEmileDB) {
         recordCreate_userName, recordCreate_timeMillis,
         recordUpdate_userName, recordUpdate_timeMillis)
         values (?, ?, ?, ?, ?, ?, ?)`)
-        .run(category.category, category.fontAwesomeIconClasses ?? 'fas fa-bolt', category.orderNumber ?? 0, sessionUser.userName, rightNowMillis, sessionUser.userName, rightNowMillis);
+        .run(category.category, category.fontAwesomeIconClasses ?? 'fas fa-bolt', category.orderNumber ?? -1, sessionUser.userName, rightNowMillis, sessionUser.userName, rightNowMillis);
     if (connectedEmileDB === undefined) {
         emileDB.close();
     }
+    clearCacheByTableName('AssetCategories');
     return result.lastInsertRowid;
 }

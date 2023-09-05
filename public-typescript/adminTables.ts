@@ -1,12 +1,16 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable @typescript-eslint/indent */
+
+// eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable unicorn/prefer-module */
 
 // eslint-disable-next-line n/no-missing-import
 import type { BulmaJS } from '@cityssm/bulma-js/types.js'
 import type { cityssmGlobal } from '@cityssm/bulma-webapp-js/src/types.js'
 
-import type { Emile as EmileGlobal } from './globalTypes.js'
 import type * as recordTypes from '../types/recordTypes.js'
+
+import type { Emile as EmileGlobal } from './globalTypes.js'
 
 declare const bulmaJS: BulmaJS
 declare const cityssm: cityssmGlobal
@@ -54,9 +58,124 @@ declare const cityssm: cityssmGlobal
    * Asset Categories
    */
 
+  type AssetCategoriesResponseJSON =
+    | {
+        success: true
+        assetCategories: recordTypes.AssetCategory[]
+      }
+    | {
+        success: false
+        errorMessage?: string
+      }
+
   // New Category Form
 
   let assetCategories = exports.assetCategories as recordTypes.AssetCategory[]
+
+  function updateAssetCategory(formEvent: Event): void {
+    formEvent.preventDefault()
+
+    cityssm.postJSON(
+      `${Emile.urlPrefix}/admin/doUpdateAssetCategory`,
+      formEvent.currentTarget,
+      (rawResponseJSON) => {
+        const responseJSON = rawResponseJSON as AssetCategoriesResponseJSON
+
+        if (responseJSON.success) {
+          bulmaJS.alert({
+            message: 'Category updated successfully.',
+            contextualColorName: 'success'
+          })
+
+          assetCategories = responseJSON.assetCategories
+          renderAssetCategories()
+        } else {
+          bulmaJS.alert({
+            title: 'Error Updating Category',
+            message: responseJSON.errorMessage ?? 'Please try again.',
+            contextualColorName: 'danger'
+          })
+        }
+      }
+    )
+  }
+
+  function moveAssetCategory(clickEvent: MouseEvent): void {
+    const buttonElement = clickEvent.currentTarget as HTMLButtonElement
+
+    const tableRowElement = buttonElement.closest('tr')
+
+    const categoryId = tableRowElement?.dataset.categoryId
+
+    cityssm.postJSON(
+      Emile.urlPrefix +
+        '/admin/' +
+        (buttonElement.dataset.direction === 'up'
+          ? 'doMoveAssetCategoryUp'
+          : 'doMoveAssetCategoryDown'),
+      {
+        categoryId,
+        moveToEnd: clickEvent.shiftKey ? '1' : '0'
+      },
+      (rawResponseJSON) => {
+        const responseJSON = rawResponseJSON as AssetCategoriesResponseJSON
+
+        if (responseJSON.success) {
+          assetCategories = responseJSON.assetCategories
+          renderAssetCategories()
+        } else {
+          bulmaJS.alert({
+            title: 'Error Moving Category',
+            message: responseJSON.errorMessage ?? 'Please try again.',
+            contextualColorName: 'danger'
+          })
+        }
+      }
+    )
+  }
+
+  function deleteAssetCategory(clickEvent: Event): void {
+    const categoryId = (clickEvent.currentTarget as HTMLElement).closest('tr')
+      ?.dataset.categoryId
+
+    function doDelete(): void {
+      cityssm.postJSON(
+        `${Emile.urlPrefix}/admin/doDeleteAssetCategory`,
+        {
+          categoryId
+        },
+        (rawResponseJSON) => {
+          const responseJSON = rawResponseJSON as AssetCategoriesResponseJSON
+
+          if (responseJSON.success) {
+            bulmaJS.alert({
+              message: 'Category deleted successfully.',
+              contextualColorName: 'success'
+            })
+
+            assetCategories = responseJSON.assetCategories
+            renderAssetCategories()
+          } else {
+            bulmaJS.alert({
+              title: 'Error Deleting Category',
+              message: responseJSON.errorMessage ?? 'Please try again.',
+              contextualColorName: 'danger'
+            })
+          }
+        }
+      )
+    }
+
+    bulmaJS.confirm({
+      title: 'Delete Asset Category',
+      message: 'Are you sure ytou want to delete this category?',
+      contextualColorName: 'warning',
+      okButton: {
+        text: 'Yes, Delete Category',
+        callbackFunction: doDelete
+      }
+    })
+  }
 
   function renderAssetCategories(): void {
     const tbodyElement = document.querySelector(
@@ -112,14 +231,14 @@ declare const cityssm: cityssmGlobal
         <td class="has-width-10">
           <div class="field has-addons">
             <div class="control">
-              <button class="button is-move-up-button" type="button">
+              <button class="button is-move-button" data-direction="up" type="button">
                 <span class="icon">
                   <i class="fas fa-arrow-up" aria-hidden="true"></i>
                 </span>
               </button>
             </div>
             <div class="control">
-              <button class="button is-move-down-button" type="button">
+              <button class="button is-move-button" data-direction="down" type="button">
                 <span class="icon">
                   <i class="fas fa-arrow-down" aria-hidden="true"></i>
                 </span>
@@ -154,6 +273,23 @@ declare const cityssm: cityssmGlobal
 
       refreshIconByElement(classNameElement)
 
+      rowElement
+        .querySelector(`#${formId}`)
+        ?.addEventListener('submit', updateAssetCategory)
+
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+      const moveButtonElements = rowElement.querySelectorAll(
+        '.is-move-button'
+      ) as NodeListOf<HTMLButtonElement>
+
+      for (const moveButtonElement of moveButtonElements) {
+        moveButtonElement.addEventListener('click', moveAssetCategory)
+      }
+
+      rowElement
+        .querySelector('.is-delete-button')
+        ?.addEventListener('click', deleteAssetCategory)
+
       tbodyElement.append(rowElement)
     }
   }
@@ -177,10 +313,21 @@ declare const cityssm: cityssmGlobal
     ?.addEventListener('submit', (formEvent) => {
       formEvent.preventDefault()
 
+      const formElement = formEvent.currentTarget as HTMLFormElement
+
       cityssm.postJSON(
         Emile.urlPrefix + '/admin/doAddAssetCategory',
         formEvent.currentTarget,
-        (rawResponseJSON) => {}
+        (rawResponseJSON) => {
+          const responseJSON = rawResponseJSON as AssetCategoriesResponseJSON
+
+          if (responseJSON.success) {
+            assetCategories = responseJSON.assetCategories ?? []
+            renderAssetCategories()
+
+            formElement.reset()
+          }
+        }
       )
     })
 

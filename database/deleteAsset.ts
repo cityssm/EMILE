@@ -14,10 +14,10 @@ export function deleteAsset(
   const result = emileDB
     .prepare(
       `update Assets
-    set recordDelete_userName = ?,
-    recordDelete_timeMillis = ?
-    where recordDelete_timeMillis is null
-    and assetId = ?`
+        set recordDelete_userName = ?,
+        recordDelete_timeMillis = ?
+        where recordDelete_timeMillis is null
+        and assetId = ?`
     )
     .run(sessionUser.userName, Date.now(), assetId)
 

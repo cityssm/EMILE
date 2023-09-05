@@ -5,10 +5,10 @@ export function deleteAssetGroup(groupId, sessionUser) {
     const emileDB = sqlite(databasePath);
     const result = emileDB
         .prepare(`update AssetGroups
-    set recordDelete_userName = ?,
-    recordDelete_timeMillis = ?
-    where recordDelete_timeMillis is null
-    and groupId = ?`)
+        set recordDelete_userName = ?,
+        recordDelete_timeMillis = ?
+        where recordDelete_timeMillis is null
+        and groupId = ?`)
         .run(sessionUser.userName, Date.now(), groupId);
     if (result.changes > 0) {
         deleteAssetGroupMembersByGroupId(groupId, sessionUser, emileDB);

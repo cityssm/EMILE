@@ -1,30 +1,27 @@
 import sqlite from 'better-sqlite3'
 
+import { clearCacheByTableName } from '../helpers/functions.cache.js'
 import { databasePath } from '../helpers/functions.database.js'
 
-import { deleteAssetGroupMembersByGroupId } from './deleteAssetGroupMember.js'
-
-export function deleteAssetGroup(
-  groupId: number | string,
+export function deleteAssetCategory(
+  categoryId: number | string,
   sessionUser: EmileUser
 ): boolean {
   const emileDB = sqlite(databasePath)
 
   const result = emileDB
     .prepare(
-      `update AssetGroups
+      `update AssetCategories
         set recordDelete_userName = ?,
         recordDelete_timeMillis = ?
         where recordDelete_timeMillis is null
-        and groupId = ?`
+        and categoryId = ?`
     )
-    .run(sessionUser.userName, Date.now(), groupId)
-
-  if (result.changes > 0) {
-    deleteAssetGroupMembersByGroupId(groupId, sessionUser, emileDB)
-  }
+    .run(sessionUser.userName, Date.now(), categoryId)
 
   emileDB.close()
+
+  clearCacheByTableName('AssetCategories')
 
   return result.changes > 0
 }
