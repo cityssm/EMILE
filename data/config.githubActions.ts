@@ -1,3 +1,5 @@
+import { enbridgeUsageHistory } from '../parsers/sheetParserConfigs.js'
+
 import baseConfig from './config.base.js'
 
 export const config = Object.assign({}, baseConfig)
@@ -33,5 +35,9 @@ config.tempUsers = [
     password: 'p@ssw0rd'
   }
 ]
+
+config.parserConfigs = config.parserConfigs ?? {}
+
+config.parserConfigs.enbridgeUsageHistory = enbridgeUsageHistory
 
 export default config

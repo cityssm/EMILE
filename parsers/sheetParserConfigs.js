@@ -45,3 +45,51 @@ export const ssmPuc = {
         }
     }
 };
+export const enbridgeUsageHistory = {
+    parserClass: 'SheetParser',
+    configName: 'Enbridge Usage History CSV',
+    aliasTypeKey: 'accountNumber.gas',
+    columns: {
+        assetAlias: {
+            dataType: 'function',
+            dataFunction(dataObject) {
+                let accountNumber = dataObject['Account Number'];
+                if (accountNumber.slice(-1) === "'") {
+                    accountNumber = accountNumber.slice(0, Math.max(0, accountNumber.length - 1));
+                }
+                return accountNumber;
+            }
+        },
+        dataType: {
+            serviceCategory: {
+                dataType: 'value',
+                dataValue: 'Gas'
+            },
+            unit: {
+                dataType: 'value',
+                dataValue: 'm3'
+            },
+            commodity: {
+                dataType: 'value',
+                dataValue: 'Natural Gas'
+            }
+        },
+        timeSeconds: {
+            dataType: 'function',
+            dataFunction(dataObject) {
+                const startDate = excelDateToDate(dataObject['Billed From']);
+                return startDate.getTime() / 1000 + startDate.getTimezoneOffset() * 60;
+            }
+        },
+        durationSeconds: {
+            dataType: 'function',
+            dataFunction(dataObject) {
+                return dataObject['Billing Days'] * 86400;
+            }
+        },
+        dataValue: {
+            dataType: 'objectKey',
+            dataObjectKey: 'Consumption M3'
+        }
+    }
+};

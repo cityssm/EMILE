@@ -55,3 +55,64 @@ export const ssmPuc: ConfigParserConfiguration = {
     }
   }
 }
+
+interface EnbridgeUsageHistoryRowData extends Record<string, unknown> {
+  'Account Number': string
+  'Billed From': number
+  'Billed To': number
+  'Billing Days': number
+  'Consumption M3': string
+}
+
+export const enbridgeUsageHistory: ConfigParserConfiguration = {
+  parserClass: 'SheetParser',
+  configName: 'Enbridge Usage History CSV',
+  aliasTypeKey: 'accountNumber.gas',
+  columns: {
+    assetAlias: {
+      dataType: 'function',
+      dataFunction(dataObject: EnbridgeUsageHistoryRowData) {
+        let accountNumber = dataObject['Account Number']
+        if (accountNumber.slice(-1) === "'") {
+          accountNumber = accountNumber.slice(
+            0,
+            Math.max(0, accountNumber.length - 1)
+          )
+        }
+
+        return accountNumber
+      }
+    },
+    dataType: {
+      serviceCategory: {
+        dataType: 'value',
+        dataValue: 'Gas'
+      },
+      unit: {
+        dataType: 'value',
+        dataValue: 'm3'
+      },
+      commodity: {
+        dataType: 'value',
+        dataValue: 'Natural Gas'
+      }
+    },
+    timeSeconds: {
+      dataType: 'function',
+      dataFunction(dataObject: EnbridgeUsageHistoryRowData) {
+        const startDate = excelDateToDate(dataObject['Billed From'])
+        return startDate.getTime() / 1000 + startDate.getTimezoneOffset() * 60
+      }
+    },
+    durationSeconds: {
+      dataType: 'function',
+      dataFunction(dataObject: EnbridgeUsageHistoryRowData) {
+        return dataObject['Billing Days'] * 86_400
+      }
+    },
+    dataValue: {
+      dataType: 'objectKey',
+      dataObjectKey: 'Consumption M3'
+    }
+  }
+}
