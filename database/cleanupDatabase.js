@@ -32,7 +32,7 @@ const deleteSql = [
     `delete from Users
     where recordDelete_timeMillis <= ?`
 ];
-export function cleanupDatabase(sessionUser) {
+export function cleanupDatabase(_sessionUser) {
     const emileDB = sqlite(databasePath);
     const recordDeleteTimeMillis = Date.now() - deleteAgeDays * 86400 * 1000;
     let deleteCount = 0;

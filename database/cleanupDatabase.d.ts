@@ -1,1 +1,1 @@
-export declare function cleanupDatabase(sessionUser: EmileUser): number;
+export declare function cleanupDatabase(_sessionUser: EmileUser): number;
