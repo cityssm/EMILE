@@ -9,7 +9,6 @@ export function getReportData(
   reportName: string,
   reportParameters: ReportParameters = {}
 ): unknown[] | undefined {
-  
   let sql = ''
 
   switch (reportName) {
@@ -37,18 +36,22 @@ export function getReportData(
      */
 
     case 'energyData-formatted-filtered': {
-      return getEnergyData({
-        assetId: reportParameters.assetId,
-        groupId: reportParameters.groupId,
-        dataTypeId: reportParameters.dataTypeId,
-        fileId: reportParameters.fileId,
-        startDateString: reportParameters.startDateString as string,
-        endDateString: reportParameters.endDateString as string,
-        timeSecondsMin: reportParameters.timeSecondsMin,
-        timeSecondsMax: reportParameters.timeSecondsMax
-      }, {
-        formatForExport: true
-      })
+      return getEnergyData(
+        {
+          assetId: reportParameters.assetId,
+          categoryId: reportParameters.categoryId,
+          groupId: reportParameters.groupId,
+          dataTypeId: reportParameters.dataTypeId,
+          fileId: reportParameters.fileId,
+          startDateString: reportParameters.startDateString as string,
+          endDateString: reportParameters.endDateString as string,
+          timeSecondsMin: reportParameters.timeSecondsMin,
+          timeSecondsMax: reportParameters.timeSecondsMax
+        },
+        {
+          formatForExport: true
+        }
+      )
     }
 
     /*

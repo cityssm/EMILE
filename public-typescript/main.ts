@@ -2,7 +2,7 @@
 import type { BulmaJS } from '@cityssm/bulma-js/types.js'
 import type { cityssmGlobal } from '@cityssm/bulma-webapp-js/src/types.js'
 
-import type { Asset, AssetGroup } from '../types/recordTypes.js'
+import type { Asset, AssetCategory, AssetGroup } from '../types/recordTypes.js'
 
 import type {
   Emile as EmileGlobal,
@@ -59,6 +59,9 @@ declare const cityssm: cityssmGlobal
     let assetFilterElement: HTMLInputElement
     let assetContainerElement: HTMLElement
 
+    let assetCategoryFilterElement: HTMLInputElement
+    let assetCategoryContainerElement: HTMLElement
+
     let assetGroupFilterElement: HTMLInputElement
     let assetGroupContainerElement: HTMLElement
 
@@ -83,6 +86,16 @@ declare const cityssm: cityssmGlobal
     const allowAssetSelect = assetIdElement !== null
 
     /*
+     * Load asset categories
+     */
+
+    const categoryIdElement =
+      assetSelectorOptions.assetSelectorElement.querySelector(
+        'input[name="categoryId"]'
+      ) as HTMLInputElement
+    const allowCategorySelect = categoryIdElement !== null
+
+    /*
      * Load asset groups
      */
 
@@ -101,12 +114,13 @@ declare const cityssm: cityssmGlobal
     if (
       noSelectionText === '' &&
       (assetIdElement === null || assetIdElement.value === '') &&
+      (categoryIdElement === null || categoryIdElement.value === '') &&
       (groupIdElement === null || groupIdElement.value === '')
     ) {
       noSelectionText = buttonElement.textContent ?? ''
     }
 
-    if (noSelectionText === '' && allowGroupSelect) {
+    if (noSelectionText === '' && (allowCategorySelect || allowGroupSelect)) {
       noSelectionText = '(Select Assets)'
     }
 
@@ -129,6 +143,10 @@ declare const cityssm: cityssmGlobal
       const asset = Emile.assets.find((possibleAsset) => {
         return possibleAsset.assetId === assetId
       }) as Asset
+
+      if (allowCategorySelect) {
+        categoryIdElement.value = ''
+      }
 
       if (allowGroupSelect) {
         groupIdElement.value = ''
@@ -211,6 +229,99 @@ declare const cityssm: cityssmGlobal
       }
     }
 
+    function selectAssetCategory(clickEvent: Event): void {
+      clickEvent.preventDefault()
+
+      const categoryId = Number.parseInt(
+        (clickEvent.currentTarget as HTMLElement).dataset.categoryId ?? '',
+        10
+      )
+
+      const assetCategory = Emile.assetCategories.find(
+        (possibleAssetCategory) => {
+          return possibleAssetCategory.categoryId === categoryId
+        }
+      ) as AssetCategory
+
+      if (allowAssetSelect) {
+        assetIdElement.value = ''
+      }
+
+      if (allowGroupSelect) {
+        groupIdElement.value = ''
+      }
+
+      categoryIdElement.value = assetCategory.categoryId?.toString() ?? ''
+
+      iconContainerElement.innerHTML = `<i class="${
+        assetCategory.fontAwesomeIconClasses ?? 'fas fa-bolt'
+      }" aria-hidden="true"></i>`
+
+      buttonElement.textContent = assetCategory.category
+
+      assetSelectorCloseModalFunction()
+
+      if (assetSelectorOptions.callbackFunction !== undefined) {
+        assetSelectorOptions.callbackFunction({
+          type: 'assetCategory',
+          categoryId
+        })
+      }
+    }
+
+    function renderAssetCategories(): void {
+      const panelElement = document.createElement('div')
+      panelElement.className = 'panel'
+
+      const searchPieces = assetCategoryFilterElement.value
+        .trim()
+        .toLowerCase()
+        .split(' ')
+
+      // eslint-disable-next-line no-labels
+      assetCategoryLoop: for (const assetCategory of Emile.assetCategories) {
+        const assetCategorySearchString = assetCategory.category.toLowerCase()
+
+        for (const searchPiece of searchPieces) {
+          if (!assetCategorySearchString.includes(searchPiece)) {
+            // eslint-disable-next-line no-labels
+            continue assetCategoryLoop
+          }
+        }
+
+        const panelBlockElement = document.createElement('a')
+        panelBlockElement.className = 'panel-block is-block'
+        panelBlockElement.href = '#'
+        panelBlockElement.dataset.categoryId =
+          assetCategory.categoryId?.toString()
+
+        panelBlockElement.innerHTML = `<span class="icon"><i class="${
+          assetCategory.fontAwesomeIconClasses ?? 'fas fa-bolt'
+        }" aria-hidden="true"></i></span>
+          <strong data-field="category"></strong>`
+        ;(
+          panelBlockElement.querySelector(
+            '[data-field="category"]'
+          ) as HTMLElement
+        ).textContent = assetCategory.category ?? ''
+
+        panelBlockElement.addEventListener('click', selectAssetCategory)
+
+        panelElement.append(panelBlockElement)
+      }
+
+      if (panelElement.hasChildNodes()) {
+        assetCategoryContainerElement.innerHTML = ''
+        assetCategoryContainerElement.append(panelElement)
+      } else {
+        assetCategoryContainerElement.innerHTML = `<div class="message is-info">
+          <p class="message-body">
+            There are no asset categories that meet your search criteria.
+          </p>
+          </div>`
+      }
+    }
+
     function selectAssetGroup(clickEvent: Event): void {
       clickEvent.preventDefault()
 
@@ -225,6 +336,10 @@ declare const cityssm: cityssmGlobal
 
       if (allowAssetSelect) {
         assetIdElement.value = ''
+      }
+
+      if (allowCategorySelect) {
+        categoryIdElement.value = ''
       }
 
       groupIdElement.value = assetGroup.groupId?.toString() ?? ''
@@ -271,7 +386,7 @@ declare const cityssm: cityssmGlobal
         panelBlockElement.href = '#'
         panelBlockElement.dataset.groupId = assetGroup.groupId?.toString()
 
-        panelBlockElement.innerHTML = `<i class="fas fa-city" aria-hidden="true"></i>
+        panelBlockElement.innerHTML = `<span class="icon"><i class="fas fa-city" aria-hidden="true"></i></span>
           <strong data-field="groupName"></strong><br />
           <span class="is-size-7" data-field="groupDescription"></span>`
         ;(
@@ -317,6 +432,14 @@ declare const cityssm: cityssmGlobal
             '#assetSelectorContainer--assets'
           ) as HTMLElement
 
+          assetCategoryFilterElement = modalElement.querySelector(
+            '#assetSelector--assetCategoryFilter'
+          ) as HTMLInputElement
+
+          assetCategoryContainerElement = modalElement.querySelector(
+            '#assetSelectorContainer--assetCategories'
+          ) as HTMLElement
+
           assetGroupFilterElement = modalElement.querySelector(
             '#assetSelector--assetGroupFilter'
           ) as HTMLInputElement
@@ -325,24 +448,51 @@ declare const cityssm: cityssmGlobal
             '#assetSelectorContainer--assetGroups'
           ) as HTMLElement
 
-          if (!allowAssetSelect || !allowGroupSelect) {
-            // Remove Tabs
-            modalElement.querySelector('.tabs')?.remove()
-          } else {
-            bulmaJS.init(modalElement)
+          if (!allowCategorySelect) {
+            console.log('remove tab')
+            // Remove Asset Categories Tab
+            modalElement
+              .querySelector('.tabs a[href$="--assetCategories"]')
+              ?.closest('li')
+              ?.remove()
+          }
+
+          if (!allowGroupSelect) {
+            // Remove Asset Group Tab
+            modalElement
+              .querySelector('.tabs a[href$="--assetGroups"]')
+              ?.closest('li')
+              ?.remove()
           }
 
           if (!allowAssetSelect) {
-            // Remove Asset Tab Container
-            modalElement.querySelector('#assetSelectorTab--assets')?.remove()
-
-            // Show Asset Groups Tab Container
+            // Remove Asset Tab
             modalElement
-              .querySelector('#assetSelectorTab--assetGroups')
+              .querySelector('.tabs a[href$="--assets"]')
+              ?.closest('li')
+              ?.remove()
+
+            // Show Asset Categories or Groups Tab Container
+
+            modalElement
+              .querySelector(
+                `a[aria-controls='assetSelectorTab--${
+                  allowCategorySelect ? 'assetCategories' : 'assetGroups'
+                }']`
+              )
+              ?.closest('li')
+              ?.classList.add('is-hidden')
+
+            modalElement
+              .querySelector(
+                `#assetSelectorTab--${
+                  allowCategorySelect ? 'assetCategories' : 'assetGroups'
+                }`
+              )
               ?.classList.remove('is-hidden')
             ;(
               modalElement.querySelector('.modal-card-title') as HTMLElement
-            ).textContent = 'Select an Asset Group'
+            ).textContent = 'Select Assets'
           }
         },
         onshown(modalElement, closeModalFunction) {
@@ -355,6 +505,14 @@ declare const cityssm: cityssmGlobal
           if (allowAssetSelect) {
             renderAssets()
             assetFilterElement.addEventListener('keyup', renderAssets)
+          }
+
+          if (allowCategorySelect) {
+            renderAssetCategories()
+            assetCategoryFilterElement.addEventListener(
+              'keyup',
+              renderAssetCategories
+            )
           }
 
           if (allowGroupSelect) {
@@ -373,6 +531,10 @@ declare const cityssm: cityssmGlobal
       ?.addEventListener('click', () => {
         if (allowAssetSelect) {
           assetIdElement.value = ''
+        }
+
+        if (allowCategorySelect) {
+          categoryIdElement.value = ''
         }
 
         if (allowGroupSelect) {

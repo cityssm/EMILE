@@ -20,6 +20,7 @@ export function getReportData(reportName, reportParameters = {}) {
         case 'energyData-formatted-filtered': {
             return getEnergyData({
                 assetId: reportParameters.assetId,
+                categoryId: reportParameters.categoryId,
                 groupId: reportParameters.groupId,
                 dataTypeId: reportParameters.dataTypeId,
                 fileId: reportParameters.fileId,

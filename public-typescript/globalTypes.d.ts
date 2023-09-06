@@ -20,6 +20,9 @@ export interface InitializeAssetSelectorOptions {
         type: 'assetGroup';
         groupId: number;
     } | {
+        type: 'assetCategory';
+        categoryId: number;
+    } | {
         type: 'clear';
     }) => void;
 }

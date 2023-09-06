@@ -6,7 +6,8 @@ function userFunction_getPowerOfTenMultiplierName(powerOfTenMultiplier) {
     if (powerOfTenMultiplier === 0) {
         return '';
     }
-    return powerOfTenMultipliers[powerOfTenMultiplier] ?? powerOfTenMultiplier.toString();
+    return (powerOfTenMultipliers[powerOfTenMultiplier] ??
+        powerOfTenMultiplier.toString());
 }
 export function getEnergyData(filters, options) {
     const columnNames = options?.formatForExport ?? false
@@ -58,6 +59,10 @@ export function getEnergyData(filters, options) {
     if ((filters.assetId ?? '') !== '') {
         sql += ' and d.assetId = ?';
         sqlParameters.push(filters.assetId);
+    }
+    if ((filters.categoryId ?? '') !== '') {
+        sql += ' and a.categoryId = ?';
+        sqlParameters.push(filters.categoryId);
     }
     if ((filters.groupId ?? '') !== '') {
         sql +=

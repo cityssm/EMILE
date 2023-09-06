@@ -10,6 +10,7 @@ import type { EnergyData } from '../types/recordTypes.js'
 
 interface GetEnergyDataFilters {
   assetId?: number | string
+  categoryId?: number | string
   groupId?: number | string
   dataTypeId?: number | string
   fileId?: number | string
@@ -24,12 +25,17 @@ interface GetEnergyDataOptions {
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-function userFunction_getPowerOfTenMultiplierName (powerOfTenMultiplier: number): string {
+function userFunction_getPowerOfTenMultiplierName(
+  powerOfTenMultiplier: number
+): string {
   if (powerOfTenMultiplier === 0) {
     return ''
   }
 
-  return powerOfTenMultipliers[powerOfTenMultiplier] ?? powerOfTenMultiplier.toString()
+  return (
+    powerOfTenMultipliers[powerOfTenMultiplier] ??
+    powerOfTenMultiplier.toString()
+  )
 }
 
 export function getEnergyData(
@@ -91,6 +97,11 @@ export function getEnergyData(
     sqlParameters.push(filters.assetId)
   }
 
+  if ((filters.categoryId ?? '') !== '') {
+    sql += ' and a.categoryId = ?'
+    sqlParameters.push(filters.categoryId)
+  }
+
   if ((filters.groupId ?? '') !== '') {
     sql +=
       ' and d.assetId in (select assetId from AssetGroupMembers where recordDelete_timeMillis is null and groupId = ?)'
@@ -142,7 +153,10 @@ export function getEnergyData(
     readonly: true
   })
 
-  emileDB.function('userFunction_getPowerOfTenMultiplierName', userFunction_getPowerOfTenMultiplierName)
+  emileDB.function(
+    'userFunction_getPowerOfTenMultiplierName',
+    userFunction_getPowerOfTenMultiplierName
+  )
 
   const data = emileDB.prepare(sql).all(sqlParameters) as EnergyData[]
 

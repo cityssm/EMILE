@@ -1,6 +1,7 @@
 import type { EnergyData } from '../types/recordTypes.js';
 interface GetEnergyDataFilters {
     assetId?: number | string;
+    categoryId?: number | string;
     groupId?: number | string;
     dataTypeId?: number | string;
     fileId?: number | string;
