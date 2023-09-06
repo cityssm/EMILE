@@ -151,16 +151,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
         <td class="has-width-10">
           <div class="field has-addons">
             <div class="control">
-              <button class="button is-move-button" data-direction="up" type="button">
-                <span class="is-sr-only">Move Category Up</span>
-                <span class="icon">
+              <button class="button is-move-button" data-direction="up" type="button" aria-label="Move Category Up">
+              <span class="icon">
                 <i class="fas fa-arrow-up" aria-hidden="true"></i>
-                </span>
+              </span>
               </button>
             </div>
             <div class="control">
-              <button class="button is-move-button" data-direction="down" type="button">
-                <span class="is-sr-only">Move Category Down</span>
+              <button class="button is-move-button" data-direction="down" type="button" aria-label="Move Category Down">
                 <span class="icon">
                   <i class="fas fa-arrow-down" aria-hidden="true"></i>
                 </span>
@@ -169,8 +167,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
           </div>
         </td>
         <td class="has-width-10">
-          <button class="button is-light is-danger is-delete-button" type="button">
-            <span class="is-sr-only">Delete Category</span>
+          <button class="button is-light is-danger is-delete-button" type="button" aria-label="Delete Category">
             <span class="icon">
               <i class="fas fa-trash" aria-hidden="true"></i>
             </span>
