@@ -6,7 +6,7 @@ import { getAssets } from '../../database/getAssets.js'
 export function handler(request: Request, response: Response): void {
   const assetId = addAsset(request.body, request.session.user as EmileUser)
 
-  const assets = getAssets()
+  const assets = getAssets({})
 
   response.json({
     success: true,

@@ -1,6 +1,7 @@
 import sqlite from 'better-sqlite3'
 
 import { databasePath } from '../helpers/functions.database.js'
+
 import { getEnergyData } from './getEnergyData.js'
 
 export type ReportParameters = Record<string, string | number>

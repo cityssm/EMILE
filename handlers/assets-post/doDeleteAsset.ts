@@ -9,7 +9,7 @@ export function handler(request: Request, response: Response): void {
     request.session.user as EmileUser
   )
 
-  const assets = getAssets()
+  const assets = getAssets({})
 
   response.json({
     success,

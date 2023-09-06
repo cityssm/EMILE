@@ -4,7 +4,7 @@ import { getParserClassesAndConfigurations } from '../../parsers/parserHelpers.j
 export function handler(request, response) {
     const pendingFiles = getPendingEnergyDataFiles();
     const processedFiles = getProcessedEnergyDataFiles('');
-    const assets = getAssets();
+    const assets = getAssets({});
     const parserClassesAndConfigurations = getParserClassesAndConfigurations();
     response.render('data', {
         headTitle: 'Data',

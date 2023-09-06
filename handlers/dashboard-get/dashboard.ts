@@ -6,7 +6,7 @@ import { getEnergyDataStatistics } from '../../database/getEnergyDataStatistics.
 import { getAssetCategories } from '../../helpers/functions.cache.js'
 
 export function handler(request: Request, response: Response): void {
-  const assets = getAssets()
+  const assets = getAssets({})
   const assetGroups = getAssetGroups(request.session.user as EmileUser)
   const assetCategories = getAssetCategories()
 

@@ -11,7 +11,7 @@ export function handler(request: Request, response: Response): void {
   const pendingFiles = getPendingEnergyDataFiles()
   const processedFiles = getProcessedEnergyDataFiles('')
 
-  const assets = getAssets()
+  const assets = getAssets({})
 
   const parserClassesAndConfigurations = getParserClassesAndConfigurations()
 

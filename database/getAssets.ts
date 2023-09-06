@@ -11,7 +11,7 @@ interface GetAssetsFilters {
 }
 
 export function getAssets(
-  filters: GetAssetsFilters = {},
+  filters: GetAssetsFilters,
   connectedEmileDB?: sqlite.Database
 ): Asset[] {
   let sql = `select a.assetId, a.assetName, a.latitude, a.longitude,

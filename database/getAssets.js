@@ -1,6 +1,6 @@
 import sqlite from 'better-sqlite3';
 import { databasePath } from '../helpers/functions.database.js';
-export function getAssets(filters = {}, connectedEmileDB) {
+export function getAssets(filters, connectedEmileDB) {
     let sql = `select a.assetId, a.assetName, a.latitude, a.longitude,
     a.categoryId, c.category, c.fontAwesomeIconClasses
     from Assets a
