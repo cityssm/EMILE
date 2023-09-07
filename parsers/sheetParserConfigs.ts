@@ -61,7 +61,7 @@ interface EnbridgeUsageHistoryRowData extends Record<string, unknown> {
   'Billed From': number
   'Billed To': number
   'Billing Days': number
-  'Consumption M3': string
+  'Consumption M3': number
 }
 
 export const enbridgeUsageHistory: ConfigParserConfiguration = {
@@ -101,7 +101,16 @@ export const enbridgeUsageHistory: ConfigParserConfiguration = {
       dataType: 'function',
       dataFunction(dataObject: EnbridgeUsageHistoryRowData) {
         const startDate = excelDateToDate(dataObject['Billed From'])
-        return startDate.getTime() / 1000 + startDate.getTimezoneOffset() * 60
+
+        let timeSeconds = Math.round(
+          startDate.getTime() / 1000 + startDate.getTimezoneOffset() * 60
+        )
+
+        if (new Date(timeSeconds * 1000).getHours() !== 0) {
+          timeSeconds += startDate.getTimezoneOffset() * 60
+        }
+
+        return timeSeconds
       }
     },
     durationSeconds: {
@@ -111,8 +120,10 @@ export const enbridgeUsageHistory: ConfigParserConfiguration = {
       }
     },
     dataValue: {
-      dataType: 'objectKey',
-      dataObjectKey: 'Consumption M3'
+      dataType: 'function',
+      dataFunction(dataObject: EnbridgeUsageHistoryRowData) {
+        return dataObject['Consumption M3'] ?? 0
+      }
     }
   }
 }

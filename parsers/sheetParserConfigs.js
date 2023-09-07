@@ -78,7 +78,11 @@ export const enbridgeUsageHistory = {
             dataType: 'function',
             dataFunction(dataObject) {
                 const startDate = excelDateToDate(dataObject['Billed From']);
-                return startDate.getTime() / 1000 + startDate.getTimezoneOffset() * 60;
+                let timeSeconds = Math.round(startDate.getTime() / 1000 + startDate.getTimezoneOffset() * 60);
+                if (new Date(timeSeconds * 1000).getHours() !== 0) {
+                    timeSeconds += startDate.getTimezoneOffset() * 60;
+                }
+                return timeSeconds;
             }
         },
         durationSeconds: {
@@ -88,8 +92,10 @@ export const enbridgeUsageHistory = {
             }
         },
         dataValue: {
-            dataType: 'objectKey',
-            dataObjectKey: 'Consumption M3'
+            dataType: 'function',
+            dataFunction(dataObject) {
+                return dataObject['Consumption M3'] ?? 0;
+            }
         }
     }
 };
