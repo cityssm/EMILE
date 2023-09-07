@@ -7,4 +7,5 @@ Object.defineProperty(exports, "__esModule", { value: true });
     Emile.initializeAssetSelector({
         assetSelectorElement: document.querySelector('#reports--assetSelector')
     });
+    bulmaJS.init();
 })();

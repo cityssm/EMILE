@@ -17,6 +17,30 @@ export function getReportData(reportName, reportParameters = {}) {
         order by a.assetName, c.category`;
             break;
         }
+        case 'assetAliases-all': {
+            sql = 'select * from AssetAliases';
+            break;
+        }
+        case 'assetGroups-all': {
+            sql = 'select * from AssetGroups';
+            break;
+        }
+        case 'assetGroupMembers-all': {
+            sql = 'select * from AssetGroupMembers';
+            break;
+        }
+        case 'assetCategories-all': {
+            sql = 'select * from AssetCategories';
+            break;
+        }
+        case 'assetAliasTypes-all': {
+            sql = 'select * from AssetAliasTypes';
+            break;
+        }
+        case 'energyData-all': {
+            sql = 'select * from EnergyData';
+            break;
+        }
         case 'energyData-formatted-filtered': {
             return getEnergyData({
                 assetId: reportParameters.assetId,
@@ -31,6 +55,38 @@ export function getReportData(reportName, reportParameters = {}) {
             }, {
                 formatForExport: true
             });
+        }
+        case 'energyDataFiles-all': {
+            sql = 'select * from EnergyDataFiles';
+            break;
+        }
+        case 'energyAccumulationBehaviours-all': {
+            sql = 'select * from EnergyAccumulationBehaviours';
+            break;
+        }
+        case 'energyCommodities-all': {
+            sql = 'select * from EnergyCommodities';
+            break;
+        }
+        case 'energyDataTypes-all': {
+            sql = 'select * from EnergyDataTypes';
+            break;
+        }
+        case 'energyReadingTypes-all': {
+            sql = 'select * from EnergyReadingTypes';
+            break;
+        }
+        case 'energyServiceCategories-all': {
+            sql = 'select * from EnergyServiceCategories';
+            break;
+        }
+        case 'energyUnits-all': {
+            sql = 'select * from EnergyUnits';
+            break;
+        }
+        case 'users-all': {
+            sql = 'select * from Users';
+            break;
         }
         default: {
             return undefined;

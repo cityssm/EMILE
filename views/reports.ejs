@@ -2,112 +2,307 @@
 
 <h1 class="title is-1">Reports</h1>
 
-<div class="columns">
-  <div class="column">
-    <div class="panel">
-      <h2 class="panel-heading">Asset Reports</h2>
-      <a class="panel-block" href="<%= urlPrefix %>/reports/assets-formatted" download>
-        <div class="media">
-          <div class="media-left">
-            <i class="fas fa-3x fa-file-csv" aria-hidden="true"></i>
-          </div>
-          <div class="media-content">
-            <h3 class="title is-5 mb-0">Assets</h3>
-            <p>
-              A formatted list of all assets tracked by
-              <%= configFunctions.getConfigProperty("application.applicationName") %>.
-            </p>
+<div class="tabs is-boxed">
+  <ul role="presentation">
+    <li class="is-active">
+      <a href="#tab--csvReports">
+        <span class="icon is-small"
+          ><i class="fas fa-file-csv" aria-hidden="true"></i
+        ></span>
+        <span>CSV Exports</span>
+      </a>
+    </li>
+    <li>
+      <a href="#tab--rawExports">
+        <span class="icon is-small"
+          ><i class="fas fa-file" aria-hidden="true"></i
+        ></span>
+        <span>Raw Exports</span>
+      </a>
+    </li>
+  </ul>
+</div>
+
+<div class="tab-container">
+  <div class="tab-content" id="tab--csvReports">
+    <div class="columns">
+      <div class="column">
+        <div class="panel">
+          <h2 class="panel-heading">Asset Reports</h2>
+          <a class="panel-block" href="<%= urlPrefix %>/reports/assets-formatted" download>
+            <div class="media">
+              <div class="media-left">
+                <i class="fas fa-3x fa-file-csv" aria-hidden="true"></i>
+              </div>
+              <div class="media-content">
+                <h3 class="title is-5 mb-0">Assets</h3>
+                <p>
+                  A formatted list of all assets tracked by
+                  <%= configFunctions.getConfigProperty("application.applicationName") %>.
+                </p>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+      <div class="column">
+        <div class="panel">
+          <h2 class="panel-heading">Energy Data</h2>
+          <div class="panel-block is-block">
+            <form method="get" action="<%= urlPrefix %>/reports/energyData-formatted-filtered">
+              <div id="reports--assetSelector">
+                <input name="assetId" type="hidden" />
+                <input name="categoryId" type="hidden" />
+                <input name="groupId" type="hidden" />
+                <strong class="label">Assets</strong>
+                <div class="field has-addons">
+                  <div class="control">
+                    <span class="button is-static">
+                      <span class="icon">
+                        <i class="fas fa-bolt" aria-hidden="true"></i>
+                      </span>
+                    </span>
+                  </div>
+                  <div class="control is-expanded">
+                    <button
+                      class="input is-justify-content-start"
+                      type="button"
+                    >
+                      (All Assets)
+                    </button>
+                  </div>
+                  <div class="control">
+                    <button class="button is-clear-button has-tooltip-left" data-tooltip="Clear" type="button" aria-label="Clear">
+                      <i class="fas fa-broom" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="columns mt-1">
+                <div class="column">
+                  <label class="label" for="reports--startDateString">
+                    Start Date
+                  </label>
+                  <div class="field has-addons">
+                    <div class="control">
+                      <span class="button is-static">
+                        <span class="icon">
+                          <i class="fas fa-play" aria-hidden="true"></i>
+                        </span>
+                      </span>
+                    </div>
+                    <div class="control is-expanded">
+                      <input
+                        class="input"
+                        id="reports--startDateString"
+                        name="startDateString"
+                        type="date"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+                  <label class="label" for="reports--endDateString">
+                    End Date
+                  </label>
+                  <div class="field has-addons">
+                    <div class="control">
+                      <span class="button is-static">
+                        <span class="icon">
+                          <i class="fas fa-stop" aria-hidden="true"></i>
+                        </span>
+                      </span>
+                    </div>
+                    <div class="control is-expanded">
+                      <input
+                        class="input"
+                        id="reports--endDateString"
+                        name="endDateString"
+                        type="date"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="column is-narrow is-align-self-flex-end">
+                  <button class="button is-primary" type="submit">
+                    <span class="icon is-small"><i class="fas fa-file-csv" aria-hidden="true"></i></span>
+                    <span>Export</span>
+                  </button>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
-      </a>
+      </div>
     </div>
   </div>
-  <div class="column">
-    <div class="panel">
-      <h2 class="panel-heading">Energy Data</h2>
-      <div class="panel-block is-block">
-        <form method="get" action="<%= urlPrefix %>/reports/energyData-formatted-filtered">
-          <div id="reports--assetSelector">
-            <input name="assetId" type="hidden" />
-            <input name="categoryId" type="hidden" />
-            <input name="groupId" type="hidden" />
-            <strong class="label">Assets</strong>
-            <div class="field has-addons">
-              <div class="control">
-                <span class="button is-static">
-                  <span class="icon">
-                    <i class="fas fa-bolt" aria-hidden="true"></i>
-                  </span>
-                </span>
+  <div class="tab-content is-hidden" id="tab--rawExports">
+    <div class="message is-warning">
+      <p class="message-body">
+        Note that raw exports are not formatted and may include deleted records
+        that have not been fully purged from the database.
+      </p>
+    </div>
+    <div class="columns">
+      <div class="column">
+        <div class="panel">
+          <h2 class="panel-heading">Data Exports</h2>
+          <a class="panel-block" href="<%= urlPrefix %>/reports/assets-all" download>
+            <div class="media">
+              <div class="media-left">
+                <i class="fas fa-3x fa-file-csv" aria-hidden="true"></i>
               </div>
-              <div class="control is-expanded">
-                <button
-                  class="input is-justify-content-start"
-                  type="button"
-                >
-                  (All Assets)
-                </button>
-              </div>
-              <div class="control">
-                <button class="button is-clear-button has-tooltip-left" data-tooltip="Clear" type="button" aria-label="Clear">
-                  <i class="fas fa-broom" aria-hidden="true"></i>
-                </button>
+              <div class="media-content">
+                <h3 class="title is-5 mb-0">Assets</h3>
               </div>
             </div>
-          </div>
-          <div class="columns mt-1">
-            <div class="column">
-              <label class="label" for="reports--startDateString">
-                Start Date
-              </label>
-              <div class="field has-addons">
-                <div class="control">
-                  <span class="button is-static">
-                    <span class="icon">
-                      <i class="fas fa-play" aria-hidden="true"></i>
-                    </span>
-                  </span>
-                </div>
-                <div class="control is-expanded">
-                  <input
-                    class="input"
-                    id="reports--startDateString"
-                    name="startDateString"
-                    type="date"
-                  />
-                </div>
+          </a>
+          <a class="panel-block" href="<%= urlPrefix %>/reports/assetAliases-all" download>
+            <div class="media">
+              <div class="media-left">
+                <i class="fas fa-3x fa-file-csv" aria-hidden="true"></i>
+              </div>
+              <div class="media-content">
+                <h3 class="title is-5 mb-0">Asset Aliases</h3>
               </div>
             </div>
-            <div class="column">
-              <label class="label" for="reports--endDateString">
-                End Date
-              </label>
-              <div class="field has-addons">
-                <div class="control">
-                  <span class="button is-static">
-                    <span class="icon">
-                      <i class="fas fa-stop" aria-hidden="true"></i>
-                    </span>
-                  </span>
-                </div>
-                <div class="control is-expanded">
-                  <input
-                    class="input"
-                    id="reports--endDateString"
-                    name="endDateString"
-                    type="date"
-                  />
-                </div>
+          </a>
+          <a class="panel-block" href="<%= urlPrefix %>/reports/assetGroups-all" download>
+            <div class="media">
+              <div class="media-left">
+                <i class="fas fa-3x fa-file-csv" aria-hidden="true"></i>
+              </div>
+              <div class="media-content">
+                <h3 class="title is-5 mb-0">Asset Groups</h3>
               </div>
             </div>
-            <div class="column is-narrow is-align-self-flex-end">
-              <button class="button is-primary" type="submit">
-                <span class="icon is-small"><i class="fas fa-file-csv" aria-hidden="true"></i></span>
-                <span>Export</span>
-              </button>
+          </a>
+          <a class="panel-block" href="<%= urlPrefix %>/reports/assetGroupMembers-all" download>
+            <div class="media">
+              <div class="media-left">
+                <i class="fas fa-3x fa-file-csv" aria-hidden="true"></i>
+              </div>
+              <div class="media-content">
+                <h3 class="title is-5 mb-0">Asset Group Members</h3>
+              </div>
             </div>
-          </div>
-        </form>
+          </a>
+          <a class="panel-block" href="<%= urlPrefix %>/reports/energyData-all" download>
+            <div class="media">
+              <div class="media-left">
+                <i class="fas fa-3x fa-file-csv" aria-hidden="true"></i>
+              </div>
+              <div class="media-content">
+                <h3 class="title is-5 mb-0">Energy Data</h3>
+              </div>
+            </div>
+          </a>
+          <a class="panel-block" href="<%= urlPrefix %>/reports/energyDataFiles-all" download>
+            <div class="media">
+              <div class="media-left">
+                <i class="fas fa-3x fa-file-csv" aria-hidden="true"></i>
+              </div>
+              <div class="media-content">
+                <h3 class="title is-5 mb-0">Energy Data Files</h3>
+              </div>
+            </div>
+          </a>
+          <a class="panel-block" href="<%= urlPrefix %>/reports/users-all" download>
+            <div class="media">
+              <div class="media-left">
+                <i class="fas fa-3x fa-file-csv" aria-hidden="true"></i>
+              </div>
+              <div class="media-content">
+                <h3 class="title is-5 mb-0">Users</h3>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+      <div class="column">
+        <div class="panel">
+          <h2 class="panel-heading">Configuration Exports</h2>
+          <a class="panel-block" href="<%= urlPrefix %>/reports/assetAliasTypes-all" download>
+            <div class="media">
+              <div class="media-left">
+                <i class="fas fa-3x fa-file-csv" aria-hidden="true"></i>
+              </div>
+              <div class="media-content">
+                <h3 class="title is-5 mb-0">Asset Alias Types</h3>
+              </div>
+            </div>
+          </a>
+          <a class="panel-block" href="<%= urlPrefix %>/reports/assetCategories-all" download>
+            <div class="media">
+              <div class="media-left">
+                <i class="fas fa-3x fa-file-csv" aria-hidden="true"></i>
+              </div>
+              <div class="media-content">
+                <h3 class="title is-5 mb-0">Asset Categories</h3>
+              </div>
+            </div>
+          </a>
+          <a class="panel-block" href="<%= urlPrefix %>/reports/energyAccumulationBehaviours-all" download>
+            <div class="media">
+              <div class="media-left">
+                <i class="fas fa-3x fa-file-csv" aria-hidden="true"></i>
+              </div>
+              <div class="media-content">
+                <h3 class="title is-5 mb-0">Energy Accumulation Behaviours</h3>
+              </div>
+            </div>
+          </a>
+          <a class="panel-block" href="<%= urlPrefix %>/reports/energyCommodities-all" download>
+            <div class="media">
+              <div class="media-left">
+                <i class="fas fa-3x fa-file-csv" aria-hidden="true"></i>
+              </div>
+              <div class="media-content">
+                <h3 class="title is-5 mb-0">Energy Commodities</h3>
+              </div>
+            </div>
+          </a>
+          <a class="panel-block" href="<%= urlPrefix %>/reports/energyDataTypes-all" download>
+            <div class="media">
+              <div class="media-left">
+                <i class="fas fa-3x fa-file-csv" aria-hidden="true"></i>
+              </div>
+              <div class="media-content">
+                <h3 class="title is-5 mb-0">Energy Data Types</h3>
+              </div>
+            </div>
+          </a>
+          <a class="panel-block" href="<%= urlPrefix %>/reports/energyReadingTypes-all" download>
+            <div class="media">
+              <div class="media-left">
+                <i class="fas fa-3x fa-file-csv" aria-hidden="true"></i>
+              </div>
+              <div class="media-content">
+                <h3 class="title is-5 mb-0">Energy Reading Types</h3>
+              </div>
+            </div>
+          </a>
+          <a class="panel-block" href="<%= urlPrefix %>/reports/energyServiceCategories-all" download>
+            <div class="media">
+              <div class="media-left">
+                <i class="fas fa-3x fa-file-csv" aria-hidden="true"></i>
+              </div>
+              <div class="media-content">
+                <h3 class="title is-5 mb-0">Energy Service Categories</h3>
+              </div>
+            </div>
+          </a>
+          <a class="panel-block" href="<%= urlPrefix %>/reports/energyUnits-all" download>
+            <div class="media">
+              <div class="media-left">
+                <i class="fas fa-3x fa-file-csv" aria-hidden="true"></i>
+              </div>
+              <div class="media-content">
+                <h3 class="title is-5 mb-0">Energy Units</h3>
+              </div>
+            </div>
+          </a>
+        </div>
       </div>
     </div>
   </div>

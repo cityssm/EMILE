@@ -33,8 +33,54 @@ export function getReportData(
     }
 
     /*
+     * Asset Aliases
+     */
+
+    case 'assetAliases-all': {
+      sql = 'select * from AssetAliases'
+      break
+    }
+
+    /*
+     * Asset Groups
+     */
+
+    case 'assetGroups-all': {
+      sql = 'select * from AssetGroups'
+      break
+    }
+
+    case 'assetGroupMembers-all': {
+      sql = 'select * from AssetGroupMembers'
+      break
+    }
+
+    /*
+     * Asset Categories
+     */
+
+    case 'assetCategories-all': {
+      sql = 'select * from AssetCategories'
+      break
+    }
+
+    /*
+     * Asset Alias Types
+     */
+
+    case 'assetAliasTypes-all': {
+      sql = 'select * from AssetAliasTypes'
+      break
+    }
+
+    /*
      * Energy Data
      */
+
+    case 'energyData-all': {
+      sql = 'select * from EnergyData'
+      break
+    }
 
     case 'energyData-formatted-filtered': {
       return getEnergyData(
@@ -53,6 +99,54 @@ export function getReportData(
           formatForExport: true
         }
       )
+    }
+
+    case 'energyDataFiles-all': {
+      sql = 'select * from EnergyDataFiles'
+      break
+    }
+
+    /*
+     * Energy Config Tables
+     */
+
+    case 'energyAccumulationBehaviours-all': {
+      sql = 'select * from EnergyAccumulationBehaviours'
+      break
+    }
+
+    case 'energyCommodities-all': {
+      sql = 'select * from EnergyCommodities'
+      break
+    }
+
+    case 'energyDataTypes-all': {
+      sql = 'select * from EnergyDataTypes'
+      break
+    }
+
+    case 'energyReadingTypes-all': {
+      sql = 'select * from EnergyReadingTypes'
+      break
+    }
+
+    case 'energyServiceCategories-all': {
+      sql = 'select * from EnergyServiceCategories'
+      break
+    }
+
+    case 'energyUnits-all': {
+      sql = 'select * from EnergyUnits'
+      break
+    }
+
+    /*
+     * Users
+     */
+
+    case 'users-all': {
+      sql = 'select * from Users'
+      break
     }
 
     /*
