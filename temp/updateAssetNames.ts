@@ -1,5 +1,3 @@
-import fs from 'node:fs/promises'
-
 import sqlite from 'better-sqlite3'
 import XLSX from 'xlsx'
 
