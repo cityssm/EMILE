@@ -13,7 +13,7 @@ export function getAssetGroup(groupId, sessionUser) {
           and (g.recordCreate_userName = ? or g.isShared = 1)`)
         .get(groupId, sessionUser.userName);
     if (assetGroup !== undefined) {
-        assetGroup.groupMembers = getAssets({ groupId: assetGroup.groupId }, emileDB);
+        assetGroup.groupMembers = getAssets({ groupId: assetGroup.groupId }, {}, emileDB);
     }
     emileDB.close();
     return assetGroup;

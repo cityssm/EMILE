@@ -237,7 +237,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         openAssetByAssetId(assetId);
     }
     function renderAssets() {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
         ;
         document.querySelector('#count--assets').textContent =
             Emile.assets.length.toString();
@@ -256,11 +256,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
             .toLowerCase()
             .split(' ');
         const tableElement = document.createElement('table');
-        tableElement.className = 'table is-fullwidth is-striped has-sticky-header is-fade-hoverable';
+        tableElement.className =
+            'table is-fullwidth is-striped has-sticky-header is-fade-hoverable';
         tableElement.innerHTML = `<thead><tr>
       <th class="has-width-10"><span class="is-sr-only">Icon</span></th>
       <th>Category</th>
       <th>Asset</th>
+      <th>Data From</th>
+      <th>Data To</th>
       <th class="has-text-centered has-width-10">
         <i class="far fa-map" aria-hidden="true"></i>
         <span class="is-sr-only">Map</span>
@@ -287,15 +290,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
         </td>
         <td data-field="category"></td>
         <td><a data-field="assetName" href="#"></a></td>
+        <td>
+          ${asset.timeSecondsMin === null
+                ? '<span class="has-text-grey">(No Data)</span>'
+                : new Date(((_f = asset.timeSecondsMin) !== null && _f !== void 0 ? _f : 0) * 1000).toLocaleString()}
+        </td>
+        <td>
+          ${asset.endTimeSecondsMax === null
+                ? ''
+                : new Date(((_g = asset.endTimeSecondsMax) !== null && _g !== void 0 ? _g : 0) * 1000).toLocaleString()}
+        </td>
         <td class="has-width-10 has-text-centered has-text-nowrap">
-          ${((_f = asset.latitude) !== null && _f !== void 0 ? _f : '') === '' || ((_g = asset.longitude) !== null && _g !== void 0 ? _g : '') === ''
+          ${((_h = asset.latitude) !== null && _h !== void 0 ? _h : '') === '' || ((_j = asset.longitude) !== null && _j !== void 0 ? _j : '') === ''
                 ? ''
                 : `<a class="has-tooltip-left" data-tooltip="Open Map" href="${Emile.getMapLink(asset.latitude, asset.longitude)}" target="_blank" rel="noopener noreferrer" aria-label="Open Map">
                 <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
-                ${(_h = asset.latitude) !== null && _h !== void 0 ? _h : 0}, ${(_j = asset.longitude) !== null && _j !== void 0 ? _j : 0}
+                ${(_k = asset.latitude) !== null && _k !== void 0 ? _k : 0}, ${(_l = asset.longitude) !== null && _l !== void 0 ? _l : 0}
                 </a>`}
         </td>`;
-            rowElement.querySelector('[data-field="category"]').textContent = (_k = asset.category) !== null && _k !== void 0 ? _k : '';
+            rowElement.querySelector('[data-field="category"]').textContent = (_m = asset.category) !== null && _m !== void 0 ? _m : '';
             const assetNameElement = rowElement.querySelector('[data-field="assetName"]');
             assetNameElement.textContent = asset.assetName;
             assetNameElement.addEventListener('click', openAssetByClick);

@@ -3,5 +3,8 @@ import type { Asset } from '../types/recordTypes.js';
 interface GetAssetsFilters {
     groupId?: number | string;
 }
-export declare function getAssets(filters: GetAssetsFilters, connectedEmileDB?: sqlite.Database): Asset[];
+interface GetAssetsOptions {
+    includeEnergyDataStats?: boolean;
+}
+export declare function getAssets(filters: GetAssetsFilters, options?: GetAssetsOptions, connectedEmileDB?: sqlite.Database): Asset[];
 export {};

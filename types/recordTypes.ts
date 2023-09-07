@@ -104,6 +104,9 @@ export interface Asset
   latitude?: number | null
   longitude?: number | null
   assetAliases?: AssetAlias[]
+
+  timeSecondsMin?: number
+  endTimeSecondsMax?: number
 }
 
 export interface AssetGroup extends Partial<RecordUserNameDateTime> {

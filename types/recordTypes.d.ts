@@ -56,6 +56,8 @@ export interface Asset extends Partial<RecordUserNameDateTime>, Partial<AssetCat
     latitude?: number | null;
     longitude?: number | null;
     assetAliases?: AssetAlias[];
+    timeSecondsMin?: number;
+    endTimeSecondsMax?: number;
 }
 export interface AssetGroup extends Partial<RecordUserNameDateTime> {
     groupId: number;

@@ -415,11 +415,14 @@ interface ErrorResponse {
       .split(' ')
 
     const tableElement = document.createElement('table')
-    tableElement.className = 'table is-fullwidth is-striped has-sticky-header is-fade-hoverable'
+    tableElement.className =
+      'table is-fullwidth is-striped has-sticky-header is-fade-hoverable'
     tableElement.innerHTML = `<thead><tr>
       <th class="has-width-10"><span class="is-sr-only">Icon</span></th>
       <th>Category</th>
       <th>Asset</th>
+      <th>Data From</th>
+      <th>Data To</th>
       <th class="has-text-centered has-width-10">
         <i class="far fa-map" aria-hidden="true"></i>
         <span class="is-sr-only">Map</span>
@@ -457,6 +460,20 @@ interface ErrorResponse {
         </td>
         <td data-field="category"></td>
         <td><a data-field="assetName" href="#"></a></td>
+        <td>
+          ${
+            asset.timeSecondsMin === null
+              ? '<span class="has-text-grey">(No Data)</span>'
+              : new Date((asset.timeSecondsMin ?? 0) * 1000).toLocaleString()
+          }
+        </td>
+        <td>
+          ${
+            asset.endTimeSecondsMax === null
+              ? ''
+              : new Date((asset.endTimeSecondsMax ?? 0) * 1000).toLocaleString()
+          }
+        </td>
         <td class="has-width-10 has-text-centered has-text-nowrap">
           ${
             (asset.latitude ?? '') === '' || (asset.longitude ?? '') === ''

@@ -26,6 +26,7 @@ export function getAssetGroup(
   if (assetGroup !== undefined) {
     assetGroup.groupMembers = getAssets(
       { groupId: assetGroup.groupId },
+      {},
       emileDB
     )
   }
