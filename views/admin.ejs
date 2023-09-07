@@ -4,35 +4,50 @@
   Administrator Settings
 </h1>
 
-<a class="media" href="<%= urlPrefix %>/admin/users">
-  <div class="media-left">
-    <i class="fas fa-fw fa-4x fa-users" aria-hidden="true"></i>
+<div class="columns">
+  <div class="column is-7">
+    <a class="media" href="<%= urlPrefix %>/admin/users">
+      <div class="media-left">
+        <i class="fas fa-fw fa-4x fa-users" aria-hidden="true"></i>
+      </div>
+      <div class="media-content">
+        <h2 class="title is-4 mb-1 has-text-link">User Maintenance</h2>
+        <p>Add users. Remove users. Manage user permissions.</p>
+      </div>
+    </a>
+    
+    <a class="media" href="<%= urlPrefix %>/admin/database">
+      <div class="media-left">
+        <i class="fas fa-fw fa-4x fa-database" aria-hidden="true"></i>
+      </div>
+      <div class="media-content">
+        <h2 class="title is-4 mb-1 has-text-link">Database Maintenance</h2>
+        <p>Backup the database. Export the database. Clean up deleted records.</p>
+      </div>
+    </a>
+    
+    <a class="media" href="<%= urlPrefix %>/admin/tables">
+      <div class="media-left">
+        <i class="fas fa-fw fa-4x fa-table" aria-hidden="true"></i>
+      </div>
+      <div class="media-content">
+        <h2 class="title is-4 mb-1 has-text-link">Table Maintenance</h2>
+        <p>Manage tables used to populate drop lists.</p>
+      </div>
+    </a>
   </div>
-  <div class="media-content">
-    <h2 class="title is-4 mb-1 has-text-link">User Maintenance</h2>
-    <p>Add users. Remove users. Manage user permissions.</p>
+  <div class="column">
+    <a class="media" href="https://github.com/cityssm/EMILE" target="_blank" rel="noopener noreferrer">
+      <div class="media-left">
+        <i class="fab fa-fw fa-4x fa-github" aria-hidden="true"></i>
+      </div>
+      <div class="media-content">
+        <h2 class="title is-4 mb-1 has-text-link">EMILE on GitHub</h2>
+        <p>Report problems on the public issue tracker. Monitor new development. Say hello.</p>
+      </div>
+    </a>
   </div>
-</a>
-
-<a class="media" href="<%= urlPrefix %>/admin/database">
-  <div class="media-left">
-    <i class="fas fa-fw fa-4x fa-database" aria-hidden="true"></i>
-  </div>
-  <div class="media-content">
-    <h2 class="title is-4 mb-1 has-text-link">Database Maintenance</h2>
-    <p>Backup the database. Export the database. Clean up deleted records.</p>
-  </div>
-</a>
-
-<a class="media" href="<%= urlPrefix %>/admin/tables">
-  <div class="media-left">
-    <i class="fas fa-fw fa-4x fa-table" aria-hidden="true"></i>
-  </div>
-  <div class="media-content">
-    <h2 class="title is-4 mb-1 has-text-link">Table Maintenance</h2>
-    <p>Manage tables used to populate drop lists.</p>
-  </div>
-</a>
+</div>
 
 <%- include('_footerA'); -%>
 
