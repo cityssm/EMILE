@@ -30,6 +30,10 @@ export interface Config {
   parserConfigs?: Record<string, ConfigParserConfiguration>
 
   tempUsers?: ConfigTemporaryUserCredentials[]
+
+  settings?: {
+    reportKeyAccessDays?: number
+  }
 }
 
 export interface ConfigActiveDirectory {

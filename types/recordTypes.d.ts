@@ -102,6 +102,7 @@ declare global {
         canLogin: boolean;
         canUpdate: boolean;
         isAdmin: boolean;
+        reportKey?: string | null;
     }
 }
 declare module 'express-session' {

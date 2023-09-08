@@ -1,6 +1,24 @@
 <%- include('_header'); -%>
 
-<h1 class="title is-1">Reports</h1>
+<%
+  const isTemporaryUser = user.userName.startsWith('~~')
+%>
+
+<div class="level is-mobile">
+  <div class="level-left">
+    <div class="level-item">
+      <h1 class="title is-1">Reports</h1>
+    </div>
+  </div>
+  <div class="level-right">
+    <div class="level-item">
+      <a class="button is-white" href="https://cityssm.github.io/EMILE/docs/reports.html" target="_blank" rel="noopener noreferrer">
+        <span class="icon is-small"><i class="far fa-question-circle" aria-hidden="true"></i></span>
+        <span>Help</span>
+      </a>
+    </div>
+  </div>
+</div>
 
 <div class="tabs is-boxed">
   <ul role="presentation">
@@ -20,6 +38,16 @@
         <span>Raw Exports</span>
       </a>
     </li>
+    <% if (!isTemporaryUser) { %>
+      <li>
+        <a href="#tab--powerQuery">
+          <span class="icon is-small"
+            ><i class="far fa-file-excel" aria-hidden="true"></i
+          ></span>
+          <span>Power Query Integration</span>
+        </a>
+      </li>
+    <% } %>
   </ul>
 </div>
 
@@ -207,16 +235,6 @@
               </div>
             </div>
           </a>
-          <a class="panel-block" href="<%= urlPrefix %>/reports/users-all" download>
-            <div class="media">
-              <div class="media-left">
-                <i class="fas fa-3x fa-file-csv" aria-hidden="true"></i>
-              </div>
-              <div class="media-content">
-                <h3 class="title is-5 mb-0">Users</h3>
-              </div>
-            </div>
-          </a>
         </div>
       </div>
       <div class="column">
@@ -306,6 +324,46 @@
       </div>
     </div>
   </div>
+  <% if (!isTemporaryUser) { %>
+    <div class="tab-content is-hidden" id="tab--powerQuery" data-report-key="<%= user.reportKey %>">
+      <div class="columns">
+        <div class="column">
+          <div class="message is-info">
+            <div class="message-body">
+              <p>
+                Power Query Integration gives you the ability to create an Excel spreadsheet
+                that is linked to your data in
+                <%= configFunctions.getConfigProperty("application.applicationName") %>.
+                New data imported into
+                <%= configFunctions.getConfigProperty("application.applicationName") %>
+                will appear in Excel without the need to do another export.
+              </p>
+              <p>
+                Note that data links are <strong>associated with your user</strong>,
+                and will only work from computers that your have accessed
+                <%= configFunctions.getConfigProperty("application.applicationName") %>
+                from in the 
+                <strong>
+                  past
+                  <%= configFunctions.getConfigProperty("settings.reportKeyAccessDays") %>
+                  days</strong>.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="column">
+          <div class="field">
+            <label class="label" for="powerQuery--reportUrl">
+              Energy Data Power Query Report URL
+            </label>
+            <div class="control">
+              <textarea class="textarea" id="powerQuery--reportUrl"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% } %>
 </div>
 
 <%- include('_footerA'); -%>

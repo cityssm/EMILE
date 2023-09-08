@@ -25,6 +25,9 @@ export interface Config {
     adWebAuthConfig?: ADWebAuthConfig;
     parserConfigs?: Record<string, ConfigParserConfiguration>;
     tempUsers?: ConfigTemporaryUserCredentials[];
+    settings?: {
+        reportKeyAccessDays?: number;
+    };
 }
 export interface ConfigActiveDirectory {
     url: string;

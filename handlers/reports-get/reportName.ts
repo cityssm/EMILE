@@ -5,6 +5,7 @@ import {
   getReportData,
   type ReportParameters
 } from '../../database/getReportData.js'
+import { hasActiveSession } from '../../helpers/functions.session.js'
 
 export function handler(request: Request, response: Response): void {
   const reportName: string = request.params.reportName
@@ -22,13 +23,14 @@ export function handler(request: Request, response: Response): void {
 
   const csv = papaparse.unparse(rows)
 
+  const disposition = hasActiveSession(request) ? 'attachment' : 'inline'
+
   response.setHeader(
     'Content-Disposition',
-    `attachment; filename=${reportName}-${Date.now().toString()}.csv`
+    `${disposition}; filename=${reportName}-${Date.now().toString()}.csv`
   )
 
   response.setHeader('Content-Type', 'text/csv')
-
   response.send(csv)
 }
 

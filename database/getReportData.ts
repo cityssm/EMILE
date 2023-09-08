@@ -188,15 +188,6 @@ export function getReportData(
     }
 
     /*
-     * Users
-     */
-
-    case 'users-all': {
-      sql = 'select * from Users'
-      break
-    }
-
-    /*
      * Default
      */
 

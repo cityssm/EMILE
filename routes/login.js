@@ -3,8 +3,11 @@ import { Router } from 'express';
 import { getUser } from '../database/getUser.js';
 import * as authenticationFunctions from '../helpers/functions.authentication.js';
 import { getConfigProperty } from '../helpers/functions.config.js';
+import { updateUserReportKey } from '../database/updateUser.js';
+import { addUserAccessLog } from '../database/addUserAccessLog.js';
 export const router = Router();
 function getHandler(request, response) {
+    console.log(request.ip);
     const sessionCookieName = getConfigProperty('session.cookieName');
     if (request.session.user !== undefined &&
         request.cookies[sessionCookieName] !== undefined) {
@@ -47,9 +50,15 @@ async function postHandler(request, response) {
     if (isAuthenticated && !isTemporaryUser) {
         const userNameLowerCase = userName.toLowerCase();
         userObject = getUser(userNameLowerCase);
+        if (userObject !== undefined && (userObject.reportKey ?? '') === '') {
+            const newReportKey = updateUserReportKey(userObject.userName, userObject);
+            userObject.reportKey =
+                typeof newReportKey === 'boolean' ? '' : newReportKey;
+        }
     }
     if (isAuthenticated && (userObject?.canLogin ?? false)) {
         request.session.user = userObject;
+        addUserAccessLog(userObject, request.ip);
         response.redirect(redirectURL);
     }
     else {

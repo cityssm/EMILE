@@ -16,3 +16,6 @@ Manage tracked assets. Create groups of assets for easier reporting.
 
 [**Data**](data.md)<br />
 Add new energy data from supporting input files.
+
+[**Reports**](reports.md)<br />
+Export data for reporting. Link to EMILE data through third party tools like Microsoft Excel.

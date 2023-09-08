@@ -20,10 +20,13 @@ import createError from 'http-errors'
 import FileStore from 'session-file-store'
 
 import { adminGetHandler, updateGetHandler } from './handlers/permissions.js'
-import { getSafeRedirectURL } from './helpers/functions.authentication.js'
 import configFunctions, {
   getConfigProperty
 } from './helpers/functions.config.js'
+import {
+  hasActiveSession,
+  sessionHandler
+} from './helpers/functions.session.js'
 import routerAdmin from './routes/admin.js'
 import routerAssets from './routes/assets.js'
 import routerDashboard from './routes/dashboard.js'
@@ -181,27 +184,6 @@ app.use((request, response, next) => {
   next()
 })
 
-// Redirect logged in users
-const sessionChecker = (
-  request: express.Request,
-  response: express.Response,
-  next: express.NextFunction
-): void => {
-  if (
-    Object.hasOwn(request.session, 'user') &&
-    Object.hasOwn(request.cookies, sessionCookieName)
-  ) {
-    next()
-    return
-  }
-
-  const redirectUrl = getSafeRedirectURL(request.originalUrl)
-
-  response.redirect(
-    `${urlPrefix}/login?redirect=${encodeURIComponent(redirectUrl)}`
-  )
-}
-
 /*
  * ROUTES
  */
@@ -224,19 +206,21 @@ app.use((request, response, next) => {
   next()
 })
 
-app.get(`${urlPrefix}/`, sessionChecker, (_request, response) => {
+app.get(`${urlPrefix}/`, sessionHandler, (_request, response) => {
   response.redirect(`${urlPrefix}/dashboard`)
 })
 
-app.use(`${urlPrefix}/dashboard`, sessionChecker, routerDashboard)
-app.use(`${urlPrefix}/assets`, sessionChecker, routerAssets)
-app.use(`${urlPrefix}/data`, sessionChecker, updateGetHandler, routerData)
-app.use(`${urlPrefix}/reports`, sessionChecker, routerReports)
-app.use(`${urlPrefix}/admin`, sessionChecker, adminGetHandler, routerAdmin)
+app.use(`${urlPrefix}/dashboard`, sessionHandler, routerDashboard)
+app.use(`${urlPrefix}/assets`, sessionHandler, routerAssets)
+app.use(`${urlPrefix}/data`, sessionHandler, updateGetHandler, routerData)
+app.use(`${urlPrefix}/admin`, sessionHandler, adminGetHandler, routerAdmin)
+
+// session checked in router
+app.use(`${urlPrefix}/reports`, routerReports)
 
 app.use(
   `${urlPrefix}/backups`,
-  sessionChecker,
+  sessionHandler,
   adminGetHandler,
   express.static(path.join('data', 'backups'))
 )
@@ -250,10 +234,7 @@ if (getConfigProperty('session.doKeepAlive')) {
 app.use(`${urlPrefix}/login`, abuseCheckHandler, routerLogin)
 
 app.get(`${urlPrefix}/logout`, (request, response) => {
-  if (
-    Object.hasOwn(request.session, 'user') &&
-    Object.hasOwn(request.cookies, sessionCookieName)
-  ) {
+  if (hasActiveSession(request)) {
     request.session.destroy(() => {
       response.clearCookie(sessionCookieName)
       response.redirect(`${urlPrefix}/`)

@@ -30,7 +30,7 @@ export function initializeDatabase() {
     const row = emileDB
         .prepare(`select name from sqlite_master
         where type = 'table'
-        and name = 'Users'`)
+        and name = 'UserAccessLog'`)
         .get();
     if (row !== undefined) {
         emileDB.close();
@@ -294,6 +294,7 @@ export function initializeDatabase() {
         canLogin bit not null default 0,
         canUpdate bit not null default 0,
         isAdmin bit not null default 0,
+        reportKey varchar(100) check (length(reportKey) >= 36),
         ${recordColumns}
       )`)
         .run();
@@ -306,6 +307,16 @@ export function initializeDatabase() {
             isAdmin: true
         }, initializeDatabaseUser, emileDB);
     }
+    emileDB
+        .prepare(`create table if not exists UserAccessLog (
+        userName varchar(30) not null,
+        ipAddress varchar(100) not null,
+        accessTimeMillis integer not null
+      )`)
+        .run();
+    emileDB
+        .prepare('create index idx_UserAccessLog on UserAccessLog (accessTimeMillis, ipAddress, userName)')
+        .run();
     emileDB.close();
     debug('Database created successfully.');
 }

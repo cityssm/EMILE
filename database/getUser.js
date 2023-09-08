@@ -5,7 +5,7 @@ export function getUser(userName) {
         readonly: true
     });
     const user = emileDB
-        .prepare(`select userName, canLogin, canUpdate, isAdmin
+        .prepare(`select userName, canLogin, canUpdate, isAdmin, reportKey
         from Users
         where recordDelete_timeMillis is null
         and userName = ?`)

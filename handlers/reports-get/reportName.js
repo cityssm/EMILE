@@ -1,5 +1,6 @@
 import papaparse from 'papaparse';
 import { getReportData } from '../../database/getReportData.js';
+import { hasActiveSession } from '../../helpers/functions.session.js';
 export function handler(request, response) {
     const reportName = request.params.reportName;
     const rows = getReportData(reportName, request.query);
@@ -11,7 +12,8 @@ export function handler(request, response) {
         return;
     }
     const csv = papaparse.unparse(rows);
-    response.setHeader('Content-Disposition', `attachment; filename=${reportName}-${Date.now().toString()}.csv`);
+    const disposition = hasActiveSession(request) ? 'attachment' : 'inline';
+    response.setHeader('Content-Disposition', `${disposition}; filename=${reportName}-${Date.now().toString()}.csv`);
     response.setHeader('Content-Type', 'text/csv');
     response.send(csv);
 }

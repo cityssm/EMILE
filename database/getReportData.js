@@ -129,10 +129,6 @@ export function getReportData(reportName, reportParameters = {}) {
             sql = 'select * from EnergyUnits';
             break;
         }
-        case 'users-all': {
-            sql = 'select * from Users';
-            break;
-        }
         default: {
             return undefined;
         }

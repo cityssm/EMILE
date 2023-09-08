@@ -43,6 +43,8 @@ configFallbackValues.set('session.doKeepAlive', false)
 
 configFallbackValues.set('parserConfigs', {})
 
+configFallbackValues.set('settings.reportKeyAccessDays', 5)
+
 /*
  * Set up function overloads
  */
@@ -64,6 +66,7 @@ export function getConfigProperty(
     | 'application.httpPort'
     | 'application.maximumProcesses'
     | typeof property_session_maxAgeMillis
+    | 'settings.reportKeyAccessDays'
 ): number
 
 export function getConfigProperty(

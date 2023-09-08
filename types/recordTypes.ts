@@ -181,6 +181,7 @@ declare global {
     canLogin: boolean
     canUpdate: boolean
     isAdmin: boolean
+    reportKey?: string | null
   }
 }
 

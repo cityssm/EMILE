@@ -10,6 +10,37 @@ declare const bulmaJS: BulmaJS
 ;(() => {
   const Emile = exports.Emile as EmileGlobal
 
+  // Power Query Tab
+
+  const powerQueryTabElement = document.querySelector('#tab--powerQuery')
+
+  const reportKey =
+    (powerQueryTabElement as HTMLElement)?.dataset.reportKey ?? ''
+
+  const powerQueryReportUrlElement = document.querySelector(
+    '#powerQuery--reportUrl'
+  ) as HTMLTextAreaElement
+
+  function refreshPowerQueryReportUrl(): void {
+    const reportUrl = `${window.location.href.slice(
+      0,
+      Math.max(0, window.location.href.indexOf(window.location.pathname) + 1)
+    )}${Emile.urlPrefix}reports/energyData-fullyJoined?reportKey=${reportKey}`
+
+    powerQueryReportUrlElement.value = reportUrl
+  }
+
+  if (powerQueryTabElement !== null) {
+    refreshPowerQueryReportUrl()
+
+    powerQueryReportUrlElement.addEventListener('click', () => {
+      powerQueryReportUrlElement.focus()
+      powerQueryReportUrlElement.select()
+    })
+  }
+
+  // Initialize
+
   Emile.initializeAssetSelector({
     assetSelectorElement: document.querySelector(
       '#reports--assetSelector'

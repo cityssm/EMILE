@@ -9,7 +9,7 @@ export function getUser(userName: string): EmileUser | undefined {
 
   const user = emileDB
     .prepare(
-      `select userName, canLogin, canUpdate, isAdmin
+      `select userName, canLogin, canUpdate, isAdmin, reportKey
         from Users
         where recordDelete_timeMillis is null
         and userName = ?`
