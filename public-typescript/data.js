@@ -348,7 +348,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         const containerElement = document.querySelector('#container--processedFiles');
         const tableElement = document.createElement('table');
         tableElement.className =
-            'table is-fullwidth is-striped is-hoverable has-sticky-header';
+            'table is-fullwidth is-striped is-hoverable is-fade-hoverable has-sticky-header';
         tableElement.innerHTML = `<thead><tr>
       <th class="has-width-10"><span class="is-sr-only">Processed Status</span></th>
       <th>Processed File</th>

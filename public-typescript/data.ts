@@ -527,7 +527,7 @@ declare const cityssm: cityssmGlobal
 
     const tableElement = document.createElement('table')
     tableElement.className =
-      'table is-fullwidth is-striped is-hoverable has-sticky-header'
+      'table is-fullwidth is-striped is-hoverable is-fade-hoverable has-sticky-header'
 
     tableElement.innerHTML = `<thead><tr>
       <th class="has-width-10"><span class="is-sr-only">Processed Status</span></th>

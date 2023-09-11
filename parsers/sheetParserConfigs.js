@@ -54,7 +54,7 @@ export const enbridgeUsageHistory = {
             dataType: 'function',
             dataFunction(dataObject) {
                 let accountNumber = dataObject['Account Number'];
-                if (accountNumber.slice(-1) === "'") {
+                if (accountNumber.endsWith("'")) {
                     accountNumber = accountNumber.slice(0, Math.max(0, accountNumber.length - 1));
                 }
                 return accountNumber;
