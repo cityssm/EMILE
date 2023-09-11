@@ -38,6 +38,10 @@ const deleteSql = [
     where recordDelete_timeMillis <= ?
     and dataTypeId not in (select dataTypeId from EnergyData)`,
 
+  `delete from EnergyDataFiles
+    where recordDelete_timeMillis <= ?
+    and fileId not in (select fileId from EnergyData)`,
+
   // Assets
 
   `delete from Assets

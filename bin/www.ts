@@ -113,6 +113,7 @@ if (process.env.STARTUP_TEST === 'true') {
   }, 10_000)
 } else {
   fork('./tasks/uploadedFilesProcessor.js')
+  fork('./tasks/deletedFilesProcessor.js')
 
   fileProcessorChildProcess = fork('./tasks/energyDataFilesProcessor.js')
 }

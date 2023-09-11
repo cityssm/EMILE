@@ -21,6 +21,9 @@ const deleteSql = [
     `delete from EnergyDataTypes
     where recordDelete_timeMillis <= ?
     and dataTypeId not in (select dataTypeId from EnergyData)`,
+    `delete from EnergyDataFiles
+    where recordDelete_timeMillis <= ?
+    and fileId not in (select fileId from EnergyData)`,
     `delete from Assets
     where recordDelete_timeMillis <= ?
     and assetId not in (select assetId from AssetGroupMembers)

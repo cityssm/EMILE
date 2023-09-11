@@ -11,15 +11,17 @@ interface GetEnergyDataFilesFilters {
   isProcessed?: boolean
   isFailed?: boolean
   searchString?: string
+  systemFolderPath?: string
 }
 
 interface GetEnergyDataFilesOptions {
   limit: number | -1
   includeSystemFileAndFolder: boolean
   includeAssetDetails: boolean
+  includeDeletedRecords?: boolean
 }
 
-function getEnergyDataFiles(
+export function getEnergyDataFiles(
   filters: GetEnergyDataFilesFilters,
   options: GetEnergyDataFilesOptions
 ): EnergyDataFile[] {
@@ -48,7 +50,11 @@ function getEnergyDataFiles(
     left join Assets a on f.assetId = a.assetId
     left join AssetCategories c on a.categoryId = c.categoryId
     left join EnergyData d on f.fileId = d.fileId and d.recordDelete_timeMillis is null
-    where f.recordDelete_timeMillis is null`
+    where ${
+      options.includeDeletedRecords ?? false
+        ? ' 1 = 1'
+        : 'f.recordDelete_timeMillis is null'
+    }`
 
   const sqlParameters: unknown[] = []
 
@@ -76,6 +82,11 @@ function getEnergyDataFiles(
   if ((filters.searchString ?? '') !== '') {
     sql += ' and (instr(f.originalFileName, ?) > 0)'
     sqlParameters.push(filters.searchString)
+  }
+
+  if ((filters.systemFolderPath ?? '') !== '') {
+    sql += ' and f.systemFolderPath = ?'
+    sqlParameters.push(filters.systemFolderPath)
   }
 
   sql += ` group by ${groupByColumnNames}

@@ -5,6 +5,7 @@ import Debug from 'debug';
 import exitHook from 'exit-hook';
 import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async';
 import { addEnergyDataFile } from '../database/addEnergyDataFile.js';
+import { importedFolderRoot, uploadsFolder } from '../helpers/functions.files.js';
 import { fileExtensions as allowedFileExtensions, getDefaultParserPropertiesByFileName } from '../parsers/parserHelpers.js';
 const debug = Debug('emile:tasks:uploadedFilesProcessor');
 const processorUser = {
@@ -13,8 +14,6 @@ const processorUser = {
     canUpdate: true,
     isAdmin: true
 };
-const uploadsFolder = 'data/files/uploads';
-const importedFolderRoot = 'data/files/imported';
 const timestampPrependedRegex = /^\[\d+\].+/;
 let terminateTask = false;
 let isProcessing = false;

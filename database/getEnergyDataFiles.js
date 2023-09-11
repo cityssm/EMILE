@@ -1,6 +1,6 @@
 import sqlite from 'better-sqlite3';
 import { databasePath } from '../helpers/functions.database.js';
-function getEnergyDataFiles(filters, options) {
+export function getEnergyDataFiles(filters, options) {
     const groupByColumnNames = `f.fileId, f.originalFileName,
     ${options.includeSystemFileAndFolder
         ? ' f.systemFileName, f.systemFolderPath,'
@@ -21,7 +21,9 @@ function getEnergyDataFiles(filters, options) {
     left join Assets a on f.assetId = a.assetId
     left join AssetCategories c on a.categoryId = c.categoryId
     left join EnergyData d on f.fileId = d.fileId and d.recordDelete_timeMillis is null
-    where f.recordDelete_timeMillis is null`;
+    where ${options.includeDeletedRecords ?? false
+        ? ' 1 = 1'
+        : 'f.recordDelete_timeMillis is null'}`;
     const sqlParameters = [];
     if ((filters.isPending ?? '') !== '') {
         sql += ' and f.isPending = ?';
@@ -39,6 +41,10 @@ function getEnergyDataFiles(filters, options) {
     if ((filters.searchString ?? '') !== '') {
         sql += ' and (instr(f.originalFileName, ?) > 0)';
         sqlParameters.push(filters.searchString);
+    }
+    if ((filters.systemFolderPath ?? '') !== '') {
+        sql += ' and f.systemFolderPath = ?';
+        sqlParameters.push(filters.systemFolderPath);
     }
     sql += ` group by ${groupByColumnNames}
     order by f.recordUpdate_timeMillis desc`;

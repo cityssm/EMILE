@@ -16,6 +16,10 @@ import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async'
 
 import { addEnergyDataFile } from '../database/addEnergyDataFile.js'
 import {
+  importedFolderRoot,
+  uploadsFolder
+} from '../helpers/functions.files.js'
+import {
   fileExtensions as allowedFileExtensions,
   getDefaultParserPropertiesByFileName
 } from '../parsers/parserHelpers.js'
@@ -32,9 +36,6 @@ const processorUser: EmileUser = {
 /*
  * Settings
  */
-
-const uploadsFolder = 'data/files/uploads'
-const importedFolderRoot = 'data/files/imported'
 
 // eslint-disable-next-line unicorn/better-regex
 const timestampPrependedRegex = /^\[\d+\].+/
@@ -66,7 +67,9 @@ async function processUploadedFiles(): Promise<void> {
 
   const systemFolderPath = path.join(
     importedFolderRoot,
-    `${rightNow.getFullYear().toString()}-${(rightNow.getMonth() + 1).toString()}`
+    `${rightNow.getFullYear().toString()}-${(
+      rightNow.getMonth() + 1
+    ).toString()}`
   )
 
   try {
