@@ -118,7 +118,7 @@ declare const cityssm: cityssmGlobal
       return
     }
 
-    containerElement.innerHTML = `<table class="table is-fullwidth is-striped is-hoverable has-sticky-header">
+    containerElement.innerHTML = `<table class="table is-fullwidth is-striped is-hoverable is-fade-hoverable has-sticky-header">
       <thead>
         <tr>
           <th>User Name</th>
@@ -279,6 +279,8 @@ declare const cityssm: cityssmGlobal
 
           closeAddUserModalFunction = closeModalFunction
 
+          ;(modalElement.querySelector('#userAdd--userName') as HTMLInputElement).focus()
+
           modalElement
             .querySelector('form')
             ?.addEventListener('submit', doAddUser)
@@ -294,4 +296,6 @@ declare const cityssm: cityssmGlobal
    */
 
   renderUsers()
+
+  bulmaJS.init()
 })()

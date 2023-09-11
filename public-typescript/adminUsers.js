@@ -82,7 +82,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         </div>`;
             return;
         }
-        containerElement.innerHTML = `<table class="table is-fullwidth is-striped is-hoverable has-sticky-header">
+        containerElement.innerHTML = `<table class="table is-fullwidth is-striped is-hoverable is-fade-hoverable has-sticky-header">
       <thead>
         <tr>
           <th>User Name</th>
@@ -205,6 +205,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
                 var _a;
                 bulmaJS.toggleHtmlClipped();
                 closeAddUserModalFunction = closeModalFunction;
+                modalElement.querySelector('#userAdd--userName').focus();
                 (_a = modalElement
                     .querySelector('form')) === null || _a === void 0 ? void 0 : _a.addEventListener('submit', doAddUser);
             },
@@ -217,4 +218,5 @@ Object.defineProperty(exports, "__esModule", { value: true });
      * Initialize
      */
     renderUsers();
+    bulmaJS.init();
 })();

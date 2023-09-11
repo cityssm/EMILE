@@ -21,31 +21,115 @@
   </ul>
 </nav>
 
-<div class="level is-mobile">
-  <div class="level-left">
-    <div class="level-item">
-      <h1 class="title is-1">
-        User Maintenance
-      </h1>
-    </div>
-  </div>
-  <div class="level-right">
-    <div class="level-item">
-      <button class="button is-success is-add-user-button" type="button">
-        <span class="icon"><i class="fas fa-plus" aria-hidden="true"></i></span>
-        <span>Add User</span>
-      </button>
-    </div>
-  </div>
+<h1 class="title is-1">User Maintenance</h1>
+
+<div class="tabs is-boxed">
+  <ul role="presentation">
+    <li class="is-active">
+      <a href="#tab--users">
+        <span class="icon is-small"
+          ><i class="fas fa-users" aria-hidden="true"></i
+        ></span>
+        <span>Users</span>
+      </a>
+    </li>
+    <li>
+      <a href="#tab--tempUsers">
+        <span class="icon is-small"
+          ><i class="fas fa-exclamation-triangle" aria-hidden="true"></i
+        ></span>
+        <span>Temporary Users</span>
+        <% if (temporaryUsers.length > 0) { %>
+          <span class="tag ml-2"><%= temporaryUsers.length %></span>
+        <% } %>
+      </a>
+    </li>
+  </ul>
 </div>
 
-<div class="message is-info">
-  <p class="message-body">
-    Note that all user permission changes are saved automatically.
-  </p>
-</div>
+<div class="tab-container">
+  <div class="tab-content" id="tab--users">
+    <div class="box has-text-right has-background-white-ter">
+      <div class="level is-mobile">
+        <div class="level-left">
+          <div class="level-item">
+            Note that all user permission changes are saved automatically.
+          </div>
+        </div>
+        <div class="level-right">
+          <div class="level-item">
+            <button class="button is-success is-add-user-button" type="button">
+              <span class="icon"><i class="fas fa-plus" aria-hidden="true"></i></span>
+              <span>Add User</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-<div id="container--users"></div>
+    <div id="container--users"></div>
+  </div>
+  <div class="tab-content is-hidden" id="tab--tempUsers">
+    <div class="message is-warning">
+      <p class="message-body">
+        Temporary Users are managed in the application's configuration file.
+        They should not be used on an ongoing basis.
+      </p>
+    </div>
+    <% if (temporaryUsers.length === 0) { %>
+      <div class="message is-info">
+        <p class="message-body">
+          There are no temporary users in the configuration file.
+        </p>
+      </div>
+    <% } else { %>
+      <table class="table is-fullwidth is-striped is-hoverable is-fade-hoverable has-sticky-header">
+        <thead>
+          <tr>
+            <th>User Name</th>
+            <th class="has-text-centered">Can Login</th>
+            <th class="has-text-centered">Can Update</th>
+            <th class="has-text-centered">Is Admin</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for (const tempUser of temporaryUsers) { %>
+            <tr>
+              <td><%= tempUser.user.userName %></td>
+              <td class="has-text-centered">
+                <% if (tempUser.user.canLogin) { %>
+                  <i class="fas fa-check has-text-success" aria-hidden="true"></i>
+                  <span class="is-sr-only">Yes</span>
+                <% } else { %>
+                  <i class="fas fa-times has-text-danger" aria-hidden="true"></i>
+                  <span class="is-sr-only">No</span>
+                <% } %>
+              </td>
+              <td class="has-text-centered">
+                <% if (tempUser.user.canUpdate) { %>
+                  <i class="fas fa-check has-text-success" aria-hidden="true"></i>
+                  <span class="is-sr-only">Yes</span>
+                <% } else { %>
+                  <i class="fas fa-times has-text-danger" aria-hidden="true"></i>
+                  <span class="is-sr-only">No</span>
+                <% } %>
+              </td>
+              <td class="has-text-centered">
+                <% if (tempUser.user.isAdmin) { %>
+                  <i class="fas fa-check has-text-success" aria-hidden="true"></i>
+                  <span class="is-sr-only">Yes</span>
+                <% } else { %>
+                  <i class="fas fa-times has-text-danger" aria-hidden="true"></i>
+                  <span class="is-sr-only">No</span>
+                <% } %>
+              </td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    <% } %>
+  </div>
+</div>
 
 <%- include('_footerA'); -%>
 
