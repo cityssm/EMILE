@@ -1,13 +1,12 @@
 import { isAbuser, recordAbuse } from '@cityssm/express-abuse-points';
 import { Router } from 'express';
+import { addUserAccessLog } from '../database/addUserAccessLog.js';
 import { getUser } from '../database/getUser.js';
+import { updateUserReportKey } from '../database/updateUser.js';
 import * as authenticationFunctions from '../helpers/functions.authentication.js';
 import { getConfigProperty } from '../helpers/functions.config.js';
-import { updateUserReportKey } from '../database/updateUser.js';
-import { addUserAccessLog } from '../database/addUserAccessLog.js';
 export const router = Router();
 function getHandler(request, response) {
-    console.log(request.ip);
     const sessionCookieName = getConfigProperty('session.cookieName');
     if (request.session.user !== undefined &&
         request.cookies[sessionCookieName] !== undefined) {

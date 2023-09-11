@@ -36,8 +36,9 @@ function getDataFieldValue(
         return dataField.dataFunction(row)
       }
       default: {
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        debug(`Configuration error, unknown data type: ${dataField.dataType}`)
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-explicit-any
+        const unknownDataType = (dataField as any).dataType as string
+        debug(`Configuration error, unknown data type: ${unknownDataType}`)
       }
     }
   }

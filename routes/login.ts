@@ -6,19 +6,16 @@ import {
   type Response
 } from 'express'
 
+import { addUserAccessLog } from '../database/addUserAccessLog.js'
 import { getUser } from '../database/getUser.js'
+import { updateUserReportKey } from '../database/updateUser.js'
 import * as authenticationFunctions from '../helpers/functions.authentication.js'
 import { getConfigProperty } from '../helpers/functions.config.js'
 import type { ConfigTemporaryUserCredentials } from '../types/configTypes.js'
-import { updateUserReportKey } from '../database/updateUser.js'
-import { addUserAccessLog } from '../database/addUserAccessLog.js'
 
 export const router = Router()
 
 function getHandler(request: Request, response: Response): void {
-
-  console.log(request.ip)
-  
   const sessionCookieName = getConfigProperty('session.cookieName')
 
   if (

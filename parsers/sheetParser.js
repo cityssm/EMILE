@@ -25,7 +25,8 @@ function getDataFieldValue(row, dataField) {
                 return dataField.dataFunction(row);
             }
             default: {
-                debug(`Configuration error, unknown data type: ${dataField.dataType}`);
+                const unknownDataType = dataField.dataType;
+                debug(`Configuration error, unknown data type: ${unknownDataType}`);
             }
         }
     }
