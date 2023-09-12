@@ -32,9 +32,9 @@ async function processGreenButtonSubscriptions() {
         for (const entry of entries) {
             const authorizationId = entry.links.selfUid ?? '';
             if (authorizationId === '' ||
-                (greenButtonSubscription.authorizationIdBlacklist ?? []).includes(authorizationId) ||
-                (greenButtonSubscription.authorizationIdWhitelist !== undefined &&
-                    !greenButtonSubscription.authorizationIdWhitelist.includes(authorizationId)) ||
+                (greenButtonSubscription.authorizationIdsToExclude ?? []).includes(authorizationId) ||
+                (greenButtonSubscription.authorizationIdsToInclude !== undefined &&
+                    !greenButtonSubscription.authorizationIdsToInclude.includes(authorizationId)) ||
                 entry.content.Authorization.status_value !== 'Active') {
                 debug(`Skipping authorization id: ${subscriptionKey}, ${authorizationId}`);
                 continue;

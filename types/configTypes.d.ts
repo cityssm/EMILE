@@ -80,6 +80,6 @@ export interface ConfigParserDataFieldFunction<T> {
 }
 export interface ConfigGreenButtonSubscription {
     configuration: GreenButtonSubscriberConfiguration;
-    authorizationIdBlacklist?: string[];
-    authorizationIdWhitelist?: string[];
+    authorizationIdsToExclude?: string[];
+    authorizationIdsToInclude?: string[];
 }

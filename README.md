@@ -11,16 +11,19 @@ _Pronounced like Emily_
 
 A tool to aggregate energy consumption data across several municipal assets and report usage to monitor and manage emissions.
 
-## Inputs
+## Available Inputs
 
 - ✔️ Green Button® formatted XML acquired manually through the [Download My Data (DMD) standard](https://www.greenbuttonalliance.org/green-button-download-my-data-dmd).
 - ✔️ CSV files.
-- ✏️ Green Button® formatted XML acquired automatically through the [Connect My Data (CMD) standard](https://www.greenbuttonalliance.org/green-button-connect-my-data-cmd).
+- ✔️ Green Button® formatted XML acquired automatically through the [Connect My Data (CMD) standard](https://www.greenbuttonalliance.org/green-button-connect-my-data-cmd), compatible with:
+  - [UtilityAPI](https://utilityapi.com/), namely their [integration with PUC Distribution Inc.](https://utilityapi.com/docs/utilities/ssmpuc)
 
-## Outputs
+## Outputs, Exports, and Reports
 
 - ✔️ Graphs.
 - ✔️ CSV files.
+- ✔️ Power Query compatible URLs for refreshable data in Microsoft Excel and Microsoft Power BI.
+- ✔️ SQLite database file.
 - ✏️ [Energy Star Portfolio Manager](https://portfoliomanager.energystar.gov/pm/login) data.
 - ✏️ [Partners for Climate Protection Milestone Tool](https://pcptool.ca/) data.
 
@@ -46,9 +49,9 @@ EMILE's energy usage monitoring is made possible using the City of Sault Ste. Ma
 [Green Button® Parser for Node](https://github.com/cityssm/node-green-button-parser)
 and [Green Button® Subscriber for Node](https://github.com/cityssm/node-green-button-subscriber).
 
-The City of Sault Ste. Marie has
+The City of Sault Ste. Marie also has
 [several other open source applications](https://cityssm.github.io/)
-available for managing municipal operations as well.
+available for managing municipal operations.
 
 - 💡 **[General Licence Manager](https://github.com/cityssm/general-licence-manager)** - An application built to manage the general licences issued by municipalities.
 - 💡 **[Lottery Licence Manager](https://github.com/cityssm/lottery-licence-manager)** - An application for managing AGCO's municipal lottery licensing requirements in Ontario.

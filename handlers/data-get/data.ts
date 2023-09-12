@@ -5,6 +5,7 @@ import {
   getPendingEnergyDataFiles,
   getProcessedEnergyDataFiles
 } from '../../database/getEnergyDataFiles.js'
+import { getConfigProperty } from '../../helpers/functions.config.js'
 import { getParserClassesAndConfigurations } from '../../parsers/parserHelpers.js'
 
 export function handler(request: Request, response: Response): void {
@@ -15,14 +16,20 @@ export function handler(request: Request, response: Response): void {
 
   const parserClassesAndConfigurations = getParserClassesAndConfigurations()
 
+  const greenButtonSubscriptions = getConfigProperty(
+    'subscriptions.greenButton'
+  )
+
   response.render('data', {
-    headTitle: 'Data',
-    menuItem: 'Data',
+    headTitle: 'Data Sources',
+    menuItem: 'Data Sources',
 
     pendingFiles,
     processedFiles,
     assets,
-    parserClassesAndConfigurations
+    parserClassesAndConfigurations,
+
+    greenButtonSubscriptions
   })
 }
 

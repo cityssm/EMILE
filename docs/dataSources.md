@@ -2,6 +2,6 @@
 •
 [Help](https://cityssm.github.io/EMILE/docs/)
 
-# Data
+# Data Sources
 
 ![Data](images/data-pendingFiles.png)

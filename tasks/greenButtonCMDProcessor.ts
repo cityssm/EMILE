@@ -20,7 +20,6 @@ updatedMin.setFullYear(updatedMin.getFullYear() - 1)
 
 let terminateTask = false
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 async function processGreenButtonSubscriptions(): Promise<void> {
   debug('Process started')
 
@@ -65,11 +64,11 @@ async function processGreenButtonSubscriptions(): Promise<void> {
 
       if (
         authorizationId === '' ||
-        (greenButtonSubscription.authorizationIdBlacklist ?? []).includes(
+        (greenButtonSubscription.authorizationIdsToExclude ?? []).includes(
           authorizationId
         ) ||
-        (greenButtonSubscription.authorizationIdWhitelist !== undefined &&
-          !greenButtonSubscription.authorizationIdWhitelist.includes(
+        (greenButtonSubscription.authorizationIdsToInclude !== undefined &&
+          !greenButtonSubscription.authorizationIdsToInclude.includes(
             authorizationId
           )) ||
         entry.content.Authorization.status_value !== 'Active'

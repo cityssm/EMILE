@@ -26,8 +26,14 @@
     "url": "git+https://github.com/cityssm/EMILE.git"
   },
   "keywords": [
-    "energy",
-    "green-button"
+    "energy-data",
+    "energy-monitoring",
+    "energy-usage",
+    "greenbutton",
+    "green-button",
+    "municipal-software",
+    "connect-my-data",
+    "download-my-data"
   ],
   "author": "The Corporation of the City of Sault Ste. Marie",
   "license": "MIT",
