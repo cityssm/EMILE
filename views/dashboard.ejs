@@ -63,7 +63,7 @@
           const dateMinString = dateTimeFunctions.dateToString(dateMin)
 
           const monthsAgoDate = new Date(dateMax.getTime())
-          monthsAgoDate.setMonth(monthsAgoDate.getMonth() - 6)
+          monthsAgoDate.setMonth(monthsAgoDate.getMonth() - 1)
 
           const startDateString = dateTimeFunctions.dateToString(new Date(Math.max(dateMin.getTime(), monthsAgoDate.getTime())))
         %>
