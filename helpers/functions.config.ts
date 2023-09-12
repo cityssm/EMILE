@@ -9,6 +9,7 @@ import type { ADWebAuthConfig } from '@cityssm/ad-web-auth-connector/types.js'
 import { config } from '../data/config.js'
 import type {
   ConfigActiveDirectory,
+  ConfigGreenButtonSubscription,
   ConfigParserConfiguration,
   ConfigTemporaryUserCredentials
 } from '../types/configTypes.js'
@@ -44,6 +45,8 @@ configFallbackValues.set('session.doKeepAlive', false)
 configFallbackValues.set('parserConfigs', {})
 
 configFallbackValues.set('settings.reportKeyAccessDays', 5)
+
+configFallbackValues.set('subscriptions.greenButton', {})
 
 /*
  * Set up function overloads
@@ -92,6 +95,10 @@ export function getConfigProperty(
 export function getConfigProperty(
   propertyName: 'parserConfigs'
 ): Record<string, ConfigParserConfiguration>
+
+export function getConfigProperty(
+  propertyName: 'subscriptions.greenButton'
+): Record<string, ConfigGreenButtonSubscription>
 
 export function getConfigProperty(propertyName: string): unknown {
   const propertyNameSplit = propertyName.split('.')

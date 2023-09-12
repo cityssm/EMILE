@@ -12,6 +12,7 @@
     "dev:live": "cross-env NODE_ENV=dev DEBUG=emile:* nodemon --inspect ./bin/www.js",
     "dev:test": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true nodemon --inspect ./bin/www.js",
     "dev:test:deletedFilesProcessor": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true nodemon --inspect ./tasks/deletedFilesProcessor.js",
+    "dev:test:greenButtonCMDProcessor": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true nodemon --inspect ./tasks/greenButtonCMDProcessor.js",
     "cy:open": "cypress open --config-file cypress.config.js",
     "cy:run": "cypress run --config-file cypress.config.js",
     "cy:run:firefox": "cypress run --config-file cypress.config.js --browser firefox",
@@ -25,6 +26,7 @@
     "url": "git+https://github.com/cityssm/EMILE.git"
   },
   "keywords": [
+    "energy",
     "green-button"
   ],
   "author": "The Corporation of the City of Sault Ste. Marie",
@@ -60,14 +62,14 @@
     "excel-date-to-js": "^1.1.5",
     "exit-hook": "^3.2.0",
     "express": "^4.18.2",
-    "express-rate-limit": "^6.11.1",
+    "express-rate-limit": "^6.11.2",
     "express-session": "^1.17.3",
     "http-errors": "^2.0.0",
     "multer": "^1.4.5-lts.1",
     "papaparse": "^5.4.1",
     "session-file-store": "^1.5.0",
     "set-interval-async": "^3.0.3",
-    "uuid": "^9.0.0",
+    "uuid": "^9.0.1",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

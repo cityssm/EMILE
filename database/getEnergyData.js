@@ -104,3 +104,20 @@ export function getEnergyData(filters, options) {
     emileDB.close();
     return data;
 }
+export function getEnergyDataPoint(filters) {
+    const emileDB = sqlite(databasePath, {
+        readonly: true
+    });
+    const dataPoint = emileDB
+        .prepare(`select dataId, assetId, dataTypeId, fileId,
+        timeSeconds, durationSeconds, dataValue, powerOfTenMultiplier
+        from EnergyData
+        where recordDelete_timeMillis is null
+        and assetId = ?
+        and dataTypeId = ?
+        and timeSeconds = ?
+        and durationSeconds = ?`)
+        .get(filters.assetId, filters.dataTypeId, filters.timeSeconds, filters.durationSeconds);
+    emileDB.close();
+    return dataPoint;
+}

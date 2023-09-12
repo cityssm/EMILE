@@ -19,6 +19,7 @@ configFallbackValues.set(property_session_maxAgeMillis, 60 * 60 * 1000);
 configFallbackValues.set('session.doKeepAlive', false);
 configFallbackValues.set('parserConfigs', {});
 configFallbackValues.set('settings.reportKeyAccessDays', 5);
+configFallbackValues.set('subscriptions.greenButton', {});
 export function getConfigProperty(propertyName) {
     const propertyNameSplit = propertyName.split('.');
     let currentObject = config;

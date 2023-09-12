@@ -1,4 +1,5 @@
 import type { ADWebAuthConfig } from '@cityssm/ad-web-auth-connector/types.js';
+import type { Configuration as GreenButtonSubscriberConfiguration } from '@cityssm/green-button-subscriber';
 export interface Config {
     application: {
         applicationName?: string;
@@ -27,6 +28,9 @@ export interface Config {
     tempUsers?: ConfigTemporaryUserCredentials[];
     settings?: {
         reportKeyAccessDays?: number;
+    };
+    subscriptions?: {
+        greenButton?: Record<string, ConfigGreenButtonSubscription>;
     };
 }
 export interface ConfigActiveDirectory {
@@ -73,4 +77,9 @@ export interface ConfigParserDataFieldObjectKey {
 export interface ConfigParserDataFieldFunction<T> {
     dataType: 'function';
     dataFunction: (dataObject: unknown) => T;
+}
+export interface ConfigGreenButtonSubscription {
+    configuration: GreenButtonSubscriberConfiguration;
+    authorizationIdBlacklist?: string[];
+    authorizationIdWhitelist?: string[];
 }

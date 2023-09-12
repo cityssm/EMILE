@@ -14,4 +14,10 @@ interface GetEnergyDataOptions {
     formatForExport?: boolean;
 }
 export declare function getEnergyData(filters: GetEnergyDataFilters, options?: GetEnergyDataOptions): EnergyData[];
+export declare function getEnergyDataPoint(filters: {
+    assetId: number;
+    dataTypeId: number;
+    timeSeconds: number;
+    durationSeconds: number;
+}): EnergyData | undefined;
 export {};

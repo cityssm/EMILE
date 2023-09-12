@@ -164,3 +164,36 @@ export function getEnergyData(
 
   return data
 }
+
+export function getEnergyDataPoint(filters: {
+  assetId: number
+  dataTypeId: number
+  timeSeconds: number
+  durationSeconds: number
+}): EnergyData | undefined {
+  const emileDB = sqlite(databasePath, {
+    readonly: true
+  })
+
+  const dataPoint = emileDB
+    .prepare(
+      `select dataId, assetId, dataTypeId, fileId,
+        timeSeconds, durationSeconds, dataValue, powerOfTenMultiplier
+        from EnergyData
+        where recordDelete_timeMillis is null
+        and assetId = ?
+        and dataTypeId = ?
+        and timeSeconds = ?
+        and durationSeconds = ?`
+    )
+    .get(
+      filters.assetId,
+      filters.dataTypeId,
+      filters.timeSeconds,
+      filters.durationSeconds
+    ) as EnergyData | undefined
+
+  emileDB.close()
+
+  return dataPoint
+}

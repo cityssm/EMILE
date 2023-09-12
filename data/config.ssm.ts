@@ -9,4 +9,7 @@ config.parserConfigs = config.parserConfigs ?? {}
 config.parserConfigs.ssmPuc = ssmPuc
 config.parserConfigs.enbridgeUsageHistory = enbridgeUsageHistory
 
+config.subscriptions = config.subscriptions ?? {}
+config.subscriptions.greenButton = config.subscriptions.greenButton ?? {}
+
 export default config
