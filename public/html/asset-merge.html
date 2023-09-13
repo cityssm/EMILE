@@ -1,0 +1,62 @@
+<div class="modal" role="dialog" aria-label="Merge Assets">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <div class="modal-card-head">
+      <h2 class="modal-card-title">Merge Assets</h2>
+      <button
+        class="delete is-close-modal-button"
+        aria-label="close"
+        type="button"
+      ></button>
+    </div>
+    <section class="modal-card-body">
+      <form id="form--assetMerge">
+        <input id="assetMerge--assetIds" name="assetIds" type="hidden" />
+        <div class="field">
+          <label class="label" for="assetMerge--categoryId"
+            >Merged Asset Category</label
+          >
+          <div class="control">
+            <div class="select is-fullwidth">
+              <select
+                id="assetMerge--categoryId"
+                name="categoryId"
+                required
+              ></select>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label" for="assetMerge--assetName">Merged Asset Name</label>
+          <div class="control">
+            <div class="select is-fullwidth">
+              <select
+                id="assetMerge--assetName"
+                name="assetName"
+                required
+              ></select>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label" for="assetMerge--latitudeLongitude">Merged Latitude and Longitude</label>
+          <div class="control">
+            <div class="select is-fullwidth">
+              <select
+                id="assetMerge--latitudeLongitude"
+                name="latitudeLongitude"
+              ></select>
+            </div>
+          </div>
+        </div>
+      </form>
+    </section>
+    <div class="modal-card-foot is-justify-content-right">
+      <button class="button is-success" type="submit" form="form--assetMerge">
+        <span class="icon"><i class="fas fa-plus" aria-hidden="true"></i></span>
+        <span>Merge Assets</span>
+      </button>
+      <button class="button is-close-modal-button" type="button">Cancel</button>
+    </div>
+  </div>
+</div>

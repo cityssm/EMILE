@@ -57,6 +57,10 @@ async function processGreenButtonSubscriptions() {
     }
     updatedMin = new Date(startTimeMillis - 3600 * 1000);
 }
+await processGreenButtonSubscriptions().catch((error) => {
+    debug('Error running task.');
+    debug(error);
+});
 const intervalID = setIntervalAsync(processGreenButtonSubscriptions, 3600 * 1000);
 exitHook(() => {
     terminateTask = true;

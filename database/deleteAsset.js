@@ -2,8 +2,8 @@ import sqlite from 'better-sqlite3';
 import { databasePath } from '../helpers/functions.database.js';
 import { deleteAssetAliasesByAssetId } from './deleteAssetAlias.js';
 import { deleteAssetGroupMembersByAssetId } from './deleteAssetGroupMember.js';
-export function deleteAsset(assetId, sessionUser) {
-    const emileDB = sqlite(databasePath);
+export function deleteAsset(assetId, sessionUser, connectedEmileDB) {
+    const emileDB = connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB;
     const result = emileDB
         .prepare(`update Assets
         set recordDelete_userName = ?,
@@ -15,6 +15,8 @@ export function deleteAsset(assetId, sessionUser) {
         deleteAssetAliasesByAssetId(assetId, sessionUser, emileDB);
         deleteAssetGroupMembersByAssetId(assetId, sessionUser, emileDB);
     }
-    emileDB.close();
+    if (connectedEmileDB === undefined) {
+        emileDB.close();
+    }
     return result.changes > 0;
 }

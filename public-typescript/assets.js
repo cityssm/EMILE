@@ -236,14 +236,97 @@ Object.defineProperty(exports, "__esModule", { value: true });
         const assetId = (_b = (_a = clickEvent.currentTarget.closest('tr')) === null || _a === void 0 ? void 0 : _a.dataset.assetId) !== null && _b !== void 0 ? _b : '';
         openAssetByAssetId(assetId);
     }
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+    const mergeAssetsButtonElement = document.querySelector('#button--mergeAssets');
+    const assetsContainerElement = document.querySelector('#container--assets');
+    function toggleMergeAssetsButton() {
+        ;
+        mergeAssetsButtonElement.disabled =
+            assetsContainerElement.querySelectorAll('input.selectedAssetId:checked')
+                .length < 2;
+    }
+    mergeAssetsButtonElement === null || mergeAssetsButtonElement === void 0 ? void 0 : mergeAssetsButtonElement.addEventListener('click', () => {
+        var _a, _b;
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+        const selectedAssetIdElements = assetsContainerElement.querySelectorAll('input.selectedAssetId:checked');
+        const selectedAssetIds = [];
+        for (const selectedAssetIdElement of selectedAssetIdElements) {
+            selectedAssetIds.push(selectedAssetIdElement.value);
+        }
+        const selectedAssets = [];
+        for (const asset of Emile.assets) {
+            if (selectedAssetIds.includes((_b = (_a = asset.assetId) === null || _a === void 0 ? void 0 : _a.toString()) !== null && _b !== void 0 ? _b : '')) {
+                selectedAssets.push(asset);
+            }
+        }
+        let mergeCloseModalFunction;
+        function doMergeAssets(formEvent) {
+            formEvent.preventDefault();
+            cityssm.postJSON(`${Emile.urlPrefix}/assets/doMergeAssets`, formEvent.currentTarget, (rawResponseJSON) => {
+                const responseJSON = rawResponseJSON;
+                if (responseJSON.success) {
+                    mergeCloseModalFunction();
+                    Emile.assets = responseJSON.assets;
+                    renderAssets();
+                    openAssetByAssetId(responseJSON.assetId.toString());
+                }
+            });
+        }
+        cityssm.openHtmlModal('asset-merge', {
+            onshow(modalElement) {
+                var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
+                ;
+                modalElement.querySelector('#assetMerge--assetIds').value = selectedAssetIds.join(',');
+                const categoryElement = modalElement.querySelector('#assetMerge--categoryId');
+                const assetNameElement = modalElement.querySelector('#assetMerge--assetName');
+                const latitudeLongitudeElement = modalElement.querySelector('#assetMerge--latitudeLongitude');
+                for (const selectedAsset of selectedAssets) {
+                    const categoryOptionElement = document.createElement('option');
+                    categoryOptionElement.textContent = (_a = selectedAsset.category) !== null && _a !== void 0 ? _a : '';
+                    categoryOptionElement.value =
+                        (_c = (_b = selectedAsset.categoryId) === null || _b === void 0 ? void 0 : _b.toString()) !== null && _c !== void 0 ? _c : '';
+                    categoryElement.append(categoryOptionElement);
+                    const assetNameOptionElement = document.createElement('option');
+                    assetNameOptionElement.textContent = selectedAsset.assetName;
+                    assetNameOptionElement.value = selectedAsset.assetName;
+                    assetNameElement.append(assetNameOptionElement);
+                    if (((_d = selectedAsset.latitude) !== null && _d !== void 0 ? _d : undefined) !== undefined ||
+                        ((_e = selectedAsset.longitude) !== null && _e !== void 0 ? _e : undefined) !== undefined) {
+                        const latitudeLongitudeOptionElement = document.createElement('option');
+                        latitudeLongitudeOptionElement.textContent =
+                            ((_g = (_f = selectedAsset.latitude) === null || _f === void 0 ? void 0 : _f.toString()) !== null && _g !== void 0 ? _g : '') +
+                                ', ' +
+                                ((_j = (_h = selectedAsset.longitude) === null || _h === void 0 ? void 0 : _h.toString()) !== null && _j !== void 0 ? _j : '');
+                        latitudeLongitudeOptionElement.value =
+                            ((_l = (_k = selectedAsset.latitude) === null || _k === void 0 ? void 0 : _k.toString()) !== null && _l !== void 0 ? _l : '') +
+                                '::' +
+                                ((_o = (_m = selectedAsset.longitude) === null || _m === void 0 ? void 0 : _m.toString()) !== null && _o !== void 0 ? _o : '');
+                        latitudeLongitudeElement.append(latitudeLongitudeOptionElement);
+                    }
+                }
+            },
+            onshown(modalElement, closeModalFunction) {
+                var _a;
+                bulmaJS.toggleHtmlClipped();
+                mergeCloseModalFunction = closeModalFunction;
+                modalElement.querySelector('#assetMerge--categoryId').focus();
+                (_a = modalElement
+                    .querySelector('form')) === null || _a === void 0 ? void 0 : _a.addEventListener('submit', doMergeAssets);
+            },
+            onremoved() {
+                bulmaJS.toggleHtmlClipped();
+            }
+        });
+    });
     function renderAssets() {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
         ;
         document.querySelector('#count--assets').textContent =
             Emile.assets.length.toString();
-        const containerElement = document.querySelector('#container--assets');
+        assetsContainerElement.innerHTML = '';
+        toggleMergeAssetsButton();
         if (Emile.assets.length === 0) {
-            containerElement.innerHTML = `<div class="message is-warning">
+            assetsContainerElement.innerHTML = `<div class="message is-warning">
         <p class="message-body">
           <strong>No Assets Found</strong><br />
           Get started by adding some assets that will be reported on.
@@ -259,6 +342,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
         tableElement.className =
             'table is-fullwidth is-striped has-sticky-header is-fade-hoverable';
         tableElement.innerHTML = `<thead><tr>
+      ${Emile.canUpdate
+            ? '<th class="has-width-10"><span class="is-sr-only">Select</span></th>'
+            : ''}
       <th class="has-width-10"><span class="is-sr-only">Icon</span></th>
       <th>Category</th>
       <th>Asset</th>
@@ -285,7 +371,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
             }
             const rowElement = document.createElement('tr');
             rowElement.dataset.assetId = (_d = (_c = asset.assetId) === null || _c === void 0 ? void 0 : _c.toString()) !== null && _d !== void 0 ? _d : '';
-            rowElement.innerHTML = `<td class="has-width-10 has-text-centered">
+            if (Emile.canUpdate) {
+                rowElement.innerHTML = `<td class="has-width-10 has-text-centered">
+          <input class="selectedAssetId" id="selectedAssetId_${asset.assetId}" type="checkbox" value="${asset.assetId}" />
+          </td>`;
+            }
+            rowElement.insertAdjacentHTML('beforeend', `<td class="has-width-10 has-text-centered">
         <i class="${(_e = asset.fontAwesomeIconClasses) !== null && _e !== void 0 ? _e : 'fas fa-bolt'}" aria-hidden="true"></i>
         </td>
         <td data-field="category"></td>
@@ -307,15 +398,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
                 <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
                 ${(_k = asset.latitude) !== null && _k !== void 0 ? _k : 0}, ${(_l = asset.longitude) !== null && _l !== void 0 ? _l : 0}
                 </a>`}
-        </td>`;
+        </td>`);
             rowElement.querySelector('[data-field="category"]').textContent = (_m = asset.category) !== null && _m !== void 0 ? _m : '';
             const assetNameElement = rowElement.querySelector('[data-field="assetName"]');
             assetNameElement.textContent = asset.assetName;
             assetNameElement.addEventListener('click', openAssetByClick);
+            (_o = rowElement
+                .querySelector('input')) === null || _o === void 0 ? void 0 : _o.addEventListener('change', toggleMergeAssetsButton);
             tableElement.querySelector('tbody').append(rowElement);
         }
         if (tableElement.querySelectorAll('tbody tr').length === 0) {
-            containerElement.innerHTML = `<div class="message is-info">
+            assetsContainerElement.innerHTML = `<div class="message is-info">
         <p class="message-body">
           <strong>There are no assets that meet your search criteria.</strong><br />
           Try to be less specific in your search. 
@@ -323,8 +416,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         </div>`;
         }
         else {
-            containerElement.innerHTML = '';
-            containerElement.append(tableElement);
+            assetsContainerElement.append(tableElement);
         }
     }
     (_a = document.querySelector('#button--addAsset')) === null || _a === void 0 ? void 0 : _a.addEventListener('click', () => {

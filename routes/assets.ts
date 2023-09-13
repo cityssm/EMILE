@@ -11,6 +11,7 @@ import handler_doDeleteAssetGroup from '../handlers/assets-post/doDeleteAssetGro
 import handler_doDeleteAssetGroupMember from '../handlers/assets-post/doDeleteAssetGroupMember.js'
 import handler_doGetAsset from '../handlers/assets-post/doGetAsset.js'
 import handler_doGetAssetGroup from '../handlers/assets-post/doGetAssetGroup.js'
+import handler_doMergeAssets from '../handlers/assets-post/doMergeAssets.js'
 import handler_doUpdateAsset from '../handlers/assets-post/doUpdateAsset.js'
 import handler_doUpdateAssetGroup from '../handlers/assets-post/doUpdateAssetGroup.js'
 import { updatePostHandler } from '../handlers/permissions.js'
@@ -26,6 +27,8 @@ router.post('/doAddAsset', updatePostHandler, handler_doAddAsset)
 router.post('/doGetAsset', handler_doGetAsset)
 
 router.post('/doUpdateAsset', updatePostHandler, handler_doUpdateAsset)
+
+router.post('/doMergeAssets', updatePostHandler, handler_doMergeAssets)
 
 router.post('/doDeleteAsset', updatePostHandler, handler_doDeleteAsset)
 

@@ -110,12 +110,10 @@ async function processGreenButtonSubscriptions(): Promise<void> {
  * Run the task
  */
 
-/*
 await processGreenButtonSubscriptions().catch((error) => {
   debug('Error running task.')
   debug(error)
 })
-*/
 
 const intervalID = setIntervalAsync(
   processGreenButtonSubscriptions,

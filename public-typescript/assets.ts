@@ -390,16 +390,149 @@ interface ErrorResponse {
     openAssetByAssetId(assetId)
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+  const mergeAssetsButtonElement = document.querySelector(
+    '#button--mergeAssets'
+  ) as HTMLButtonElement | null
+
+  const assetsContainerElement = document.querySelector(
+    '#container--assets'
+  ) as HTMLElement
+
+  function toggleMergeAssetsButton(): void {
+    ;(mergeAssetsButtonElement as HTMLButtonElement).disabled =
+      assetsContainerElement.querySelectorAll('input.selectedAssetId:checked')
+        .length < 2
+  }
+
+  mergeAssetsButtonElement?.addEventListener('click', () => {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+    const selectedAssetIdElements = assetsContainerElement.querySelectorAll(
+      'input.selectedAssetId:checked'
+    ) as NodeListOf<HTMLInputElement>
+
+    const selectedAssetIds: string[] = []
+
+    for (const selectedAssetIdElement of selectedAssetIdElements) {
+      selectedAssetIds.push(selectedAssetIdElement.value)
+    }
+
+    const selectedAssets: Asset[] = []
+
+    for (const asset of Emile.assets) {
+      if (selectedAssetIds.includes(asset.assetId?.toString() ?? '')) {
+        selectedAssets.push(asset)
+      }
+    }
+
+    let mergeCloseModalFunction: () => void
+
+    function doMergeAssets(formEvent: SubmitEvent): void {
+      formEvent.preventDefault()
+
+      cityssm.postJSON(
+        `${Emile.urlPrefix}/assets/doMergeAssets`,
+        formEvent.currentTarget,
+        (rawResponseJSON) => {
+          const responseJSON = rawResponseJSON as
+            | {
+                success: true
+                assetId: number
+                assets: Asset[]
+              }
+            | ErrorResponse
+
+          if (responseJSON.success) {
+            mergeCloseModalFunction()
+
+            Emile.assets = responseJSON.assets
+            renderAssets()
+
+            openAssetByAssetId(responseJSON.assetId.toString())
+          }
+        }
+      )
+    }
+
+    cityssm.openHtmlModal('asset-merge', {
+      onshow(modalElement) {
+        ;(
+          modalElement.querySelector(
+            '#assetMerge--assetIds'
+          ) as HTMLInputElement
+        ).value = selectedAssetIds.join(',')
+
+        const categoryElement = modalElement.querySelector(
+          '#assetMerge--categoryId'
+        ) as HTMLSelectElement
+
+        const assetNameElement = modalElement.querySelector(
+          '#assetMerge--assetName'
+        ) as HTMLSelectElement
+
+        const latitudeLongitudeElement = modalElement.querySelector(
+          '#assetMerge--latitudeLongitude'
+        ) as HTMLSelectElement
+
+        for (const selectedAsset of selectedAssets) {
+          const categoryOptionElement = document.createElement('option')
+          categoryOptionElement.textContent = selectedAsset.category ?? ''
+          categoryOptionElement.value =
+            selectedAsset.categoryId?.toString() ?? ''
+          categoryElement.append(categoryOptionElement)
+
+          const assetNameOptionElement = document.createElement('option')
+          assetNameOptionElement.textContent = selectedAsset.assetName
+          assetNameOptionElement.value = selectedAsset.assetName
+          assetNameElement.append(assetNameOptionElement)
+
+          if (
+            (selectedAsset.latitude ?? undefined) !== undefined ||
+            (selectedAsset.longitude ?? undefined) !== undefined
+          ) {
+            const latitudeLongitudeOptionElement =
+              document.createElement('option')
+            latitudeLongitudeOptionElement.textContent =
+              (selectedAsset.latitude?.toString() ?? '') +
+              ', ' +
+              (selectedAsset.longitude?.toString() ?? '')
+            latitudeLongitudeOptionElement.value =
+              (selectedAsset.latitude?.toString() ?? '') +
+              '::' +
+              (selectedAsset.longitude?.toString() ?? '')
+            latitudeLongitudeElement.append(latitudeLongitudeOptionElement)
+          }
+        }
+      },
+      onshown(modalElement, closeModalFunction) {
+        bulmaJS.toggleHtmlClipped()
+
+        mergeCloseModalFunction = closeModalFunction
+        ;(
+          modalElement.querySelector(
+            '#assetMerge--categoryId'
+          ) as HTMLSelectElement
+        ).focus()
+
+        modalElement
+          .querySelector('form')
+          ?.addEventListener('submit', doMergeAssets)
+      },
+      onremoved() {
+        bulmaJS.toggleHtmlClipped()
+      }
+    })
+  })
+
   function renderAssets(): void {
     ;(document.querySelector('#count--assets') as HTMLElement).textContent =
       Emile.assets.length.toString()
 
-    const containerElement = document.querySelector(
-      '#container--assets'
-    ) as HTMLElement
+    assetsContainerElement.innerHTML = ''
+    toggleMergeAssetsButton()
 
     if (Emile.assets.length === 0) {
-      containerElement.innerHTML = `<div class="message is-warning">
+      assetsContainerElement.innerHTML = `<div class="message is-warning">
         <p class="message-body">
           <strong>No Assets Found</strong><br />
           Get started by adding some assets that will be reported on.
@@ -415,9 +548,16 @@ interface ErrorResponse {
       .split(' ')
 
     const tableElement = document.createElement('table')
+
     tableElement.className =
       'table is-fullwidth is-striped has-sticky-header is-fade-hoverable'
+
     tableElement.innerHTML = `<thead><tr>
+      ${
+        Emile.canUpdate
+          ? '<th class="has-width-10"><span class="is-sr-only">Select</span></th>'
+          : ''
+      }
       <th class="has-width-10"><span class="is-sr-only">Icon</span></th>
       <th>Category</th>
       <th>Asset</th>
@@ -453,7 +593,17 @@ interface ErrorResponse {
       const rowElement = document.createElement('tr')
       rowElement.dataset.assetId = asset.assetId?.toString() ?? ''
 
-      rowElement.innerHTML = `<td class="has-width-10 has-text-centered">
+      if (Emile.canUpdate) {
+        rowElement.innerHTML = `<td class="has-width-10 has-text-centered">
+          <input class="selectedAssetId" id="selectedAssetId_${
+            asset.assetId as number
+          }" type="checkbox" value="${asset.assetId as number}" />
+          </td>`
+      }
+
+      rowElement.insertAdjacentHTML(
+        'beforeend',
+        `<td class="has-width-10 has-text-centered">
         <i class="${
           asset.fontAwesomeIconClasses ?? 'fas fa-bolt'
         }" aria-hidden="true"></i>
@@ -487,6 +637,7 @@ interface ErrorResponse {
                 </a>`
           }
         </td>`
+      )
       ;(
         rowElement.querySelector(
           '[data-field="category"]'
@@ -500,21 +651,24 @@ interface ErrorResponse {
       assetNameElement.textContent = asset.assetName
 
       assetNameElement.addEventListener('click', openAssetByClick)
+
+      rowElement
+        .querySelector('input')
+        ?.addEventListener('change', toggleMergeAssetsButton)
       ;(tableElement.querySelector('tbody') as HTMLTableSectionElement).append(
         rowElement
       )
     }
 
     if (tableElement.querySelectorAll('tbody tr').length === 0) {
-      containerElement.innerHTML = `<div class="message is-info">
+      assetsContainerElement.innerHTML = `<div class="message is-info">
         <p class="message-body">
           <strong>There are no assets that meet your search criteria.</strong><br />
           Try to be less specific in your search. 
         </p>
         </div>`
     } else {
-      containerElement.innerHTML = ''
-      containerElement.append(tableElement)
+      assetsContainerElement.append(tableElement)
     }
   }
 

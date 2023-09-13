@@ -89,19 +89,33 @@
             </a>
           </div>
           <% if (user.canUpdate) { %>
-          <div class="level-item">
-            <button
-              class="button is-success"
-              id="button--addAsset"
-              data-cy="add"
-              type="button"
-            >
-              <span class="icon">
-                <i class="fas fa-plus" aria-hidden="true"></i>
-              </span>
-              <span>Create Asset</span>
-            </button>
-          </div>
+            <div class="level-item">
+              <button
+                class="button is-primary"
+                id="button--mergeAssets"
+                data-cy="merge"
+                type="button"
+                disabled
+              >
+                <span class="icon">
+                  <i class="far fa-object-group" aria-hidden="true"></i>
+                </span>
+                <span>Merge Assets</span>
+              </button>
+            </div>
+            <div class="level-item">
+              <button
+                class="button is-success"
+                id="button--addAsset"
+                data-cy="add"
+                type="button"
+              >
+                <span class="icon">
+                  <i class="fas fa-plus" aria-hidden="true"></i>
+                </span>
+                <span>Create Asset</span>
+              </button>
+            </div>
           <% } %>
         </div>
       </div>

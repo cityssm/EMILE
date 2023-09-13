@@ -7,9 +7,11 @@ import { deleteAssetGroupMembersByAssetId } from './deleteAssetGroupMember.js'
 
 export function deleteAsset(
   assetId: number | string,
-  sessionUser: EmileUser
+  sessionUser: EmileUser,
+  connectedEmileDB?: sqlite.Database
 ): boolean {
-  const emileDB = sqlite(databasePath)
+  const emileDB =
+    connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB
 
   const result = emileDB
     .prepare(
@@ -26,7 +28,9 @@ export function deleteAsset(
     deleteAssetGroupMembersByAssetId(assetId, sessionUser, emileDB)
   }
 
-  emileDB.close()
+  if (connectedEmileDB === undefined) {
+    emileDB.close()
+  }
 
   return result.changes > 0
 }

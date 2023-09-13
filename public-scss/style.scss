@@ -150,7 +150,8 @@ span.button.is-static {
   tbody tr {
     &:hover,
     &:focus,
-    &:focus-within {
+    &:focus-within,
+    &:has(input[type='checkbox']:checked) {
       opacity: 1;
     }
   }
