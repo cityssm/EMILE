@@ -6,8 +6,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
     const Emile = exports.Emile;
     const dashboardContainer = document.querySelector('#container--dashboard');
     const dashboardFormElement = document.querySelector('#form--dashboard');
-    const startDateStringElement = dashboardFormElement.querySelector('#dashboard--startDateString');
-    const endDateStringElement = dashboardFormElement.querySelector('#dashboard--endDateString');
+    // Start Date
+    const startDateStringElementId = 'dashboard--startDateString';
+    const startDateStringElement = dashboardFormElement.querySelector(`#${startDateStringElementId}`);
+    const savedStartDateStringValue = sessionStorage.getItem(startDateStringElementId);
+    if (savedStartDateStringValue !== null) {
+        startDateStringElement.value = savedStartDateStringValue;
+    }
+    // End Date
+    const endDateStringElementId = 'dashboard--endDateString';
+    const endDateStringElement = dashboardFormElement.querySelector(`#${endDateStringElementId}`);
+    const savedEndDateStringValue = sessionStorage.getItem(endDateStringElementId);
+    if (savedEndDateStringValue !== null) {
+        endDateStringElement.value = savedEndDateStringValue;
+    }
+    const submitButtonElement = dashboardFormElement.querySelector('button[type="submit"]');
     let charts = {};
     function getChartKey(assetId, dataTypeId) {
         return `${assetId}_${dataTypeId}`;
@@ -67,10 +80,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
         </div>`;
             return;
         }
+        submitButtonElement.disabled = true;
         dashboardContainer.innerHTML = `<p class="has-text-centered has-text-grey">
       <i class="fas fa-pulse fa-spinner fa-4x" aria-hidden="true"></i><br />
       Loading data...
       </p>`;
+        sessionStorage.setItem(startDateStringElementId, startDateStringElement.value);
+        sessionStorage.setItem(endDateStringElementId, endDateStringElement.value);
         cityssm.postJSON(`${Emile.urlPrefix}/dashboard/doGetEnergyData`, dashboardFormElement, (rawResponseJSON) => {
             var _a, _b, _c;
             const responseJSON = rawResponseJSON;
@@ -189,6 +205,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
             bulmaJS.init(dashboardContainer);
         });
     }
+    function enableSubmitButton() {
+        submitButtonElement.disabled = false;
+    }
     /*
      * Initialize
      */
@@ -196,8 +215,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
         assetSelectorElement: dashboardFormElement.querySelector('#dashboard--assetSelector'),
         callbackFunction: getEnergyData
     });
-    startDateStringElement.addEventListener('change', getEnergyData);
-    endDateStringElement.addEventListener('change', getEnergyData);
+    startDateStringElement.addEventListener('change', enableSubmitButton);
+    endDateStringElement.addEventListener('change', enableSubmitButton);
     dashboardFormElement.addEventListener('submit', (formEvent) => {
         formEvent.preventDefault();
         getEnergyData();

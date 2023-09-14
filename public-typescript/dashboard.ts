@@ -16,6 +16,8 @@ import type { Emile as EmileGlobal } from './globalTypes.js'
 
 declare const bulmaJS: BulmaJS
 declare const cityssm: cityssmGlobal
+
+  // eslint-disable-next-line sonarjs/cognitive-complexity
 ;(() => {
   const Emile = exports.Emile as EmileGlobal
 
@@ -27,13 +29,39 @@ declare const cityssm: cityssmGlobal
     '#form--dashboard'
   ) as HTMLFormElement
 
+  // Start Date
+
+  const startDateStringElementId = 'dashboard--startDateString'
+
   const startDateStringElement = dashboardFormElement.querySelector(
-    '#dashboard--startDateString'
+    `#${startDateStringElementId}`
   ) as HTMLInputElement
 
+  const savedStartDateStringValue = sessionStorage.getItem(
+    startDateStringElementId
+  )
+
+  if (savedStartDateStringValue !== null) {
+    startDateStringElement.value = savedStartDateStringValue
+  }
+
+  // End Date
+
+  const endDateStringElementId = 'dashboard--endDateString'
+
   const endDateStringElement = dashboardFormElement.querySelector(
-    '#dashboard--endDateString'
+    `#${endDateStringElementId}`
   ) as HTMLInputElement
+
+  const savedEndDateStringValue = sessionStorage.getItem(endDateStringElementId)
+
+  if (savedEndDateStringValue !== null) {
+    endDateStringElement.value = savedEndDateStringValue
+  }
+
+  const submitButtonElement = dashboardFormElement.querySelector(
+    'button[type="submit"]'
+  ) as HTMLButtonElement
 
   let charts: Record<
     string,
@@ -117,10 +145,18 @@ declare const cityssm: cityssmGlobal
       return
     }
 
+    submitButtonElement.disabled = true
+
     dashboardContainer.innerHTML = `<p class="has-text-centered has-text-grey">
       <i class="fas fa-pulse fa-spinner fa-4x" aria-hidden="true"></i><br />
       Loading data...
       </p>`
+
+    sessionStorage.setItem(
+      startDateStringElementId,
+      startDateStringElement.value
+    )
+    sessionStorage.setItem(endDateStringElementId, endDateStringElement.value)
 
     cityssm.postJSON(
       `${Emile.urlPrefix}/dashboard/doGetEnergyData`,
@@ -289,6 +325,10 @@ declare const cityssm: cityssmGlobal
     )
   }
 
+  function enableSubmitButton(): void {
+    submitButtonElement.disabled = false
+  }
+
   /*
    * Initialize
    */
@@ -300,9 +340,9 @@ declare const cityssm: cityssmGlobal
     callbackFunction: getEnergyData
   })
 
-  startDateStringElement.addEventListener('change', getEnergyData)
+  startDateStringElement.addEventListener('change', enableSubmitButton)
 
-  endDateStringElement.addEventListener('change', getEnergyData)
+  endDateStringElement.addEventListener('change', enableSubmitButton)
 
   dashboardFormElement.addEventListener('submit', (formEvent) => {
     formEvent.preventDefault()
