@@ -240,10 +240,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
     const mergeAssetsButtonElement = document.querySelector('#button--mergeAssets');
     const assetsContainerElement = document.querySelector('#container--assets');
     function toggleMergeAssetsButton() {
-        ;
-        mergeAssetsButtonElement.disabled =
-            assetsContainerElement.querySelectorAll('input.selectedAssetId:checked')
-                .length < 2;
+        if (mergeAssetsButtonElement !== null) {
+            mergeAssetsButtonElement.disabled =
+                assetsContainerElement.querySelectorAll('input.selectedAssetId:checked')
+                    .length < 2;
+        }
     }
     mergeAssetsButtonElement === null || mergeAssetsButtonElement === void 0 ? void 0 : mergeAssetsButtonElement.addEventListener('click', () => {
         var _a, _b;

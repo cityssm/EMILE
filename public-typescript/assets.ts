@@ -400,9 +400,11 @@ interface ErrorResponse {
   ) as HTMLElement
 
   function toggleMergeAssetsButton(): void {
-    ;(mergeAssetsButtonElement as HTMLButtonElement).disabled =
-      assetsContainerElement.querySelectorAll('input.selectedAssetId:checked')
-        .length < 2
+    if (mergeAssetsButtonElement !== null) {
+      mergeAssetsButtonElement.disabled =
+        assetsContainerElement.querySelectorAll('input.selectedAssetId:checked')
+          .length < 2
+    }
   }
 
   mergeAssetsButtonElement?.addEventListener('click', () => {
