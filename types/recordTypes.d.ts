@@ -25,6 +25,8 @@ export interface EnergyUnit extends Partial<RecordUserNameDateTime>, Partial<Rec
     unitId: number;
     unit: string;
     unitLong?: string;
+    preferredPowerOfTenMultiplier: number;
+    preferredPowerOfTenMultiplierName?: string;
 }
 export interface EnergyReadingType extends Partial<RecordUserNameDateTime>, Partial<RecordGreenButton>, Partial<RecordOrderNumber> {
     readingTypeId: number;

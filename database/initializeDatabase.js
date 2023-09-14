@@ -62,6 +62,7 @@ export function initializeDatabase() {
         unitId integer primary key autoincrement,
         unit varchar(100) not null,
         unitLong varchar(100) not null,
+        preferredPowerOfTenMultiplier integer not null default 0,
         ${greenButtonColumns},
         ${orderNumberColumns},
         ${recordColumns}
@@ -73,6 +74,7 @@ export function initializeDatabase() {
             addEnergyUnit({
                 unit,
                 unitLong: unit,
+                preferredPowerOfTenMultiplier: unit === 'Wh' ? 3 : 0,
                 greenButtonId
             }, initializeDatabaseUser, emileDB);
         }

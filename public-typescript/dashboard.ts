@@ -181,6 +181,14 @@ declare const cityssm: cityssmGlobal
             dataItem.dataTypeId as number
           )
 
+          const dataValue =
+            (dataItem.dataValue * Math.pow(10, dataItem.powerOfTenMultiplier)) /
+            Math.pow(10, dataItem.preferredPowerOfTenMultiplier ?? 0)
+
+          const dataUnit = `${
+            dataItem.preferredPowerOfTenMultiplierName ?? ''
+          } ${dataItem.unit ?? ''}`
+
           if (charts[chartKey] === undefined) {
             const panelElement = document.createElement('div')
             panelElement.className = 'panel'
@@ -267,11 +275,8 @@ declare const cityssm: cityssmGlobal
                   labels: [formatDateLabel(dataItem.timeSeconds)],
                   datasets: [
                     {
-                      label: dataItem.unit,
-                      data: [
-                        dataItem.dataValue *
-                          Math.pow(10, dataItem.powerOfTenMultiplier)
-                      ]
+                      label: dataUnit,
+                      data: [dataValue]
                     }
                   ]
                 }
@@ -299,7 +304,7 @@ declare const cityssm: cityssmGlobal
             addDataToChart(
               charts[chartKey].chart,
               formatDateLabel(dataItem.timeSeconds),
-              dataItem.dataValue * Math.pow(10, dataItem.powerOfTenMultiplier)
+              dataValue
             )
 
             addDataToTable(charts[chartKey].table, dataItem)

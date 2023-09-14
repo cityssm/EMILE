@@ -49,6 +49,8 @@ export interface EnergyUnit
   unitId: number
   unit: string
   unitLong?: string
+  preferredPowerOfTenMultiplier: number
+  preferredPowerOfTenMultiplierName?: string
 }
 
 export interface EnergyReadingType

@@ -88,7 +88,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         sessionStorage.setItem(startDateStringElementId, startDateStringElement.value);
         sessionStorage.setItem(endDateStringElementId, endDateStringElement.value);
         cityssm.postJSON(`${Emile.urlPrefix}/dashboard/doGetEnergyData`, dashboardFormElement, (rawResponseJSON) => {
-            var _a, _b, _c;
+            var _a, _b, _c, _d, _e, _f;
             const responseJSON = rawResponseJSON;
             dashboardContainer.innerHTML = '';
             charts = {};
@@ -99,6 +99,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
             }
             for (const dataItem of responseJSON.energyData) {
                 const chartKey = getChartKey(dataItem.assetId, dataItem.dataTypeId);
+                const dataValue = (dataItem.dataValue * Math.pow(10, dataItem.powerOfTenMultiplier)) /
+                    Math.pow(10, (_a = dataItem.preferredPowerOfTenMultiplier) !== null && _a !== void 0 ? _a : 0);
+                const dataUnit = `${(_b = dataItem.preferredPowerOfTenMultiplierName) !== null && _b !== void 0 ? _b : ''} ${(_c = dataItem.unit) !== null && _c !== void 0 ? _c : ''}`;
                 if (charts[chartKey] === undefined) {
                     const panelElement = document.createElement('div');
                     panelElement.className = 'panel';
@@ -106,7 +109,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
               <div class="level is-mobile">
                 <div class="level-left">
                   <div class="level-item">
-                    <i class="${(_a = dataItem.fontAwesomeIconClasses) !== null && _a !== void 0 ? _a : 'fas fa-bolt'}" aria-hidden="true"></i>
+                    <i class="${(_d = dataItem.fontAwesomeIconClasses) !== null && _d !== void 0 ? _d : 'fas fa-bolt'}" aria-hidden="true"></i>
                   </div>
                   <div class="level-item is-block">
                     <h2 class="has-text-weight-bold" data-field="assetName"></h2>
@@ -161,8 +164,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
                   </table>
                 </div>
               </div>`;
-                    panelElement.querySelector('[data-field="assetName"]').textContent = (_b = dataItem.assetName) !== null && _b !== void 0 ? _b : '';
-                    panelElement.querySelector('[data-field="serviceCategory"]').textContent = (_c = dataItem.serviceCategory) !== null && _c !== void 0 ? _c : '';
+                    panelElement.querySelector('[data-field="assetName"]').textContent = (_e = dataItem.assetName) !== null && _e !== void 0 ? _e : '';
+                    panelElement.querySelector('[data-field="serviceCategory"]').textContent = (_f = dataItem.serviceCategory) !== null && _f !== void 0 ? _f : '';
                     dashboardContainer.append(panelElement);
                     const chart = new Chart(panelElement.querySelector('canvas'), {
                         type: 'bar',
@@ -170,11 +173,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
                             labels: [formatDateLabel(dataItem.timeSeconds)],
                             datasets: [
                                 {
-                                    label: dataItem.unit,
-                                    data: [
-                                        dataItem.dataValue *
-                                            Math.pow(10, dataItem.powerOfTenMultiplier)
-                                    ]
+                                    label: dataUnit,
+                                    data: [dataValue]
                                 }
                             ]
                         }
@@ -192,7 +192,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
                     addDataToTable(table, dataItem);
                 }
                 else {
-                    addDataToChart(charts[chartKey].chart, formatDateLabel(dataItem.timeSeconds), dataItem.dataValue * Math.pow(10, dataItem.powerOfTenMultiplier));
+                    addDataToChart(charts[chartKey].chart, formatDateLabel(dataItem.timeSeconds), dataValue);
                     addDataToTable(charts[chartKey].table, dataItem);
                     charts[chartKey].timeSecondsMin = Math.min(charts[chartKey].timeSecondsMin, dataItem.timeSeconds);
                     charts[chartKey].timeSecondsMax = Math.max(charts[chartKey].timeSecondsMax, dataItem.timeSeconds);

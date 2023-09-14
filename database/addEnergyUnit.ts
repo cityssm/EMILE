@@ -16,14 +16,17 @@ export function addEnergyUnit(
   const result = emileDB
     .prepare(
       `insert into EnergyUnits (
-        unit, unitLong, greenButtonId, orderNumber,
+        unit, unitLong,
+        preferredPowerOfTenMultiplier,
+        greenButtonId, orderNumber,
         recordCreate_userName, recordCreate_timeMillis,
         recordUpdate_userName, recordUpdate_timeMillis)
-        values (?, ?, ?, ?, ?, ?, ?, ?)`
+        values (?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .run(
       unit.unit,
       unit.unitLong ?? unit.unit,
+      unit.preferredPowerOfTenMultiplier ?? 0,
       unit.greenButtonId,
       unit.orderNumber ?? 0,
       sessionUser.userName,
