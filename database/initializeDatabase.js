@@ -232,16 +232,23 @@ export function initializeDatabase() {
         .get();
     if (result === undefined) {
         addAssetAliasType({
-            aliasType: 'Green Button Interval Block Link',
-            aliasTypeKey: 'GreenButtonParser.IntervalBlock.link'
+            aliasType: 'Civic Address',
+            orderNumber: 1
         }, initializeDatabaseUser);
         addAssetAliasType({
             aliasType: 'Electricity Account Number',
-            aliasTypeKey: 'accountNumber.electricity'
+            aliasTypeKey: 'accountNumber.electricity',
+            orderNumber: 2
         }, initializeDatabaseUser);
         addAssetAliasType({
             aliasType: 'Gas Account Number',
-            aliasTypeKey: 'accountNumber.gas'
+            aliasTypeKey: 'accountNumber.gas',
+            orderNumber: 3
+        }, initializeDatabaseUser);
+        addAssetAliasType({
+            aliasType: 'Green Button Interval Block Link',
+            aliasTypeKey: 'GreenButtonParser.IntervalBlock.link',
+            orderNumber: 4
         }, initializeDatabaseUser);
     }
     emileDB
