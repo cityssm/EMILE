@@ -1,4 +1,3 @@
-import { isLocal } from '@cityssm/is-private-network-address'
 import { type NextFunction, type Request, type Response, Router } from 'express'
 
 import { isValidUserReportKey } from '../database/isValidUserReportKey.js'
