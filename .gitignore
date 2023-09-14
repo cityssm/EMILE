@@ -15,6 +15,9 @@ data/config.d.ts
 data/config.js
 data/config.ts
 
+data/caches/*
+!data/caches/README.md
+
 data/files/imported/*
 !data/files/imported/README.md
 data/files/uploads/*

@@ -1,5 +1,7 @@
 /* eslint-disable eslint-comments/disable-enable-pair, unicorn/filename-case */
 
+import fs from 'node:fs'
+
 import { helpers as greenButtonHelpers } from '@cityssm/green-button-parser'
 import * as greenButtonSubscriber from '@cityssm/green-button-subscriber'
 import Debug from 'debug'
@@ -15,15 +17,37 @@ const debug = Debug('emile:tasks:greenButtonCMDProcessor')
  * Task
  */
 
-let updatedMin = new Date()
-updatedMin.setFullYear(updatedMin.getFullYear() - 1)
+const pollingIntervalMillis = 3 * 3600 * 1000
+
+const updatedMinsCacheFile = 'data/caches/greenButtonCMDProcessor.json'
+
+let updatedMins: Record<string, number> = {}
+
+try {
+  updatedMins = JSON.parse(
+    fs.readFileSync(updatedMinsCacheFile) as unknown as string
+  )
+} catch {
+  debug(`No cache file available: ${updatedMinsCacheFile}`)
+  updatedMins = {}
+}
 
 let terminateTask = false
 
+function saveCache(): void {
+  try {
+    fs.writeFileSync(
+      updatedMinsCacheFile,
+      JSON.stringify(updatedMins, undefined, 2)
+    )
+  } catch (error) {
+    debug(`Error saving cache file: ${updatedMinsCacheFile}`)
+    debug(error)
+  }
+}
+
 async function processGreenButtonSubscriptions(): Promise<void> {
   debug('Process started')
-
-  const startTimeMillis = Date.now()
 
   const greenButtonSubscriptions = getConfigProperty(
     'subscriptions.greenButton'
@@ -79,6 +103,23 @@ async function processGreenButtonSubscriptions(): Promise<void> {
         continue
       }
 
+      const updatedMinMillis = updatedMins[authorizationId]
+      let updatedMin: Date
+
+      if ((updatedMinMillis ?? undefined) === undefined) {
+        updatedMin = new Date()
+        updatedMin.setFullYear(updatedMin.getFullYear() - 1)
+      } else {
+        updatedMin = new Date(updatedMinMillis)
+      }
+
+      if (updatedMin.getTime() + pollingIntervalMillis > Date.now()) {
+        debug(
+          `Skipping recently refreshed authorization id: ${subscriptionKey}, ${authorizationId}`
+        )
+        continue
+      }
+
       const usageData =
         await greenButtonSubscriber.getBatchSubscriptionsByAuthorization(
           authorizationId,
@@ -96,14 +137,14 @@ async function processGreenButtonSubscriptions(): Promise<void> {
 
       try {
         recordGreenButtonData(usageData, {})
+        updatedMins[authorizationId] = usageData.updatedDate?.getTime() ?? 0
+        saveCache()
       } catch (error) {
         debug(`Error recording data: ${subscriptionKey}, ${authorizationId}`)
         debug(error)
       }
     }
   }
-
-  updatedMin = new Date(startTimeMillis - 3600 * 1000)
 }
 
 /*
@@ -117,7 +158,7 @@ await processGreenButtonSubscriptions().catch((error) => {
 
 const intervalID = setIntervalAsync(
   processGreenButtonSubscriptions,
-  3600 * 1000
+  pollingIntervalMillis
 )
 
 exitHook(() => {

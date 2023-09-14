@@ -4,6 +4,8 @@
   },
   "ignore": [
     "cypress/*",
+    "data/caches/*",
+    "data/files/*",
     "data/sessions/*",
     "public/javascripts/*",
     "public-typescript/*",
