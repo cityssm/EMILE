@@ -76,18 +76,6 @@
           </div>
         </div>
         <div class="level-right">
-          <div class="level-item">
-            <a
-              class="button"
-              href="<%= urlPrefix %>/reports/assets-formatted"
-              download
-            >
-              <span class="icon">
-                <i class="fas fa-file-csv" aria-hidden="true"></i>
-              </span>
-              <span>Export Assets</span>
-            </a>
-          </div>
           <% if (user.canUpdate) { %>
             <div class="level-item">
               <button
@@ -117,6 +105,18 @@
               </button>
             </div>
           <% } %>
+          <div class="level-item">
+            <a
+              class="button"
+              href="<%= urlPrefix %>/reports/assets-formatted"
+              download
+            >
+              <span class="icon">
+                <i class="fas fa-file-csv" aria-hidden="true"></i>
+              </span>
+              <span>Export Assets</span>
+            </a>
+          </div>
         </div>
       </div>
     </div>
