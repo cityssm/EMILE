@@ -7,7 +7,7 @@ import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async';
 import { getConfigProperty } from '../helpers/functions.config.js';
 import { recordGreenButtonData } from '../helpers/functions.greenButton.js';
 const debug = Debug('emile:tasks:greenButtonCMDProcessor');
-const pollingIntervalMillis = 3 * 3600 * 1000;
+const pollingIntervalMillis = (86400 * 1000) + 60000;
 const updatedMinsCacheFile = 'data/caches/greenButtonCMDProcessor.json';
 let updatedMins = {};
 try {

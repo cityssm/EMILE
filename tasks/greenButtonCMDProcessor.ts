@@ -17,7 +17,7 @@ const debug = Debug('emile:tasks:greenButtonCMDProcessor')
  * Task
  */
 
-const pollingIntervalMillis = 3 * 3600 * 1000
+const pollingIntervalMillis = (86_400 * 1000) + 60_000
 
 const updatedMinsCacheFile = 'data/caches/greenButtonCMDProcessor.json'
 
