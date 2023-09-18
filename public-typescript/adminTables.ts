@@ -211,7 +211,8 @@ declare const cityssm: cityssmGlobal
               </div>
             </div>
             <div class="control is-expanded">
-              <input class="input" name="fontAwesomeIconClass-className" form="${formId}" list="datalist--iconClasses-${fontAwesomeIconClasses[0]}" aria-label="Font Awesome Class Name" maxlength="43" required />
+              <input class="input" name="fontAwesomeIconClass-className" form="${formId}" list="datalist--iconClasses-${fontAwesomeIconClasses[0]}" aria-label="Font Awesome Class Name"
+                pattern="^[a-z0-9-]+$" maxlength="43" required />
             </div>
             <div class="control">
               <span class="button is-static">
