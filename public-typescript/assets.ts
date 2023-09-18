@@ -494,14 +494,15 @@ interface ErrorResponse {
           ) {
             const latitudeLongitudeOptionElement =
               document.createElement('option')
-            latitudeLongitudeOptionElement.textContent =
-              (selectedAsset.latitude?.toString() ?? '') +
-              ', ' +
-              (selectedAsset.longitude?.toString() ?? '')
-            latitudeLongitudeOptionElement.value =
-              (selectedAsset.latitude?.toString() ?? '') +
-              '::' +
-              (selectedAsset.longitude?.toString() ?? '')
+
+            latitudeLongitudeOptionElement.textContent = `${
+              selectedAsset.latitude?.toString() ?? ''
+            }, ${selectedAsset.longitude?.toString() ?? ''}`
+
+            latitudeLongitudeOptionElement.value = `${
+              selectedAsset.latitude?.toString() ?? ''
+            }::${selectedAsset.longitude?.toString() ?? ''}`
+
             latitudeLongitudeElement.append(latitudeLongitudeOptionElement)
           }
         }

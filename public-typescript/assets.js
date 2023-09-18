@@ -294,14 +294,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
                     if (((_d = selectedAsset.latitude) !== null && _d !== void 0 ? _d : undefined) !== undefined ||
                         ((_e = selectedAsset.longitude) !== null && _e !== void 0 ? _e : undefined) !== undefined) {
                         const latitudeLongitudeOptionElement = document.createElement('option');
-                        latitudeLongitudeOptionElement.textContent =
-                            ((_g = (_f = selectedAsset.latitude) === null || _f === void 0 ? void 0 : _f.toString()) !== null && _g !== void 0 ? _g : '') +
-                                ', ' +
-                                ((_j = (_h = selectedAsset.longitude) === null || _h === void 0 ? void 0 : _h.toString()) !== null && _j !== void 0 ? _j : '');
-                        latitudeLongitudeOptionElement.value =
-                            ((_l = (_k = selectedAsset.latitude) === null || _k === void 0 ? void 0 : _k.toString()) !== null && _l !== void 0 ? _l : '') +
-                                '::' +
-                                ((_o = (_m = selectedAsset.longitude) === null || _m === void 0 ? void 0 : _m.toString()) !== null && _o !== void 0 ? _o : '');
+                        latitudeLongitudeOptionElement.textContent = `${(_g = (_f = selectedAsset.latitude) === null || _f === void 0 ? void 0 : _f.toString()) !== null && _g !== void 0 ? _g : ''}, ${(_j = (_h = selectedAsset.longitude) === null || _h === void 0 ? void 0 : _h.toString()) !== null && _j !== void 0 ? _j : ''}`;
+                        latitudeLongitudeOptionElement.value = `${(_l = (_k = selectedAsset.latitude) === null || _k === void 0 ? void 0 : _k.toString()) !== null && _l !== void 0 ? _l : ''}::${(_o = (_m = selectedAsset.longitude) === null || _m === void 0 ? void 0 : _m.toString()) !== null && _o !== void 0 ? _o : ''}`;
                         latitudeLongitudeElement.append(latitudeLongitudeOptionElement);
                     }
                 }
