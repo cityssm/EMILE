@@ -170,7 +170,7 @@ await processFiles().catch((error) => {
   debug(error)
 })
 
-const intervalID = setIntervalAsync(processFiles, 10 * 60 * 1000)
+const intervalID = setIntervalAsync(processFiles, 3600 * 1000)
 
 exitHook(() => {
   terminateTask = true
