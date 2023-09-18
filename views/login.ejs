@@ -97,6 +97,12 @@
 
   <script src="<%= urlPrefix %>/lib/fa/js/all.min.js" defer></script>
 
+  <script defer>
+    try {
+      window.sessionStorage.clear()
+    } catch {}
+  </script>
+
   <% if (isAbuser) { %>
     <script defer>
       window.location.reload();
