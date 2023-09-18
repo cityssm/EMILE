@@ -329,15 +329,17 @@
       <div class="columns">
         <div class="column">
           <div class="message is-info">
+            <p class="message-body">
+              Power Query Integration gives you the ability to create an Excel spreadsheet
+              that is linked to your data in
+              <%= configFunctions.getConfigProperty("application.applicationName") %>.
+              New data imported into
+              <%= configFunctions.getConfigProperty("application.applicationName") %>
+              will appear in Excel without the need to do another export.
+            </p>
+          </div>
+          <div class="message is-warning">
             <div class="message-body">
-              <p>
-                Power Query Integration gives you the ability to create an Excel spreadsheet
-                that is linked to your data in
-                <%= configFunctions.getConfigProperty("application.applicationName") %>.
-                New data imported into
-                <%= configFunctions.getConfigProperty("application.applicationName") %>
-                will appear in Excel without the need to do another export.
-              </p>
               <p>
                 Note that data links are <strong>associated with your user</strong>,
                 and will only work from computers that your have accessed
@@ -347,6 +349,10 @@
                   past
                   <%= configFunctions.getConfigProperty("settings.reportKeyAccessDays") %>
                   days</strong>.
+              </p>
+              <p>
+                Due to the significant size of this export,
+                the data is cached, and may be up to an hour behind.
               </p>
             </div>
           </div>

@@ -115,6 +115,8 @@ if (process.env.STARTUP_TEST === 'true') {
   fork('./tasks/uploadedFilesProcessor.js')
   fork('./tasks/deletedFilesProcessor.js')
 
+  fork('./tasks/reportDataCache.js')
+
   fileProcessorChildProcess = fork('./tasks/energyDataFilesProcessor.js')
 
   if (Object.keys(getConfigProperty('subscriptions.greenButton')).length > 0) {

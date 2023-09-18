@@ -1,0 +1,74 @@
+import fs from 'node:fs/promises'
+import path from 'node:path'
+
+import Debug from 'debug'
+import exitHook from 'exit-hook'
+import papaparse from 'papaparse'
+import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async'
+
+import { getReportData } from '../database/getReportData.js'
+import {
+  reportCacheFolder,
+  reportsToCache
+} from '../helpers/functions.reports.js'
+
+const debug = Debug('emile:tasks:reportDataCache')
+
+/*
+ * Task
+ */
+
+const pollingIntervalMillis = 3600 * 1000 + 60_000
+
+let terminateTask = false
+
+async function refreshReportDataCaches(): Promise<void> {
+  debug('Process started')
+
+  for (const reportName of reportsToCache) {
+    if (terminateTask) {
+      break
+    }
+
+    debug(`Getting report data: ${reportName} ...`)
+
+    const data = getReportData(reportName) ?? []
+
+    debug(`Converting ${data.length ?? 0} rows to CSV: ${reportName}`)
+
+    const csv = papaparse.unparse(data)
+
+    debug(`Writing report data: ${reportName} ...`)
+
+    try {
+      await fs.writeFile(path.join(reportCacheFolder, `${reportName}.csv`), csv)
+      debug(`Report data written successfully: ${reportName}`)
+    } catch (error) {
+      debug(`Error writting reprot data: ${reportName}`)
+      debug(error)
+    }
+  }
+}
+
+/*
+ * Run the task
+ */
+
+await refreshReportDataCaches().catch((error) => {
+  debug('Error running task.')
+  debug(error)
+})
+
+const intervalID = setIntervalAsync(
+  refreshReportDataCaches,
+  pollingIntervalMillis
+)
+
+exitHook(() => {
+  terminateTask = true
+  try {
+    void clearIntervalAsync(intervalID)
+  } catch {
+    debug('Error exiting task.')
+  }
+})
