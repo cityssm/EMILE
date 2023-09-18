@@ -1,4 +1,7 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable unicorn/no-nested-ternary */
+
+// eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable @typescript-eslint/indent */
 
 import { powerOfTenMultipliers } from '@cityssm/green-button-parser/lookups.js'
@@ -42,6 +45,10 @@ export function getEnergyData(
   filters: GetEnergyDataFilters,
   options?: GetEnergyDataOptions
 ): EnergyData[] {
+  const doGroupByDate =
+    !(options?.formatForExport ?? false) &&
+    filters.startDateString !== filters.endDateString
+
   const columnNames =
     options?.formatForExport ?? false
       ? `d.dataId,
@@ -55,6 +62,25 @@ export function getEnergyData(
         datetime(d.timeSeconds, 'unixepoch', 'localtime') as startDateTime,
         d.durationSeconds,
         d.dataValue, d.powerOfTenMultiplier`
+      : doGroupByDate
+      ? `min(d.dataId) as dataId,
+        d.assetId, a.assetName,
+        c.category, c.fontAwesomeIconClasses,
+        d.dataTypeId,
+        t.serviceCategoryId, ts.serviceCategory,
+        t.unitId, tu.unit, tu.unitLong, tu.preferredPowerOfTenMultiplier,
+        userFunction_getPowerOfTenMultiplierName(d.powerOfTenMultiplier) as powerOfTenMultiplierName,
+        userFunction_getPowerOfTenMultiplierName(tu.preferredPowerOfTenMultiplier) as preferredPowerOfTenMultiplierName,
+        t.readingTypeId, tr.readingType,
+        t.commodityId, tc.commodity,
+        t.accumulationBehaviourId, ta.accumulationBehaviour,
+        min(d.fileId) as fileId,
+        f.originalFileName,
+        min(d.timeSeconds) as timeSeconds,
+        max(d.endTimeSeconds) - min(d.timeSeconds) as durationSeconds,
+        max(d.endTimeSeconds) as endTimeSeconds,
+        sum(d.dataValue) as dataValue,
+        d.powerOfTenMultiplier`
       : `d.dataId,
         d.assetId, a.assetName, c.category, c.fontAwesomeIconClasses,
         d.dataTypeId,
@@ -149,7 +175,12 @@ export function getEnergyData(
     sqlParameters.push(filters.timeSecondsMax)
   }
 
-  sql += ' order by d.assetId, d.dataTypeId, d.timeSeconds'
+  if (doGroupByDate) {
+    sql +=
+      " group by d.assetId, d.dataTypeId, substr(datetime(d.timeSeconds, 'unixepoch', 'localtime'), 1, 10), d.powerOfTenMultiplier"
+  }
+
+  sql += ' order by d.assetId, d.dataTypeId, timeSeconds'
 
   const emileDB = sqlite(databasePath, {
     readonly: true
