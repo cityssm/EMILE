@@ -7,7 +7,11 @@ export function getAssetAliases(filters, connectedEmileDB) {
     left join AssetAliasTypes t on a.aliasTypeId = t.aliasTypeId
     where a.recordDelete_timeMillis is null`;
     const sqlParameters = [];
-    if ((filters.assetId ?? '') !== '') {
+    if ((filters.assetId ?? '') === '') {
+        sql +=
+            ' and a.assetId in (select assetId from Assets where recordDelete_timeMillis is null)';
+    }
+    else {
         sql += ' and a.assetId = ?';
         sqlParameters.push(filters.assetId ?? '');
     }

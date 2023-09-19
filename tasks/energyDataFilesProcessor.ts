@@ -182,10 +182,6 @@ exitHook(() => {
 })
 
 /*
- * Response to messaging
- */
-
-/*
  * Respond to messaging
  */
 

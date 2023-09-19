@@ -60,6 +60,7 @@ export function getAssetByAssetAlias(
 
   let sql = `select assetId from AssetAliases
     where recordDelete_timeMillis is null
+    and assetId in (select assetId from Assets where recordDelete_timeMillis is null)
     and assetAlias = ?`
 
   const sqlParameters: unknown[] = [assetAlias]

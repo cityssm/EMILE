@@ -22,10 +22,10 @@ export function addUser(
     emileDB
       .prepare(
         `insert into Users (
-        userName, canLogin, canUpdate, isAdmin,
-        recordCreate_userName, recordCreate_timeMillis,
-        recordUpdate_userName, recordUpdate_timeMillis)
-        values (?, ?, ?, ?, ?, ?, ?, ?)`
+          userName, canLogin, canUpdate, isAdmin,
+          recordCreate_userName, recordCreate_timeMillis,
+          recordUpdate_userName, recordUpdate_timeMillis)
+          values (?, ?, ?, ?, ?, ?, ?, ?)`
       )
       .run(
         user.userName,

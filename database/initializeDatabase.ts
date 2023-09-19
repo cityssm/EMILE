@@ -33,28 +33,7 @@ const greenButtonColumns = ' greenButtonId varchar(50)'
 
 const orderNumberColumns = ' orderNumber integer not null default 0'
 
-export function initializeDatabase(): void {
-  const emileDB = sqlite(databasePath)
-
-  const row = emileDB
-    .prepare(
-      `select name from sqlite_master
-        where type = 'table'
-        and name = 'UserAccessLog'`
-    )
-    .get() as { name: string } | undefined
-
-  if (row !== undefined) {
-    emileDB.close()
-    return
-  }
-
-  debug(`Creating ${databasePath} ...`)
-
-  /*
-   * Service Categories
-   */
-
+function initializeEnergyServiceCategories(emileDB: sqlite.Database): void {
   emileDB
     .prepare(
       `create table if not exists EnergyServiceCategories (
@@ -63,11 +42,11 @@ export function initializeDatabase(): void {
         ${greenButtonColumns},
         ${orderNumberColumns},
         ${recordColumns}
-    )`
+  )`
     )
     .run()
 
-  let result = emileDB
+  const result = emileDB
     .prepare('select serviceCategoryId from EnergyServiceCategories limit 1')
     .get()
 
@@ -85,11 +64,9 @@ export function initializeDatabase(): void {
       )
     }
   }
+}
 
-  /*
-   * Units
-   */
-
+function initializeEnergyUnits(emileDB: sqlite.Database): void {
   emileDB
     .prepare(
       `create table if not exists EnergyUnits (
@@ -104,7 +81,7 @@ export function initializeDatabase(): void {
     )
     .run()
 
-  result = emileDB.prepare('select unitId from EnergyUnits limit 1').get()
+  const result = emileDB.prepare('select unitId from EnergyUnits limit 1').get()
 
   if (result === undefined) {
     for (const [greenButtonId, unit] of Object.entries(
@@ -122,11 +99,9 @@ export function initializeDatabase(): void {
       )
     }
   }
+}
 
-  /*
-   * Reading Type
-   */
-
+function initializeEnergyReadingTypes(emileDB: sqlite.Database): void {
   emileDB
     .prepare(
       `create table if not exists EnergyReadingTypes (
@@ -139,7 +114,7 @@ export function initializeDatabase(): void {
     )
     .run()
 
-  result = emileDB
+  const result = emileDB
     .prepare('select readingTypeId from EnergyReadingTypes limit 1')
     .get()
 
@@ -157,11 +132,9 @@ export function initializeDatabase(): void {
       )
     }
   }
+}
 
-  /*
-   * Commodities
-   */
-
+function initializeEnergyCommodities(emileDB: sqlite.Database): void {
   emileDB
     .prepare(
       `create table if not exists EnergyCommodities (
@@ -174,7 +147,7 @@ export function initializeDatabase(): void {
     )
     .run()
 
-  result = emileDB
+  const result = emileDB
     .prepare('select commodityId from EnergyCommodities limit 1')
     .get()
 
@@ -192,11 +165,11 @@ export function initializeDatabase(): void {
       )
     }
   }
+}
 
-  /*
-   * Accumulation Behaviours
-   */
-
+function initializeEnergyAccumulationBehaviours(
+  emileDB: sqlite.Database
+): void {
   emileDB
     .prepare(
       `create table if not exists EnergyAccumulationBehaviours (
@@ -209,7 +182,7 @@ export function initializeDatabase(): void {
     )
     .run()
 
-  result = emileDB
+  const result = emileDB
     .prepare(
       'select accumulationBehaviourId from EnergyAccumulationBehaviours limit 1'
     )
@@ -229,51 +202,9 @@ export function initializeDatabase(): void {
       )
     }
   }
+}
 
-  /*
-   * Energy Data Types
-   */
-
-  emileDB
-    .prepare(
-      `create table if not exists EnergyDataTypes (
-        dataTypeId integer primary key autoincrement,
-        serviceCategoryId integer not null references EnergyServiceCategories (serviceCategoryId),
-        unitId integer not null references EnergyUnits (unitId),
-        readingTypeId integer references EnergyReadingTypes (readingTypeId),
-        commodityId integer references EnergyCommodities (commodityId),
-        accumulationBehaviourId integer references EnergyAccumulationBehaviours (accumulationBehaviourId),
-        ${recordColumns}
-      )`
-    )
-    .run()
-
-  /*
-   * Data Files
-   */
-
-  emileDB
-    .prepare(
-      `create table if not exists EnergyDataFiles (
-        fileId integer primary key autoincrement,
-        originalFileName varchar(200) not null,
-        systemFileName varchar(200) not null,
-        systemFolderPath varchar(200) not null,
-        assetId integer,
-        isPending bit not null default 1,
-        parserPropertiesJson text,
-        processedTimeMillis integer,
-        isFailed bit not null default 0,
-        processedMessage text,
-        ${recordColumns}
-      )`
-    )
-    .run()
-
-  /*
-   * Asset Categories
-   */
-
+function initializeAssetCategories(emileDB: sqlite.Database): void {
   emileDB
     .prepare(
       `create table if not exists AssetCategories (
@@ -286,7 +217,7 @@ export function initializeDatabase(): void {
     )
     .run()
 
-  result = emileDB
+  const result = emileDB
     .prepare('select categoryId from AssetCategories limit 1')
     .get()
 
@@ -354,28 +285,9 @@ export function initializeDatabase(): void {
       emileDB
     )
   }
+}
 
-  /*
-   * Assets
-   */
-
-  emileDB
-    .prepare(
-      `create table if not exists Assets (
-        assetId integer primary key autoincrement,
-        assetName varchar(100) not null,
-        categoryId integer not null references AssetCategories (categoryId),
-        latitude decimal(8, 6) check (latitude >= -90 and latitude <= 90),
-        longitude decimal(9, 6) check (longitude >= -180 and longitude <= 180),
-        ${recordColumns}
-      )`
-    )
-    .run()
-
-  /*
-   * Asset Alias Types
-   */
-
+function initializeAssetAliasTypes(emileDB: sqlite.Database): void {
   emileDB
     .prepare(
       `create table if not exists AssetAliasTypes (
@@ -389,7 +301,7 @@ export function initializeDatabase(): void {
     )
     .run()
 
-  result = emileDB
+  const result = emileDB
     .prepare('select aliasTypeId from AssetAliasTypes limit 1')
     .get()
 
@@ -429,10 +341,96 @@ export function initializeDatabase(): void {
       initializeDatabaseUser
     )
   }
+}
+
+export function initializeDatabase(): void {
+  const emileDB = sqlite(databasePath)
+
+  const row = emileDB
+    .prepare(
+      `select name from sqlite_master
+        where type = 'table'
+        and name = 'UserAccessLog'`
+    )
+    .get() as { name: string } | undefined
+
+  if (row !== undefined) {
+    emileDB.close()
+    return
+  }
+
+  debug(`Creating ${databasePath} ...`)
+
+  /*
+   * Energy Data Types
+   */
+
+  initializeEnergyServiceCategories(emileDB)
+  initializeEnergyUnits(emileDB)
+  initializeEnergyReadingTypes(emileDB)
+  initializeEnergyCommodities(emileDB)
+  initializeEnergyAccumulationBehaviours(emileDB)
+
+  emileDB
+    .prepare(
+      `create table if not exists EnergyDataTypes (
+        dataTypeId integer primary key autoincrement,
+        serviceCategoryId integer not null references EnergyServiceCategories (serviceCategoryId),
+        unitId integer not null references EnergyUnits (unitId),
+        readingTypeId integer references EnergyReadingTypes (readingTypeId),
+        commodityId integer references EnergyCommodities (commodityId),
+        accumulationBehaviourId integer references EnergyAccumulationBehaviours (accumulationBehaviourId),
+        ${recordColumns}
+      )`
+    )
+    .run()
+
+  /*
+   * Data Files
+   */
+
+  emileDB
+    .prepare(
+      `create table if not exists EnergyDataFiles (
+        fileId integer primary key autoincrement,
+        originalFileName varchar(200) not null,
+        systemFileName varchar(200) not null,
+        systemFolderPath varchar(200) not null,
+        assetId integer,
+        isPending bit not null default 1,
+        parserPropertiesJson text,
+        processedTimeMillis integer,
+        isFailed bit not null default 0,
+        processedMessage text,
+        ${recordColumns}
+      )`
+    )
+    .run()
+
+  /*
+   * Assets
+   */
+
+  initializeAssetCategories(emileDB)
+
+  emileDB
+    .prepare(
+      `create table if not exists Assets (
+        assetId integer primary key autoincrement,
+        assetName varchar(100) not null,
+        categoryId integer not null references AssetCategories (categoryId),
+        latitude decimal(8, 6) check (latitude >= -90 and latitude <= 90),
+        longitude decimal(9, 6) check (longitude >= -180 and longitude <= 180),
+        ${recordColumns}
+      )`
+    )
+    .run()
 
   /*
    * Asset Aliases
    */
+
+  initializeAssetAliasTypes(emileDB)
 
   emileDB
     .prepare(
@@ -524,7 +522,9 @@ export function initializeDatabase(): void {
     )
     .run()
 
-  result = emileDB.prepare('select userName from Users limit 1').get()
+  // TODO: Remove initializing d.gowans user
+
+  const result = emileDB.prepare('select userName from Users limit 1').get()
 
   if (result === undefined) {
     addUser(

@@ -19,6 +19,50 @@ interface GetEnergyDataFilesOptions {
   includeDeletedRecords?: boolean
 }
 
+function buildWhereClause(filters: GetEnergyDataFilesFilters): {
+  sqlWhereClause: string
+  sqlParameters: unknown[]
+} {
+  let sqlWhereClause = ''
+  const sqlParameters: unknown[] = []
+
+  if ((filters.isPending ?? '') !== '') {
+    sqlWhereClause += ' and f.isPending = ?'
+
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+    sqlParameters.push(filters.isPending ? 1 : 0)
+  }
+
+  if ((filters.isProcessed ?? '') !== '') {
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+    sqlWhereClause += filters.isProcessed
+      ? ' and f.processedTimeMillis is not null'
+      : ' and f.processedTimeMillis is null'
+  }
+
+  if ((filters.isFailed ?? '') !== '') {
+    sqlWhereClause += ' and f.isFailed = ?'
+
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+    sqlParameters.push(filters.isFailed ? 1 : 0)
+  }
+
+  if ((filters.searchString ?? '') !== '') {
+    sqlWhereClause += ' and (instr(f.originalFileName, ?) > 0)'
+    sqlParameters.push(filters.searchString)
+  }
+
+  if ((filters.systemFolderPath ?? '') !== '') {
+    sqlWhereClause += ' and f.systemFolderPath = ?'
+    sqlParameters.push(filters.systemFolderPath)
+  }
+
+  return {
+    sqlWhereClause,
+    sqlParameters
+  }
+}
+
 export async function getEnergyDataFiles(
   filters: GetEnergyDataFilesFilters,
   options: GetEnergyDataFilesOptions
@@ -39,6 +83,8 @@ export async function getEnergyDataFiles(
     processedTimeMillis, isFailed, processedMessage,
     f.recordCreate_timeMillis, f.recordUpdate_timeMillis`
 
+  const { sqlParameters, sqlWhereClause } = buildWhereClause(filters)
+
   let sql = `select ${groupByColumnNames},
     count(d.dataId) as energyDataCount,
     count(distinct d.assetId) as assetIdCount,
@@ -52,42 +98,9 @@ export async function getEnergyDataFiles(
       options.includeDeletedRecords ?? false
         ? ' 1 = 1'
         : 'f.recordDelete_timeMillis is null'
-    }`
-
-  const sqlParameters: unknown[] = []
-
-  if ((filters.isPending ?? '') !== '') {
-    sql += ' and f.isPending = ?'
-
-    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-    sqlParameters.push(filters.isPending ? 1 : 0)
-  }
-
-  if ((filters.isProcessed ?? '') !== '') {
-    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-    sql += filters.isProcessed
-      ? ' and f.processedTimeMillis is not null'
-      : ' and f.processedTimeMillis is null'
-  }
-
-  if ((filters.isFailed ?? '') !== '') {
-    sql += ' and f.isFailed = ?'
-
-    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-    sqlParameters.push(filters.isFailed ? 1 : 0)
-  }
-
-  if ((filters.searchString ?? '') !== '') {
-    sql += ' and (instr(f.originalFileName, ?) > 0)'
-    sqlParameters.push(filters.searchString)
-  }
-
-  if ((filters.systemFolderPath ?? '') !== '') {
-    sql += ' and f.systemFolderPath = ?'
-    sqlParameters.push(filters.systemFolderPath)
-  }
-
-  sql += ` group by ${groupByColumnNames}
+    }
+    ${sqlWhereClause}
+    group by ${groupByColumnNames}
     order by f.recordUpdate_timeMillis desc`
 
   if (options.limit !== -1) {

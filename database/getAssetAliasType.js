@@ -7,9 +7,9 @@ export function getAssetAliasTypeByAliasTypeKey(aliasTypeKey) {
         });
         const assetAliasType = emileDB
             .prepare(`select aliasTypeId, aliasType, regularExpression, aliasTypeKey
-        from AssetAliasTypes
-        where recordDelete_timeMillis is null
-        and aliasTypeKey = ?`)
+          from AssetAliasTypes
+          where recordDelete_timeMillis is null
+          and aliasTypeKey = ?`)
             .get(aliasTypeKey);
         emileDB.close();
         return assetAliasType;

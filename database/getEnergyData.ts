@@ -44,6 +44,74 @@ function userFunction_getPowerOfTenMultiplierName(
   )
 }
 
+function buildWhereClause(filters: GetEnergyDataFilters): {
+  sqlWhereClause: string
+  sqlParameters: unknown[]
+} {
+  let sqlWhereClause = ''
+  const sqlParameters: unknown[] = []
+
+  if ((filters.assetId ?? '') !== '') {
+    sqlWhereClause += ' and d.assetId = ?'
+    sqlParameters.push(filters.assetId)
+  }
+
+  if ((filters.categoryId ?? '') !== '') {
+    sqlWhereClause += ' and a.categoryId = ?'
+    sqlParameters.push(filters.categoryId)
+  }
+
+  if ((filters.groupId ?? '') !== '') {
+    sqlWhereClause +=
+      ' and d.assetId in (select assetId from AssetGroupMembers where recordDelete_timeMillis is null and groupId = ?)'
+    sqlParameters.push(filters.groupId)
+  }
+
+  if ((filters.dataTypeId ?? '') !== '') {
+    sqlWhereClause += ' and d.dataTypeId = ?'
+    sqlParameters.push(filters.dataTypeId)
+  }
+
+  if ((filters.fileId ?? '') !== '') {
+    sqlWhereClause += ' and d.fileId = ?'
+    sqlParameters.push(filters.fileId)
+  }
+
+  if ((filters.startDateString ?? '') !== '') {
+    sqlWhereClause += ' and d.timeSeconds >= ?'
+
+    sqlParameters.push(
+      dateStringToDate(filters.startDateString ?? '').getTime() / 1000
+    )
+  }
+
+  if ((filters.timeSecondsMin ?? '') !== '') {
+    sqlWhereClause += ' and d.timeSeconds >= ?'
+
+    sqlParameters.push(filters.timeSecondsMin)
+  }
+
+  if ((filters.endDateString ?? '') !== '') {
+    sqlWhereClause += ' and d.timeSeconds <= ?'
+
+    const endDate = dateStringToDate(filters.endDateString ?? '')
+    endDate.setDate(endDate.getDate() + 1)
+
+    sqlParameters.push(endDate.getTime() / 1000)
+  }
+
+  if ((filters.timeSecondsMax ?? '') !== '') {
+    sqlWhereClause += ' and d.timeSeconds <= ?'
+
+    sqlParameters.push(filters.timeSecondsMax)
+  }
+
+  return {
+    sqlWhereClause,
+    sqlParameters
+  }
+}
+
 export async function getEnergyData(
   filters: GetEnergyDataFilters,
   options?: GetEnergyDataOptions
@@ -98,6 +166,8 @@ export async function getEnergyData(
         d.timeSeconds, d.durationSeconds, d.endTimeSeconds,
         d.dataValue, d.powerOfTenMultiplier`
 
+  const { sqlParameters, sqlWhereClause } = buildWhereClause(filters)
+
   let sql = `select ${columnNames}
     from EnergyData d
     left join Assets a
@@ -119,64 +189,8 @@ export async function getEnergyData(
     left join EnergyDataFiles f
       on d.fileId = f.fileId
     where d.recordDelete_timeMillis is null
-      and a.recordDelete_timeMillis is null`
-
-  const sqlParameters: unknown[] = []
-
-  if ((filters.assetId ?? '') !== '') {
-    sql += ' and d.assetId = ?'
-    sqlParameters.push(filters.assetId)
-  }
-
-  if ((filters.categoryId ?? '') !== '') {
-    sql += ' and a.categoryId = ?'
-    sqlParameters.push(filters.categoryId)
-  }
-
-  if ((filters.groupId ?? '') !== '') {
-    sql +=
-      ' and d.assetId in (select assetId from AssetGroupMembers where recordDelete_timeMillis is null and groupId = ?)'
-    sqlParameters.push(filters.groupId)
-  }
-
-  if ((filters.dataTypeId ?? '') !== '') {
-    sql += ' and d.dataTypeId = ?'
-    sqlParameters.push(filters.dataTypeId)
-  }
-
-  if ((filters.fileId ?? '') !== '') {
-    sql += ' and d.fileId = ?'
-    sqlParameters.push(filters.fileId)
-  }
-
-  if ((filters.startDateString ?? '') !== '') {
-    sql += ' and d.timeSeconds >= ?'
-
-    sqlParameters.push(
-      dateStringToDate(filters.startDateString ?? '').getTime() / 1000
-    )
-  }
-
-  if ((filters.timeSecondsMin ?? '') !== '') {
-    sql += ' and d.timeSeconds >= ?'
-
-    sqlParameters.push(filters.timeSecondsMin)
-  }
-
-  if ((filters.endDateString ?? '') !== '') {
-    sql += ' and d.timeSeconds <= ?'
-
-    const endDate = dateStringToDate(filters.endDateString ?? '')
-    endDate.setDate(endDate.getDate() + 1)
-
-    sqlParameters.push(endDate.getTime() / 1000)
-  }
-
-  if ((filters.timeSecondsMax ?? '') !== '') {
-    sql += ' and d.timeSeconds <= ?'
-
-    sqlParameters.push(filters.timeSecondsMax)
-  }
+      and a.recordDelete_timeMillis is null
+      ${sqlWhereClause}`
 
   if (doGroupByDate) {
     sql +=

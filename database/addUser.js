@@ -9,10 +9,10 @@ export function addUser(user, sessionUser, connectedEmileDB) {
     if (result === undefined) {
         emileDB
             .prepare(`insert into Users (
-        userName, canLogin, canUpdate, isAdmin,
-        recordCreate_userName, recordCreate_timeMillis,
-        recordUpdate_userName, recordUpdate_timeMillis)
-        values (?, ?, ?, ?, ?, ?, ?, ?)`)
+          userName, canLogin, canUpdate, isAdmin,
+          recordCreate_userName, recordCreate_timeMillis,
+          recordUpdate_userName, recordUpdate_timeMillis)
+          values (?, ?, ?, ?, ?, ?, ?, ?)`)
             .run(user.userName, user.canLogin ? 1 : 0, user.canUpdate ? 1 : 0, user.isAdmin ? 1 : 0, sessionUser.userName, rightNowMillis, sessionUser.userName, rightNowMillis);
     }
     else if (result.recordDelete_timeMillis !== null) {

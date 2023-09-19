@@ -22,7 +22,10 @@ export function getAssetAliases(
 
   const sqlParameters: unknown[] = []
 
-  if ((filters.assetId ?? '') !== '') {
+  if ((filters.assetId ?? '') === '') {
+    sql +=
+      ' and a.assetId in (select assetId from Assets where recordDelete_timeMillis is null)'
+  } else {
     sql += ' and a.assetId = ?'
     sqlParameters.push(filters.assetId ?? '')
   }
