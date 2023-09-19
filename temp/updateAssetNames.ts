@@ -24,7 +24,7 @@ const updateUser = {
   isAdmin: false
 }
 
-async function updateSsmPucAssetNames(): Promise<void> {
+function updateSsmPucAssetNames(): void {
   const workbook = XLSX.readFile('./temp/assetNames.xlsx', {})
 
   const worksheet = workbook.Sheets[workbook.SheetNames[0]]
@@ -123,4 +123,4 @@ async function updateSsmPucAssetNames(): Promise<void> {
   emileDB.close()
 }
 
-await updateSsmPucAssetNames()
+updateSsmPucAssetNames()

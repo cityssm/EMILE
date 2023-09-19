@@ -14,4 +14,4 @@ export declare function getEnergyDataTypeByNames(names: {
     readingType: string | '';
     commodity: string | '';
     accumulationBehaviour: string | '';
-}, sessionUser: EmileUser, createIfUnavailable?: boolean): EnergyDataType | undefined;
+}, sessionUser: EmileUser, createIfUnavailable?: boolean, connectedEmileDB?: sqlite.Database): EnergyDataType | undefined;

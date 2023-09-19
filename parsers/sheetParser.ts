@@ -1,5 +1,6 @@
 import path from 'node:path'
 
+import type sqlite from 'better-sqlite3'
 import Debug from 'debug'
 import XLSX from 'xlsx'
 
@@ -12,6 +13,7 @@ import { getAssetCategories } from '../database/getAssetCategories.js'
 import { getEnergyDataTypeByNames } from '../database/getEnergyDataType.js'
 import { updateEnergyDataFileAsProcessed } from '../database/updateEnergyDataFile.js'
 import { getConfigProperty } from '../helpers/functions.config.js'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 import type { ConfigParserDataField } from '../types/configTypes.js'
 
 import { BaseParser } from './baseParser.js'
@@ -90,6 +92,8 @@ export class SheetParser extends BaseParser {
       aliasTypeId = aliasType.aliasTypeId
     }
 
+    let emileDB: sqlite.Database | undefined
+
     try {
       const workbook = XLSX.readFile(
         path.join(
@@ -113,6 +117,8 @@ export class SheetParser extends BaseParser {
         rawNumbers: true
       }) as Array<Record<string, string | number>>
 
+      emileDB = await getConnectionWhenAvailable()
+
       for (const row of rows) {
         /*
          * Ensure an assetId is available
@@ -130,7 +136,7 @@ export class SheetParser extends BaseParser {
             throw new Error('No asset alias available.')
           }
 
-          const asset = getAssetByAssetAlias(assetAlias, aliasTypeId)
+          const asset = getAssetByAssetAlias(assetAlias, aliasTypeId, emileDB)
 
           // Create asset
           if (asset === undefined) {
@@ -147,7 +153,8 @@ export class SheetParser extends BaseParser {
                 assetName: assetAlias,
                 categoryId: assetCategory.categoryId
               },
-              SheetParser.parserUser
+              SheetParser.parserUser,
+              emileDB
             )
 
             addAssetAlias(
@@ -156,7 +163,8 @@ export class SheetParser extends BaseParser {
                 aliasTypeId,
                 assetAlias
               },
-              SheetParser.parserUser
+              SheetParser.parserUser,
+              emileDB
             )
           } else {
             assetId = asset.assetId
@@ -201,7 +209,8 @@ export class SheetParser extends BaseParser {
             accumulationBehaviour: accumulationBehaviourName
           },
           SheetParser.parserUser,
-          true
+          true,
+          emileDB
         )
 
         if (energyDataType === undefined) {
@@ -249,17 +258,23 @@ export class SheetParser extends BaseParser {
             dataValue,
             powerOfTenMultiplier
           },
-          SheetParser.parserUser
+          SheetParser.parserUser,
+          emileDB
         )
       }
 
       updateEnergyDataFileAsProcessed(
         this.energyDataFile.fileId,
-        SheetParser.parserUser
+        SheetParser.parserUser,
+        emileDB
       )
     } catch (error) {
       this.handleParseFileError(error)
       return false
+    } finally {
+      if (emileDB !== undefined) {
+        emileDB.close()
+      }
     }
 
     return true

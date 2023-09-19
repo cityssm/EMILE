@@ -134,11 +134,10 @@ export function recordGreenButtonData(greenButtonJson, options) {
             }
         }
     }
-    catch (error) {
+    finally {
         if (emileDB !== undefined) {
             emileDB.close();
         }
-        throw error;
     }
     return recordCount;
 }

@@ -73,8 +73,8 @@ export function updateEnergyDataFileAsReadyToProcess(fileId, sessionUser) {
     emileDB.close();
     return result.changes > 0;
 }
-export function updateEnergyDataFileAsProcessed(fileId, sessionUser) {
-    const emileDB = sqlite(databasePath);
+export function updateEnergyDataFileAsProcessed(fileId, sessionUser, connectedEmileDB) {
+    const emileDB = connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB;
     const rightNow = Date.now();
     const result = emileDB
         .prepare(`update EnergyDataFiles
@@ -84,6 +84,8 @@ export function updateEnergyDataFileAsProcessed(fileId, sessionUser) {
         where recordDelete_timeMillis is null
         and fileId = ?`)
         .run(rightNow, sessionUser.userName, Date.now(), fileId);
-    emileDB.close();
+    if (connectedEmileDB === undefined) {
+        emileDB.close();
+    }
     return result.changes > 0;
 }

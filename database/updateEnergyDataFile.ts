@@ -51,7 +51,6 @@ export function updatePendingEnergyDataFile(
   energyDataFile: PendingEnergyDataFile,
   sessionUser: EmileUser
 ): boolean {
-
   let parserClass = energyDataFile.parserClass
   let parserConfig = ''
 
@@ -59,7 +58,6 @@ export function updatePendingEnergyDataFile(
     parserConfig = parserClass.slice(Math.max(0, parserClass.indexOf('::') + 2))
     parserClass = parserClass.slice(0, Math.max(0, parserClass.indexOf('::')))
   }
-
 
   const parserPropertiesJson =
     energyDataFile.parserClass === ''
@@ -146,9 +144,11 @@ export function updateEnergyDataFileAsReadyToProcess(
 
 export function updateEnergyDataFileAsProcessed(
   fileId: number,
-  sessionUser: EmileUser
+  sessionUser: EmileUser,
+  connectedEmileDB?: sqlite.Database
 ): boolean {
-  const emileDB = sqlite(databasePath)
+  const emileDB =
+    connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB
 
   const rightNow = Date.now()
 
@@ -163,7 +163,9 @@ export function updateEnergyDataFileAsProcessed(
     )
     .run(rightNow, sessionUser.userName, Date.now(), fileId)
 
-  emileDB.close()
+  if (connectedEmileDB === undefined) {
+    emileDB.close()
+  }
 
   return result.changes > 0
 }

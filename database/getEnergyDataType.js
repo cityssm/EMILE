@@ -113,8 +113,8 @@ export function getEnergyDataTypeByGreenButtonIds(greenButtonIds, sessionUser, c
     }
     return energyDataType;
 }
-export function getEnergyDataTypeByNames(names, sessionUser, createIfUnavailable = true) {
-    const emileDB = sqlite(databasePath);
+export function getEnergyDataTypeByNames(names, sessionUser, createIfUnavailable = true, connectedEmileDB) {
+    const emileDB = connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB;
     let sql = `select t.dataTypeId,
       t.serviceCategoryId, s.serviceCategory,
       t.unitId, u.unit, u.unitLong,
@@ -171,7 +171,9 @@ export function getEnergyDataTypeByNames(names, sessionUser, createIfUnavailable
             (commodity === undefined && names.commodity !== '') ||
             (accumulationBehaviour === undefined &&
                 names.accumulationBehaviour !== '')) {
-            emileDB.close();
+            if (connectedEmileDB === undefined) {
+                emileDB.close();
+            }
             return undefined;
         }
         const dataTypeId = addEnergyDataType({
@@ -183,6 +185,8 @@ export function getEnergyDataTypeByNames(names, sessionUser, createIfUnavailable
         }, sessionUser, emileDB);
         energyDataType = getEnergyDataType(dataTypeId, emileDB);
     }
-    emileDB.close();
+    if (connectedEmileDB === undefined) {
+        emileDB.close();
+    }
     return energyDataType;
 }

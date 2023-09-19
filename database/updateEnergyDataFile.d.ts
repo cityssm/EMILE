@@ -1,3 +1,4 @@
+import sqlite from 'better-sqlite3';
 interface FailedEnergyDataFile {
     fileId: number;
     processedMessage: string;
@@ -12,5 +13,5 @@ interface PendingEnergyDataFile {
 export declare function updatePendingEnergyDataFile(energyDataFile: PendingEnergyDataFile, sessionUser: EmileUser): boolean;
 export declare function updateEnergyDataFileAsReadyToPending(fileId: string | number, sessionUser: EmileUser): boolean;
 export declare function updateEnergyDataFileAsReadyToProcess(fileId: string | number, sessionUser: EmileUser): boolean;
-export declare function updateEnergyDataFileAsProcessed(fileId: number, sessionUser: EmileUser): boolean;
+export declare function updateEnergyDataFileAsProcessed(fileId: number, sessionUser: EmileUser, connectedEmileDB?: sqlite.Database): boolean;
 export {};

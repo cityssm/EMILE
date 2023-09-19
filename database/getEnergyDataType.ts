@@ -202,9 +202,11 @@ export function getEnergyDataTypeByNames(
     accumulationBehaviour: string | ''
   },
   sessionUser: EmileUser,
-  createIfUnavailable = true
+  createIfUnavailable = true,
+  connectedEmileDB?: sqlite.Database
 ): EnergyDataType | undefined {
-  const emileDB = sqlite(databasePath)
+  const emileDB =
+    connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB
 
   let sql = `select t.dataTypeId,
       t.serviceCategoryId, s.serviceCategory,
@@ -283,7 +285,10 @@ export function getEnergyDataTypeByNames(
       (accumulationBehaviour === undefined &&
         names.accumulationBehaviour !== '')
     ) {
-      emileDB.close()
+      if (connectedEmileDB === undefined) {
+        emileDB.close()
+      }
+
       return undefined
     }
 
@@ -302,7 +307,9 @@ export function getEnergyDataTypeByNames(
     energyDataType = getEnergyDataType(dataTypeId, emileDB)
   }
 
-  emileDB.close()
+  if (connectedEmileDB === undefined) {
+    emileDB.close()
+  }
 
   return energyDataType
 }

@@ -12,7 +12,7 @@ const updateUser = {
     canUpdate: true,
     isAdmin: false
 };
-async function updateSsmPucAssetNames() {
+function updateSsmPucAssetNames() {
     const workbook = XLSX.readFile('./temp/assetNames.xlsx', {});
     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
     const assetRows = XLSX.utils.sheet_to_json(worksheet, {
@@ -66,4 +66,4 @@ async function updateSsmPucAssetNames() {
     }
     emileDB.close();
 }
-await updateSsmPucAssetNames();
+updateSsmPucAssetNames();

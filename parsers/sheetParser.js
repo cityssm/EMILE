@@ -10,6 +10,7 @@ import { getAssetCategories } from '../database/getAssetCategories.js';
 import { getEnergyDataTypeByNames } from '../database/getEnergyDataType.js';
 import { updateEnergyDataFileAsProcessed } from '../database/updateEnergyDataFile.js';
 import { getConfigProperty } from '../helpers/functions.config.js';
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
 import { BaseParser } from './baseParser.js';
 const debug = Debug('emile:parsers:sheetParser');
 function getDataFieldValue(row, dataField) {
@@ -53,6 +54,7 @@ export class SheetParser extends BaseParser {
             }
             aliasTypeId = aliasType.aliasTypeId;
         }
+        let emileDB;
         try {
             const workbook = XLSX.readFile(path.join(this.energyDataFile.systemFolderPath, this.energyDataFile.systemFileName), {});
             if (workbook.SheetNames.length > 0) {
@@ -63,6 +65,7 @@ export class SheetParser extends BaseParser {
                 raw: true,
                 rawNumbers: true
             });
+            emileDB = await getConnectionWhenAvailable();
             for (const row of rows) {
                 let assetId = this.energyDataFile.assetId;
                 if ((assetId ?? '') === '') {
@@ -70,7 +73,7 @@ export class SheetParser extends BaseParser {
                     if (assetAlias === undefined) {
                         throw new Error('No asset alias available.');
                     }
-                    const asset = getAssetByAssetAlias(assetAlias, aliasTypeId);
+                    const asset = getAssetByAssetAlias(assetAlias, aliasTypeId, emileDB);
                     if (asset === undefined) {
                         const assetCategory = getAssetCategories()[0];
                         if (assetCategory === undefined) {
@@ -79,12 +82,12 @@ export class SheetParser extends BaseParser {
                         assetId = addAsset({
                             assetName: assetAlias,
                             categoryId: assetCategory.categoryId
-                        }, SheetParser.parserUser);
+                        }, SheetParser.parserUser, emileDB);
                         addAssetAlias({
                             assetId,
                             aliasTypeId,
                             assetAlias
-                        }, SheetParser.parserUser);
+                        }, SheetParser.parserUser, emileDB);
                     }
                     else {
                         assetId = asset.assetId;
@@ -101,7 +104,7 @@ export class SheetParser extends BaseParser {
                     readingType: readingTypeName,
                     commodity: commodityName,
                     accumulationBehaviour: accumulationBehaviourName
-                }, SheetParser.parserUser, true);
+                }, SheetParser.parserUser, true, emileDB);
                 if (energyDataType === undefined) {
                     throw new Error('Unable to retrieve EnergyDataType.');
                 }
@@ -123,13 +126,18 @@ export class SheetParser extends BaseParser {
                     durationSeconds,
                     dataValue,
                     powerOfTenMultiplier
-                }, SheetParser.parserUser);
+                }, SheetParser.parserUser, emileDB);
             }
-            updateEnergyDataFileAsProcessed(this.energyDataFile.fileId, SheetParser.parserUser);
+            updateEnergyDataFileAsProcessed(this.energyDataFile.fileId, SheetParser.parserUser, emileDB);
         }
         catch (error) {
             this.handleParseFileError(error);
             return false;
+        }
+        finally {
+            if (emileDB !== undefined) {
+                emileDB.close();
+            }
         }
         return true;
     }

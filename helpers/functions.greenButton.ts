@@ -220,13 +220,16 @@ export function recordGreenButtonData(
             intervalReading.timePeriod !== undefined &&
             intervalReading.value !== undefined
           ) {
-            const currentDataPoint = getEnergyDataPoint({
-              assetId: assetId as number,
-              dataTypeId: energyDataTypeAndPower.energyDataType
-                .dataTypeId as number,
-              timeSeconds: intervalReading.timePeriod.start,
-              durationSeconds: intervalReading.timePeriod.duration
-            }, emileDB)
+            const currentDataPoint = getEnergyDataPoint(
+              {
+                assetId: assetId as number,
+                dataTypeId: energyDataTypeAndPower.energyDataType
+                  .dataTypeId as number,
+                timeSeconds: intervalReading.timePeriod.start,
+                durationSeconds: intervalReading.timePeriod.duration
+              },
+              emileDB
+            )
 
             if (currentDataPoint === undefined) {
               addEnergyData(
@@ -268,11 +271,10 @@ export function recordGreenButtonData(
         }
       }
     }
-  } catch (error) {
+  } finally {
     if (emileDB !== undefined) {
       emileDB.close()
     }
-    throw error
   }
 
   return recordCount
