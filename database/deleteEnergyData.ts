@@ -1,6 +1,6 @@
 import sqlite from 'better-sqlite3'
 
-import { databasePath } from '../helpers/functions.database.js'
+import { databasePath, getConnectionWhenAvailable } from '../helpers/functions.database.js'
 
 export function deleteEnergyData(
   dataId: number | string,
@@ -23,11 +23,11 @@ export function deleteEnergyData(
   return result.changes > 0
 }
 
-export function deleteEnergyDataByFileId(
+export async function deleteEnergyDataByFileId(
   fileId: number | string,
   sessionUser: EmileUser
-): boolean {
-  const emileDB = sqlite(databasePath)
+): Promise<boolean> {
+  const emileDB = await getConnectionWhenAvailable()
 
   const result = emileDB
     .prepare(

@@ -1,11 +1,13 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
+import sqlite from 'better-sqlite3'
 import Debug from 'debug'
 
 import type { DatabaseFile } from '../types/applicationTypes.js'
 
 import { getConfigProperty } from './functions.config.js'
+import { delay } from './functions.utilities.js'
 
 const debug = Debug('emile:functions.database')
 
@@ -97,4 +99,16 @@ export async function getBackedUpDatabaseFiles(): Promise<DatabaseFile[]> {
   }
 
   return databaseFiles
+}
+
+export async function getConnectionWhenAvailable(
+  readOnly = false
+): Promise<sqlite.Database> {
+  try {
+    return sqlite(databasePath)
+  } catch {
+    debug('Waiting 1s for database connection...')
+    await delay(1000)
+    return await getConnectionWhenAvailable(readOnly)
+  }
 }

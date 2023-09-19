@@ -1,4 +1,5 @@
 import { helpers as greenButtonHelpers } from '@cityssm/green-button-parser';
+import sqlite from 'better-sqlite3';
 import { addAsset } from '../database/addAsset.js';
 import { addAssetAlias } from '../database/addAssetAlias.js';
 import { addEnergyData } from '../database/addEnergyData.js';
@@ -7,6 +8,7 @@ import { getAssetAliasTypeByAliasTypeKey } from '../database/getAssetAliasType.j
 import { getEnergyDataPoint } from '../database/getEnergyData.js';
 import { getEnergyDataTypeByGreenButtonIds } from '../database/getEnergyDataType.js';
 import { updateEnergyDataValue } from '../database/updateEnergyData.js';
+import { databasePath } from '../helpers/functions.database.js';
 import { getAssetCategories } from './functions.cache.js';
 const greenButtonAliasTypeKey = 'GreenButtonParser.IntervalBlock.link';
 export const greenButtonAssetAliasType = getAssetAliasTypeByAliasTypeKey(greenButtonAliasTypeKey);
@@ -16,7 +18,7 @@ const greenButtonUser = {
     canUpdate: true,
     isAdmin: false
 };
-function getAssetIdFromIntervalBlock(intervalBlockEntry) {
+function getAssetIdFromIntervalBlock(intervalBlockEntry, connectedEmileDB) {
     let assetId;
     let assetAlias = intervalBlockEntry.links.self ?? '';
     if (assetAlias === undefined) {
@@ -26,7 +28,7 @@ function getAssetIdFromIntervalBlock(intervalBlockEntry) {
         assetAlias = assetAlias.slice(0, Math.max(0, assetAlias.indexOf('/MeterReading/')));
     }
     console.log(`assetAlias: ${assetAlias}`);
-    const asset = getAssetByAssetAlias(assetAlias, greenButtonAssetAliasType?.aliasTypeId);
+    const asset = getAssetByAssetAlias(assetAlias, greenButtonAssetAliasType?.aliasTypeId, connectedEmileDB);
     if (asset === undefined) {
         const assetCategory = getAssetCategories()[0];
         if (assetCategory === undefined) {
@@ -35,19 +37,19 @@ function getAssetIdFromIntervalBlock(intervalBlockEntry) {
         assetId = addAsset({
             assetName: assetAlias,
             categoryId: assetCategory.categoryId
-        }, greenButtonUser);
+        }, greenButtonUser, connectedEmileDB);
         addAssetAlias({
             assetId,
             aliasTypeId: greenButtonAssetAliasType?.aliasTypeId,
             assetAlias
-        }, greenButtonUser);
+        }, greenButtonUser, connectedEmileDB);
     }
     else {
         assetId = asset.assetId;
     }
     return assetId;
 }
-function getEnergyDataTypeAndPowerOfTenMultiplier(greenButtonJson, intervalBlockEntry) {
+function getEnergyDataTypeAndPowerOfTenMultiplier(greenButtonJson, intervalBlockEntry, connectedEmileDB) {
     const meterReadingEntry = greenButtonHelpers.getMeterReadingEntryFromIntervalBlockEntry(greenButtonJson, intervalBlockEntry);
     if (meterReadingEntry === undefined) {
         throw new Error('Unable to find related MeterReading entry.');
@@ -68,7 +70,7 @@ function getEnergyDataTypeAndPowerOfTenMultiplier(greenButtonJson, intervalBlock
             readingTypeId: readingType.content.ReadingType.kind?.toString(),
             commodityId: readingType.content.ReadingType.commodity?.toString(),
             accumulationBehaviourId: readingType.content.ReadingType.accumulationBehaviour?.toString()
-        }, greenButtonUser, true),
+        }, greenButtonUser, true, connectedEmileDB),
         powerOfTenMultiplier: typeof powerOfTenMultiplier === 'string'
             ? Number.parseInt(powerOfTenMultiplier, 10)
             : powerOfTenMultiplier
@@ -80,53 +82,63 @@ export function recordGreenButtonData(greenButtonJson, options) {
     if (intervalBlockEntries.length === 0) {
         throw new Error('File contains no IntervalBlock entries.');
     }
-    for (const intervalBlockEntry of intervalBlockEntries) {
-        let assetId = options.assetId;
-        if ((assetId ?? '') === '') {
-            assetId = getAssetIdFromIntervalBlock(intervalBlockEntry);
-        }
-        const energyDataTypeAndPower = getEnergyDataTypeAndPowerOfTenMultiplier(greenButtonJson, intervalBlockEntry);
-        if (energyDataTypeAndPower === undefined ||
-            energyDataTypeAndPower.energyDataType === undefined) {
-            throw new Error('Unable to retrieve EnergyDataType.');
-        }
-        for (const intervalBlock of intervalBlockEntry.content.IntervalBlock) {
-            for (const intervalReading of intervalBlock.IntervalReading ?? []) {
-                if (intervalReading.timePeriod !== undefined &&
-                    intervalReading.value !== undefined) {
-                    const currentDataPoint = getEnergyDataPoint({
-                        assetId: assetId,
-                        dataTypeId: energyDataTypeAndPower.energyDataType
-                            .dataTypeId,
-                        timeSeconds: intervalReading.timePeriod.start,
-                        durationSeconds: intervalReading.timePeriod.duration
-                    });
-                    if (currentDataPoint === undefined) {
-                        addEnergyData({
-                            assetId,
-                            dataTypeId: energyDataTypeAndPower.energyDataType.dataTypeId,
-                            fileId: options.fileId,
-                            timeSeconds: intervalReading.timePeriod?.start,
-                            durationSeconds: intervalReading.timePeriod?.duration,
-                            dataValue: intervalReading.value,
-                            powerOfTenMultiplier: energyDataTypeAndPower.powerOfTenMultiplier
-                        }, greenButtonUser);
-                        recordCount += 1;
-                    }
-                    else if (currentDataPoint.dataValue !== intervalReading.value ||
-                        currentDataPoint.powerOfTenMultiplier !==
-                            energyDataTypeAndPower.powerOfTenMultiplier) {
-                        updateEnergyDataValue({
-                            dataId: currentDataPoint.dataId,
-                            fileId: options.fileId,
-                            dataValue: intervalReading.value,
-                            powerOfTenMultiplier: energyDataTypeAndPower.powerOfTenMultiplier
-                        }, greenButtonUser);
-                        recordCount += 1;
+    let emileDB;
+    try {
+        emileDB = sqlite(databasePath);
+        for (const intervalBlockEntry of intervalBlockEntries) {
+            let assetId = options.assetId;
+            if ((assetId ?? '') === '') {
+                assetId = getAssetIdFromIntervalBlock(intervalBlockEntry, emileDB);
+            }
+            const energyDataTypeAndPower = getEnergyDataTypeAndPowerOfTenMultiplier(greenButtonJson, intervalBlockEntry, emileDB);
+            if (energyDataTypeAndPower === undefined ||
+                energyDataTypeAndPower.energyDataType === undefined) {
+                throw new Error('Unable to retrieve EnergyDataType.');
+            }
+            for (const intervalBlock of intervalBlockEntry.content.IntervalBlock) {
+                for (const intervalReading of intervalBlock.IntervalReading ?? []) {
+                    if (intervalReading.timePeriod !== undefined &&
+                        intervalReading.value !== undefined) {
+                        const currentDataPoint = getEnergyDataPoint({
+                            assetId: assetId,
+                            dataTypeId: energyDataTypeAndPower.energyDataType
+                                .dataTypeId,
+                            timeSeconds: intervalReading.timePeriod.start,
+                            durationSeconds: intervalReading.timePeriod.duration
+                        }, emileDB);
+                        if (currentDataPoint === undefined) {
+                            addEnergyData({
+                                assetId,
+                                dataTypeId: energyDataTypeAndPower.energyDataType.dataTypeId,
+                                fileId: options.fileId,
+                                timeSeconds: intervalReading.timePeriod?.start,
+                                durationSeconds: intervalReading.timePeriod?.duration,
+                                dataValue: intervalReading.value,
+                                powerOfTenMultiplier: energyDataTypeAndPower.powerOfTenMultiplier
+                            }, greenButtonUser, emileDB);
+                            recordCount += 1;
+                        }
+                        else if (currentDataPoint.dataValue !== intervalReading.value ||
+                            currentDataPoint.powerOfTenMultiplier !==
+                                energyDataTypeAndPower.powerOfTenMultiplier) {
+                            updateEnergyDataValue({
+                                dataId: currentDataPoint.dataId,
+                                fileId: options.fileId,
+                                dataValue: intervalReading.value,
+                                powerOfTenMultiplier: energyDataTypeAndPower.powerOfTenMultiplier
+                            }, greenButtonUser, emileDB);
+                            recordCount += 1;
+                        }
                     }
                 }
             }
         }
+    }
+    catch (error) {
+        if (emileDB !== undefined) {
+            emileDB.close();
+        }
+        throw error;
     }
     return recordCount;
 }

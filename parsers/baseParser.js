@@ -18,7 +18,7 @@ export class BaseParser {
         throw new Error('parseFile() must be implemented');
     }
     handleParseFileError(error) {
-        deleteEnergyDataByFileId(this.energyDataFile.fileId, BaseParser.parserUser);
+        void deleteEnergyDataByFileId(this.energyDataFile.fileId, BaseParser.parserUser);
         updateEnergyDataFileAsFailed({
             fileId: this.energyDataFile.fileId,
             processedMessage: `${error.message}`,

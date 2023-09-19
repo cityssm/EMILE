@@ -7,7 +7,7 @@ export declare function getEnergyDataTypeByGreenButtonIds(greenButtonIds: {
     readingTypeId?: string;
     commodityId?: string;
     accumulationBehaviourId?: string;
-}, sessionUser: EmileUser, createIfUnavailable?: boolean): EnergyDataType | undefined;
+}, sessionUser: EmileUser, createIfUnavailable?: boolean, connectedEmileDB?: sqlite.Database): EnergyDataType | undefined;
 export declare function getEnergyDataTypeByNames(names: {
     serviceCategory: string;
     unit: string;

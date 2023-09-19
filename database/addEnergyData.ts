@@ -5,9 +5,11 @@ import type { EnergyData } from '../types/recordTypes.js'
 
 export function addEnergyData(
   data: Partial<EnergyData>,
-  sessionUser: EmileUser
+  sessionUser: EmileUser,
+  connectedEmileDB?: sqlite.Database
 ): number {
-  const emileDB = sqlite(databasePath)
+  const emileDB =
+    connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB
 
   const rightNowMillis = Date.now()
 
@@ -34,7 +36,9 @@ export function addEnergyData(
       rightNowMillis
     )
 
-  emileDB.close()
+  if (connectedEmileDB === undefined) {
+    emileDB.close()
+  }
 
   return result.lastInsertRowid as number
 }

@@ -16,16 +16,16 @@ async function refreshReportDataCaches() {
             break;
         }
         debug(`Getting report data: ${reportName} ...`);
-        const data = getReportData(reportName) ?? [];
+        const data = await getReportData(reportName) ?? [];
         debug(`Converting ${data.length ?? 0} rows to CSV: ${reportName}`);
         const csv = papaparse.unparse(data);
         debug(`Writing report data: ${reportName} ...`);
         try {
             await fs.writeFile(path.join(reportCacheFolder, `${reportName}.csv`), csv);
-            debug(`Report data written successfully: ${reportName}`);
+            debug(`Report data written successfully: ${reportName}.csv`);
         }
         catch (error) {
-            debug(`Error writting reprot data: ${reportName}`);
+            debug(`Error writing report data: ${reportName}`);
             debug(error);
         }
     }

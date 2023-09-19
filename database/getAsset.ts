@@ -48,11 +48,15 @@ export function getAsset(
 
 export function getAssetByAssetAlias(
   assetAlias: string,
-  aliasTypeId?: number | string
+  aliasTypeId?: number | string,
+  connectedEmileDB?: sqlite.Database
 ): Asset | undefined {
-  const emileDB = sqlite(databasePath, {
-    readonly: true
-  })
+  const emileDB =
+    connectedEmileDB === undefined
+      ? sqlite(databasePath, {
+          readonly: true
+        })
+      : connectedEmileDB
 
   let sql = `select assetId from AssetAliases
     where recordDelete_timeMillis is null
@@ -65,13 +69,19 @@ export function getAssetByAssetAlias(
     sqlParameters.push(aliasTypeId)
   }
 
-  const asset = emileDB.prepare(sql).get(sqlParameters) as
+  let asset: Asset | undefined
+
+  const assetId = emileDB.prepare(sql).get(sqlParameters) as
     | { assetId: number }
     | undefined
 
-  if (asset !== undefined) {
-    return getAsset(asset.assetId, emileDB)
+  if (assetId !== undefined) {
+    asset = getAsset(assetId.assetId, emileDB)
   }
 
-  return undefined
+  if (connectedEmileDB === undefined) {
+    emileDB.close()
+  }
+
+  return asset
 }

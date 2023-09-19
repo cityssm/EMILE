@@ -1,7 +1,7 @@
 import { powerOfTenMultipliers } from '@cityssm/green-button-parser/lookups.js';
 import { dateStringToDate } from '@cityssm/utils-datetime';
 import sqlite from 'better-sqlite3';
-import { databasePath } from '../helpers/functions.database.js';
+import { databasePath, getConnectionWhenAvailable } from '../helpers/functions.database.js';
 function userFunction_getPowerOfTenMultiplierName(powerOfTenMultiplier) {
     if (powerOfTenMultiplier === 0) {
         return '';
@@ -9,7 +9,7 @@ function userFunction_getPowerOfTenMultiplierName(powerOfTenMultiplier) {
     return (powerOfTenMultipliers[powerOfTenMultiplier] ??
         powerOfTenMultiplier.toString());
 }
-export function getEnergyData(filters, options) {
+export async function getEnergyData(filters, options) {
     const doGroupByDate = !(options?.formatForExport ?? false) &&
         filters.startDateString !== filters.endDateString;
     const columnNames = options?.formatForExport ?? false
@@ -123,18 +123,18 @@ export function getEnergyData(filters, options) {
             " group by d.assetId, d.dataTypeId, substr(datetime(d.timeSeconds, 'unixepoch', 'localtime'), 1, 10), d.powerOfTenMultiplier";
     }
     sql += ' order by d.assetId, d.dataTypeId, timeSeconds';
-    const emileDB = sqlite(databasePath, {
-        readonly: true
-    });
+    const emileDB = await getConnectionWhenAvailable(true);
     emileDB.function('userFunction_getPowerOfTenMultiplierName', userFunction_getPowerOfTenMultiplierName);
     const data = emileDB.prepare(sql).all(sqlParameters);
     emileDB.close();
     return data;
 }
-export function getEnergyDataPoint(filters) {
-    const emileDB = sqlite(databasePath, {
-        readonly: true
-    });
+export function getEnergyDataPoint(filters, connectedEmileDB) {
+    const emileDB = connectedEmileDB === undefined
+        ? sqlite(databasePath, {
+            readonly: true
+        })
+        : connectedEmileDB;
     const dataPoint = emileDB
         .prepare(`select dataId, assetId, dataTypeId, fileId,
         timeSeconds, durationSeconds, dataValue, powerOfTenMultiplier
@@ -145,6 +145,8 @@ export function getEnergyDataPoint(filters) {
         and timeSeconds = ?
         and durationSeconds = ?`)
         .get(filters.assetId, filters.dataTypeId, filters.timeSeconds, filters.durationSeconds);
-    emileDB.close();
+    if (connectedEmileDB === undefined) {
+        emileDB.close();
+    }
     return dataPoint;
 }

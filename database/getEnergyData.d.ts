@@ -1,3 +1,4 @@
+import sqlite from 'better-sqlite3';
 import type { EnergyData } from '../types/recordTypes.js';
 interface GetEnergyDataFilters {
     assetId?: number | string;
@@ -13,11 +14,11 @@ interface GetEnergyDataFilters {
 interface GetEnergyDataOptions {
     formatForExport?: boolean;
 }
-export declare function getEnergyData(filters: GetEnergyDataFilters, options?: GetEnergyDataOptions): EnergyData[];
+export declare function getEnergyData(filters: GetEnergyDataFilters, options?: GetEnergyDataOptions): Promise<EnergyData[]>;
 export declare function getEnergyDataPoint(filters: {
     assetId: number;
     dataTypeId: number;
     timeSeconds: number;
     durationSeconds: number;
-}): EnergyData | undefined;
+}, connectedEmileDB?: sqlite.Database): EnergyData | undefined;
 export {};

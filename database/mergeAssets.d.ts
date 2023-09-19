@@ -4,5 +4,5 @@ interface MergeAssetsForm {
     assetName: string;
     latitudeLongitude?: '' | `${number}::${number}`;
 }
-export declare function mergeAssets(assetForm: MergeAssetsForm, sessionUser: EmileUser): number;
+export declare function mergeAssets(assetForm: MergeAssetsForm, sessionUser: EmileUser): Promise<number>;
 export {};

@@ -7,8 +7,8 @@ import {
 } from '../../database/getEnergyDataFiles.js'
 import { updateEnergyDataFileAsReadyToPending } from '../../database/updateEnergyDataFile.js'
 
-export function handler(request: Request, response: Response): void {
-  deleteEnergyDataByFileId(
+export async function handler(request: Request, response: Response): Promise<void> {
+  await deleteEnergyDataByFileId(
     request.body.fileId,
     request.session.user as EmileUser
   )

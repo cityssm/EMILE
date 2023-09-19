@@ -30,7 +30,7 @@ export async function handler(request: Request, response: Response): Promise<voi
   }
 
   if ((csv ?? '') === '') {
-    const rows = getReportData(reportName, request.query as ReportParameters)
+    const rows = await getReportData(reportName, request.query as ReportParameters)
 
     if (rows === undefined) {
       response.status(404).json({

@@ -1,5 +1,5 @@
 import sqlite from 'better-sqlite3';
-import { databasePath } from '../helpers/functions.database.js';
+import { databasePath, getConnectionWhenAvailable } from '../helpers/functions.database.js';
 export function deleteEnergyData(dataId, sessionUser) {
     const emileDB = sqlite(databasePath);
     const result = emileDB
@@ -12,8 +12,8 @@ export function deleteEnergyData(dataId, sessionUser) {
     emileDB.close();
     return result.changes > 0;
 }
-export function deleteEnergyDataByFileId(fileId, sessionUser) {
-    const emileDB = sqlite(databasePath);
+export async function deleteEnergyDataByFileId(fileId, sessionUser) {
+    const emileDB = await getConnectionWhenAvailable();
     const result = emileDB
         .prepare(`update EnergyData
         set recordDelete_userName = ?,

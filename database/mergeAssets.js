@@ -1,9 +1,8 @@
-import sqlite from 'better-sqlite3';
-import { databasePath } from '../helpers/functions.database.js';
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
 import { addAsset } from './addAsset.js';
 import { deleteAsset } from './deleteAsset.js';
-export function mergeAssets(assetForm, sessionUser) {
-    const emileDB = sqlite(databasePath);
+export async function mergeAssets(assetForm, sessionUser) {
+    const emileDB = await getConnectionWhenAvailable();
     let latitude;
     let longitude;
     if (assetForm.latitudeLongitude !== undefined &&

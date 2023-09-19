@@ -1,6 +1,4 @@
-import sqlite from 'better-sqlite3'
-
-import { databasePath } from '../helpers/functions.database.js'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 
 import { addAsset } from './addAsset.js'
 import { deleteAsset } from './deleteAsset.js'
@@ -12,11 +10,11 @@ interface MergeAssetsForm {
   latitudeLongitude?: '' | `${number}::${number}`
 }
 
-export function mergeAssets(
+export async function mergeAssets(
   assetForm: MergeAssetsForm,
   sessionUser: EmileUser
-): number {
-  const emileDB = sqlite(databasePath)
+): Promise<number> {
+  const emileDB = await getConnectionWhenAvailable()
 
   let latitude: number | undefined
   let longitude: number | undefined

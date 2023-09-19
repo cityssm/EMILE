@@ -32,7 +32,7 @@ async function refreshReportDataCaches(): Promise<void> {
 
     debug(`Getting report data: ${reportName} ...`)
 
-    const data = getReportData(reportName) ?? []
+    const data = await getReportData(reportName) ?? []
 
     debug(`Converting ${data.length ?? 0} rows to CSV: ${reportName}`)
 
@@ -42,9 +42,9 @@ async function refreshReportDataCaches(): Promise<void> {
 
     try {
       await fs.writeFile(path.join(reportCacheFolder, `${reportName}.csv`), csv)
-      debug(`Report data written successfully: ${reportName}`)
+      debug(`Report data written successfully: ${reportName}.csv`)
     } catch (error) {
-      debug(`Error writting reprot data: ${reportName}`)
+      debug(`Error writing report data: ${reportName}`)
       debug(error)
     }
   }

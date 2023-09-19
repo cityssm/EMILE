@@ -1,7 +1,9 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import sqlite from 'better-sqlite3';
 import Debug from 'debug';
 import { getConfigProperty } from './functions.config.js';
+import { delay } from './functions.utilities.js';
 const debug = Debug('emile:functions.database');
 export const useTestDatabases = getConfigProperty('application.useTestDatabases') ||
     process.env.TEST_DATABASES === 'true';
@@ -57,4 +59,14 @@ export async function getBackedUpDatabaseFiles() {
         }
     }
     return databaseFiles;
+}
+export async function getConnectionWhenAvailable(readOnly = false) {
+    try {
+        return sqlite(databasePath);
+    }
+    catch {
+        debug('Waiting 1s for database connection...');
+        await delay(1000);
+        return await getConnectionWhenAvailable(readOnly);
+    }
 }

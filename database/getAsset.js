@@ -25,10 +25,12 @@ export function getAsset(assetId, connectedEmileDB) {
     }
     return asset;
 }
-export function getAssetByAssetAlias(assetAlias, aliasTypeId) {
-    const emileDB = sqlite(databasePath, {
-        readonly: true
-    });
+export function getAssetByAssetAlias(assetAlias, aliasTypeId, connectedEmileDB) {
+    const emileDB = connectedEmileDB === undefined
+        ? sqlite(databasePath, {
+            readonly: true
+        })
+        : connectedEmileDB;
     let sql = `select assetId from AssetAliases
     where recordDelete_timeMillis is null
     and assetAlias = ?`;
@@ -37,9 +39,13 @@ export function getAssetByAssetAlias(assetAlias, aliasTypeId) {
         sql += ' and aliasTypeId = ?';
         sqlParameters.push(aliasTypeId);
     }
-    const asset = emileDB.prepare(sql).get(sqlParameters);
-    if (asset !== undefined) {
-        return getAsset(asset.assetId, emileDB);
+    let asset;
+    const assetId = emileDB.prepare(sql).get(sqlParameters);
+    if (assetId !== undefined) {
+        asset = getAsset(assetId.assetId, emileDB);
     }
-    return undefined;
+    if (connectedEmileDB === undefined) {
+        emileDB.close();
+    }
+    return asset;
 }

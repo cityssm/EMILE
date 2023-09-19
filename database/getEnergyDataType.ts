@@ -7,11 +7,26 @@ import { databasePath } from '../helpers/functions.database.js'
 import type { EnergyDataType } from '../types/recordTypes.js'
 
 import { addEnergyDataType } from './addEnergyDataType.js'
-import { getEnergyAccumulationBehaviourByGreenButtonId, getEnergyAccumulationBehaviourByName } from './getEnergyAccumulationBehaviour.js'
-import { getEnergyCommodityByGreenButtonId, getEnergyCommodityByName } from './getEnergyCommodity.js'
-import { getEnergyReadingTypeByGreenButtonId, getEnergyReadingTypeByName } from './getEnergyReadingType.js'
-import { getEnergyServiceCategoryByGreenButtonId, getEnergyServiceCategoryByName } from './getEnergyServiceCategory.js'
-import { getEnergyUnitByGreenButtonId, getEnergyUnitByName } from './getEnergyUnit.js'
+import {
+  getEnergyAccumulationBehaviourByGreenButtonId,
+  getEnergyAccumulationBehaviourByName
+} from './getEnergyAccumulationBehaviour.js'
+import {
+  getEnergyCommodityByGreenButtonId,
+  getEnergyCommodityByName
+} from './getEnergyCommodity.js'
+import {
+  getEnergyReadingTypeByGreenButtonId,
+  getEnergyReadingTypeByName
+} from './getEnergyReadingType.js'
+import {
+  getEnergyServiceCategoryByGreenButtonId,
+  getEnergyServiceCategoryByName
+} from './getEnergyServiceCategory.js'
+import {
+  getEnergyUnitByGreenButtonId,
+  getEnergyUnitByName
+} from './getEnergyUnit.js'
 
 export function getEnergyDataType(
   dataTypeId: number | string,
@@ -64,9 +79,11 @@ export function getEnergyDataTypeByGreenButtonIds(
     accumulationBehaviourId?: string
   },
   sessionUser: EmileUser,
-  createIfUnavailable = true
+  createIfUnavailable = true,
+  connectedEmileDB?: sqlite.Database
 ): EnergyDataType | undefined {
-  const emileDB = sqlite(databasePath)
+  const emileDB =
+    connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB
 
   let sql = `select t.dataTypeId,
       t.serviceCategoryId, s.serviceCategory,
@@ -169,7 +186,9 @@ export function getEnergyDataTypeByGreenButtonIds(
     energyDataType = getEnergyDataType(dataTypeId, emileDB)
   }
 
-  emileDB.close()
+  if (connectedEmileDB === undefined) {
+    emileDB.close()
+  }
 
   return energyDataType
 }
@@ -244,10 +263,7 @@ export function getEnergyDataTypeByNames(
     const readingType =
       names.readingType === ''
         ? undefined
-        : getEnergyReadingTypeByName(
-            names.readingType,
-            emileDB
-          )
+        : getEnergyReadingTypeByName(names.readingType, emileDB)
 
     const commodity =
       names.commodity === ''
@@ -257,15 +273,12 @@ export function getEnergyDataTypeByNames(
     const accumulationBehaviour =
       names.accumulationBehaviour === ''
         ? undefined
-        : getEnergyAccumulationBehaviourByName(
-            names.accumulationBehaviour
-          )
+        : getEnergyAccumulationBehaviourByName(names.accumulationBehaviour)
 
     if (
       serviceCategory === undefined ||
       unit === undefined ||
-      (readingType === undefined &&
-        names.readingType !== '') ||
+      (readingType === undefined && names.readingType !== '') ||
       (commodity === undefined && names.commodity !== '') ||
       (accumulationBehaviour === undefined &&
         names.accumulationBehaviour !== '')

@@ -9,9 +9,11 @@ export function updateEnergyDataValue(
     dataValue: number
     powerOfTenMultiplier: number
   },
-  sessionUser: EmileUser
+  sessionUser: EmileUser,
+  connectedEmileDB?: sqlite.Database
 ): boolean {
-  const emileDB = sqlite(databasePath)
+  const emileDB =
+    connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB
 
   const rightNowMillis = Date.now()
 
@@ -34,7 +36,9 @@ export function updateEnergyDataValue(
       data.dataId
     )
 
-  emileDB.close()
+  if (connectedEmileDB === undefined) {
+    emileDB.close()
+  }
 
   return result.changes > 0
 }

@@ -2,8 +2,8 @@ import type { Request, Response } from 'express'
 
 import { getEnergyData } from '../../database/getEnergyData.js'
 
-export function handler(request: Request, response: Response): void {
-  const energyData = getEnergyData(request.body)
+export async function handler(request: Request, response: Response): Promise<void> {
+  const energyData = await getEnergyData(request.body)
 
   response.json({
     success: true,

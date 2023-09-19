@@ -27,7 +27,7 @@ export class BaseParser {
   }
 
   handleParseFileError(error: Error): void {
-    deleteEnergyDataByFileId(
+    void deleteEnergyDataByFileId(
       this.energyDataFile.fileId,
       BaseParser.parserUser
     )

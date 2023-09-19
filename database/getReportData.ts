@@ -1,15 +1,13 @@
-import sqlite from 'better-sqlite3'
-
-import { databasePath } from '../helpers/functions.database.js'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 
 import { getEnergyData } from './getEnergyData.js'
 
 export type ReportParameters = Record<string, string | number>
 
-export function getReportData(
+export async function getReportData(
   reportName: string,
   reportParameters: ReportParameters = {}
-): unknown[] | undefined {
+): Promise<unknown[] | undefined> {
   let sql = ''
 
   switch (reportName) {
@@ -83,7 +81,7 @@ export function getReportData(
     }
 
     case 'energyData-formatted-filtered': {
-      return getEnergyData(
+      return await getEnergyData(
         {
           assetId: reportParameters.assetId,
           categoryId: reportParameters.categoryId,
@@ -196,9 +194,7 @@ export function getReportData(
     }
   }
 
-  const emileDB = sqlite(databasePath, {
-    readonly: true
-  })
+  const emileDB = await getConnectionWhenAvailable(true)
 
   const resultRows = emileDB.prepare(sql).all()
 

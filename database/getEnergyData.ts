@@ -8,7 +8,10 @@ import { powerOfTenMultipliers } from '@cityssm/green-button-parser/lookups.js'
 import { dateStringToDate } from '@cityssm/utils-datetime'
 import sqlite from 'better-sqlite3'
 
-import { databasePath } from '../helpers/functions.database.js'
+import {
+  databasePath,
+  getConnectionWhenAvailable
+} from '../helpers/functions.database.js'
 import type { EnergyData } from '../types/recordTypes.js'
 
 interface GetEnergyDataFilters {
@@ -41,10 +44,10 @@ function userFunction_getPowerOfTenMultiplierName(
   )
 }
 
-export function getEnergyData(
+export async function getEnergyData(
   filters: GetEnergyDataFilters,
   options?: GetEnergyDataOptions
-): EnergyData[] {
+): Promise<EnergyData[]> {
   const doGroupByDate =
     !(options?.formatForExport ?? false) &&
     filters.startDateString !== filters.endDateString
@@ -182,9 +185,7 @@ export function getEnergyData(
 
   sql += ' order by d.assetId, d.dataTypeId, timeSeconds'
 
-  const emileDB = sqlite(databasePath, {
-    readonly: true
-  })
+  const emileDB = await getConnectionWhenAvailable(true)
 
   emileDB.function(
     'userFunction_getPowerOfTenMultiplierName',
@@ -198,15 +199,21 @@ export function getEnergyData(
   return data
 }
 
-export function getEnergyDataPoint(filters: {
-  assetId: number
-  dataTypeId: number
-  timeSeconds: number
-  durationSeconds: number
-}): EnergyData | undefined {
-  const emileDB = sqlite(databasePath, {
-    readonly: true
-  })
+export function getEnergyDataPoint(
+  filters: {
+    assetId: number
+    dataTypeId: number
+    timeSeconds: number
+    durationSeconds: number
+  },
+  connectedEmileDB?: sqlite.Database
+): EnergyData | undefined {
+  const emileDB =
+    connectedEmileDB === undefined
+      ? sqlite(databasePath, {
+          readonly: true
+        })
+      : connectedEmileDB
 
   const dataPoint = emileDB
     .prepare(
@@ -226,7 +233,9 @@ export function getEnergyDataPoint(filters: {
       filters.durationSeconds
     ) as EnergyData | undefined
 
-  emileDB.close()
+  if (connectedEmileDB === undefined) {
+    emileDB.close()
+  }
 
   return dataPoint
 }

@@ -15,7 +15,7 @@ export async function handler(request, response) {
         }
     }
     if ((csv ?? '') === '') {
-        const rows = getReportData(reportName, request.query);
+        const rows = await getReportData(reportName, request.query);
         if (rows === undefined) {
             response.status(404).json({
                 success: false,

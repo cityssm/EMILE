@@ -1,7 +1,7 @@
 import sqlite from 'better-sqlite3';
 import { databasePath } from '../helpers/functions.database.js';
-export function addEnergyData(data, sessionUser) {
-    const emileDB = sqlite(databasePath);
+export function addEnergyData(data, sessionUser, connectedEmileDB) {
+    const emileDB = connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB;
     const rightNowMillis = Date.now();
     const result = emileDB
         .prepare(`insert into EnergyData (
@@ -11,6 +11,8 @@ export function addEnergyData(data, sessionUser) {
         recordUpdate_userName, recordUpdate_timeMillis)
         values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
         .run(data.assetId, data.dataTypeId, data.fileId, data.timeSeconds, data.durationSeconds, data.dataValue, data.powerOfTenMultiplier ?? 0, sessionUser.userName, rightNowMillis, sessionUser.userName, rightNowMillis);
-    emileDB.close();
+    if (connectedEmileDB === undefined) {
+        emileDB.close();
+    }
     return result.lastInsertRowid;
 }
