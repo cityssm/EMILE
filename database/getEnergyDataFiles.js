@@ -1,6 +1,5 @@
-import sqlite from 'better-sqlite3';
-import { databasePath } from '../helpers/functions.database.js';
-export function getEnergyDataFiles(filters, options) {
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
+export async function getEnergyDataFiles(filters, options) {
     const groupByColumnNames = `f.fileId, f.originalFileName,
     ${options.includeSystemFileAndFolder
         ? ' f.systemFileName, f.systemFolderPath,'
@@ -51,9 +50,7 @@ export function getEnergyDataFiles(filters, options) {
     if (options.limit !== -1) {
         sql += ` limit ${options.limit}`;
     }
-    const emileDB = sqlite(databasePath, {
-        readonly: true
-    });
+    const emileDB = await getConnectionWhenAvailable(true);
     const dataFiles = emileDB.prepare(sql).all(sqlParameters);
     emileDB.close();
     for (const dataFile of dataFiles) {
@@ -65,8 +62,8 @@ export function getEnergyDataFiles(filters, options) {
     }
     return dataFiles;
 }
-export function getPendingEnergyDataFiles() {
-    return getEnergyDataFiles({
+export async function getPendingEnergyDataFiles() {
+    return await getEnergyDataFiles({
         isPending: true
     }, {
         includeAssetDetails: true,
@@ -74,8 +71,8 @@ export function getPendingEnergyDataFiles() {
         limit: -1
     });
 }
-export function getFailedEnergyDataFiles() {
-    return getEnergyDataFiles({
+export async function getFailedEnergyDataFiles() {
+    return await getEnergyDataFiles({
         isFailed: true
     }, {
         includeAssetDetails: true,
@@ -83,8 +80,8 @@ export function getFailedEnergyDataFiles() {
         limit: -1
     });
 }
-export function getProcessedEnergyDataFiles(searchString) {
-    return getEnergyDataFiles({
+export async function getProcessedEnergyDataFiles(searchString) {
+    return await getEnergyDataFiles({
         isProcessed: true,
         searchString
     }, {
@@ -93,8 +90,8 @@ export function getProcessedEnergyDataFiles(searchString) {
         limit: 100
     });
 }
-export function getEnergyDataFilesToProcess() {
-    return getEnergyDataFiles({
+export async function getEnergyDataFilesToProcess() {
+    return await getEnergyDataFiles({
         isPending: false,
         isProcessed: false
     }, {

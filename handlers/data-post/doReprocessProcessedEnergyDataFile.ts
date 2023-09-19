@@ -18,8 +18,8 @@ export async function handler(request: Request, response: Response): Promise<voi
     request.session.user as EmileUser
   )
 
-  const pendingFiles = getPendingEnergyDataFiles()
-  const processedFiles = getProcessedEnergyDataFiles('')
+  const pendingFiles = await getPendingEnergyDataFiles()
+  const processedFiles = await getProcessedEnergyDataFiles('')
 
   response.json({
     success,

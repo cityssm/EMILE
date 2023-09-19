@@ -14,9 +14,9 @@ export const storage = multer.diskStorage({
   }
 })
 
-export function successHandler(request: Request, response: Response): void {
-  const pendingFiles = getPendingEnergyDataFiles()
-  const processedFiles = getProcessedEnergyDataFiles('')
+export async function successHandler(request: Request, response: Response): Promise<void> {
+  const pendingFiles = await getPendingEnergyDataFiles()
+  const processedFiles = await getProcessedEnergyDataFiles('')
 
   response.json({
     success: true,

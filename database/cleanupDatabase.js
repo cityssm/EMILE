@@ -1,5 +1,4 @@
-import sqlite from 'better-sqlite3';
-import { databasePath } from '../helpers/functions.database.js';
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
 const deleteAgeDays = 14;
 const deleteSql = [
     `delete from AssetAliases
@@ -35,8 +34,8 @@ const deleteSql = [
     `delete from Users
     where recordDelete_timeMillis <= ?`
 ];
-export function cleanupDatabase(_sessionUser) {
-    const emileDB = sqlite(databasePath);
+export async function cleanupDatabase(_sessionUser) {
+    const emileDB = await getConnectionWhenAvailable();
     const recordDeleteTimeMillis = Date.now() - deleteAgeDays * 86400 * 1000;
     let deleteCount = 0;
     for (const sql of deleteSql) {

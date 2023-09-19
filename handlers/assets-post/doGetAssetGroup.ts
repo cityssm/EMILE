@@ -2,8 +2,8 @@ import type { Request, Response } from 'express'
 
 import { getAssetGroup } from '../../database/getAssetGroup.js'
 
-export function handler(request: Request, response: Response): void {
-  const assetGroup = getAssetGroup(
+export async function handler(request: Request, response: Response): Promise<void> {
+  const assetGroup = await getAssetGroup(
     request.body.groupId,
     request.session.user as EmileUser
   )

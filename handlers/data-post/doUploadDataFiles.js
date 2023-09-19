@@ -8,9 +8,9 @@ export const storage = multer.diskStorage({
         callback(null, `[${Date.now().toString()}]${file.originalname}`);
     }
 });
-export function successHandler(request, response) {
-    const pendingFiles = getPendingEnergyDataFiles();
-    const processedFiles = getProcessedEnergyDataFiles('');
+export async function successHandler(request, response) {
+    const pendingFiles = await getPendingEnergyDataFiles();
+    const processedFiles = await getProcessedEnergyDataFiles('');
     response.json({
         success: true,
         pendingFiles,

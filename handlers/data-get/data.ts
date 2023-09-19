@@ -8,11 +8,11 @@ import {
 import { getConfigProperty } from '../../helpers/functions.config.js'
 import { getParserClassesAndConfigurations } from '../../parsers/parserHelpers.js'
 
-export function handler(request: Request, response: Response): void {
-  const pendingFiles = getPendingEnergyDataFiles()
-  const processedFiles = getProcessedEnergyDataFiles('')
+export async function handler(request: Request, response: Response): Promise<void> {
+  const pendingFiles = await getPendingEnergyDataFiles()
+  const processedFiles = await getProcessedEnergyDataFiles('')
 
-  const assets = getAssets({})
+  const assets = await getAssets({})
 
   const parserClassesAndConfigurations = getParserClassesAndConfigurations()
 

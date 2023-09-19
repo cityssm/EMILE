@@ -1,6 +1,3 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable @typescript-eslint/indent */
-
 import cluster from 'node:cluster'
 
 import Debug from 'debug'

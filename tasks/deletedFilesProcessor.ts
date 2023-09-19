@@ -56,7 +56,7 @@ async function deleteUnrecordedFiles(): Promise<void> {
       continue
     }
 
-    const trackedFiles = getEnergyDataFiles(
+    const trackedFiles = await getEnergyDataFiles(
       {
         systemFolderPath
       },

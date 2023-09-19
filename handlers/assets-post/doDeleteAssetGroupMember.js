@@ -1,8 +1,8 @@
 import { deleteAssetGroupMember } from '../../database/deleteAssetGroupMember.js';
 import { getAssets } from '../../database/getAssets.js';
-export function handler(request, response) {
+export async function handler(request, response) {
     const success = deleteAssetGroupMember(request.body.groupId, request.body.assetId, request.session.user);
-    const groupMembers = getAssets({
+    const groupMembers = await getAssets({
         groupId: request.body.groupId
     });
     response.json({

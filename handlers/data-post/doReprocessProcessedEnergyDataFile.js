@@ -4,8 +4,8 @@ import { updateEnergyDataFileAsReadyToPending } from '../../database/updateEnerg
 export async function handler(request, response) {
     await deleteEnergyDataByFileId(request.body.fileId, request.session.user);
     const success = updateEnergyDataFileAsReadyToPending(request.body.fileId, request.session.user);
-    const pendingFiles = getPendingEnergyDataFiles();
-    const processedFiles = getProcessedEnergyDataFiles('');
+    const pendingFiles = await getPendingEnergyDataFiles();
+    const processedFiles = await getProcessedEnergyDataFiles('');
     response.json({
         success,
         pendingFiles,

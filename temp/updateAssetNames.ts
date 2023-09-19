@@ -82,7 +82,7 @@ function updateSsmPucAssetNames(): void {
       assetRow.accountNumberGas !== undefined &&
       assetRow.accountNumberGas !== ''
     ) {
-      let assetId: number
+      let assetId: number | undefined
 
       const gasAccountNumber = assetRow.accountNumberGas.replace("'", '')
 

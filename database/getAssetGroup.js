@@ -1,10 +1,7 @@
-import sqlite from 'better-sqlite3';
-import { databasePath } from '../helpers/functions.database.js';
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
 import { getAssets } from './getAssets.js';
-export function getAssetGroup(groupId, sessionUser) {
-    const emileDB = sqlite(databasePath, {
-        readonly: true
-    });
+export async function getAssetGroup(groupId, sessionUser) {
+    const emileDB = await getConnectionWhenAvailable();
     const assetGroup = emileDB
         .prepare(`select g.groupId, g.groupName, g.groupDescription, g.isShared, g.recordCreate_userName
         from AssetGroups g
@@ -13,7 +10,7 @@ export function getAssetGroup(groupId, sessionUser) {
           and (g.recordCreate_userName = ? or g.isShared = 1)`)
         .get(groupId, sessionUser.userName);
     if (assetGroup !== undefined) {
-        assetGroup.groupMembers = getAssets({ groupId: assetGroup.groupId }, {}, emileDB);
+        assetGroup.groupMembers = await getAssets({ groupId: assetGroup.groupId }, {}, emileDB);
     }
     emileDB.close();
     return assetGroup;

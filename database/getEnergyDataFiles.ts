@@ -1,9 +1,7 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable @typescript-eslint/indent */
 
-import sqlite from 'better-sqlite3'
-
-import { databasePath } from '../helpers/functions.database.js'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 import type { EnergyDataFile } from '../types/recordTypes.js'
 
 interface GetEnergyDataFilesFilters {
@@ -21,10 +19,10 @@ interface GetEnergyDataFilesOptions {
   includeDeletedRecords?: boolean
 }
 
-export function getEnergyDataFiles(
+export async function getEnergyDataFiles(
   filters: GetEnergyDataFilesFilters,
   options: GetEnergyDataFilesOptions
-): EnergyDataFile[] {
+): Promise<EnergyDataFile[]> {
   const groupByColumnNames = `f.fileId, f.originalFileName,
     ${
       options.includeSystemFileAndFolder
@@ -96,9 +94,7 @@ export function getEnergyDataFiles(
     sql += ` limit ${options.limit}`
   }
 
-  const emileDB = sqlite(databasePath, {
-    readonly: true
-  })
+  const emileDB = await getConnectionWhenAvailable(true)
 
   const dataFiles = emileDB.prepare(sql).all(sqlParameters) as EnergyDataFile[]
 
@@ -118,8 +114,8 @@ export function getEnergyDataFiles(
   return dataFiles
 }
 
-export function getPendingEnergyDataFiles(): EnergyDataFile[] {
-  return getEnergyDataFiles(
+export async function getPendingEnergyDataFiles(): Promise<EnergyDataFile[]> {
+  return await getEnergyDataFiles(
     {
       isPending: true
     },
@@ -131,8 +127,8 @@ export function getPendingEnergyDataFiles(): EnergyDataFile[] {
   )
 }
 
-export function getFailedEnergyDataFiles(): EnergyDataFile[] {
-  return getEnergyDataFiles(
+export async function getFailedEnergyDataFiles(): Promise<EnergyDataFile[]> {
+  return await getEnergyDataFiles(
     {
       isFailed: true
     },
@@ -144,10 +140,10 @@ export function getFailedEnergyDataFiles(): EnergyDataFile[] {
   )
 }
 
-export function getProcessedEnergyDataFiles(
+export async function getProcessedEnergyDataFiles(
   searchString?: ''
-): EnergyDataFile[] {
-  return getEnergyDataFiles(
+): Promise<EnergyDataFile[]> {
+  return await getEnergyDataFiles(
     {
       isProcessed: true,
       searchString
@@ -160,8 +156,8 @@ export function getProcessedEnergyDataFiles(
   )
 }
 
-export function getEnergyDataFilesToProcess(): EnergyDataFile[] {
-  return getEnergyDataFiles(
+export async function getEnergyDataFilesToProcess(): Promise<EnergyDataFile[]> {
+  return await getEnergyDataFiles(
     {
       isPending: false,
       isProcessed: false

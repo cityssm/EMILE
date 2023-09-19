@@ -1,17 +1,13 @@
-import sqlite from 'better-sqlite3'
-
-import { databasePath } from '../helpers/functions.database.js'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 import type { AssetGroup } from '../types/recordTypes.js'
 
 import { getAssets } from './getAssets.js'
 
-export function getAssetGroup(
+export async function getAssetGroup(
   groupId: number | string,
   sessionUser: EmileUser
-): AssetGroup | undefined {
-  const emileDB = sqlite(databasePath, {
-    readonly: true
-  })
+): Promise<AssetGroup | undefined> {
+  const emileDB = await getConnectionWhenAvailable()
 
   const assetGroup = emileDB
     .prepare(
@@ -24,7 +20,7 @@ export function getAssetGroup(
     .get(groupId, sessionUser.userName) as AssetGroup | undefined
 
   if (assetGroup !== undefined) {
-    assetGroup.groupMembers = getAssets(
+    assetGroup.groupMembers = await getAssets(
       { groupId: assetGroup.groupId },
       {},
       emileDB

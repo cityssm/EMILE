@@ -12,9 +12,9 @@ interface GetEnergyDataFilesOptions {
     includeAssetDetails: boolean;
     includeDeletedRecords?: boolean;
 }
-export declare function getEnergyDataFiles(filters: GetEnergyDataFilesFilters, options: GetEnergyDataFilesOptions): EnergyDataFile[];
-export declare function getPendingEnergyDataFiles(): EnergyDataFile[];
-export declare function getFailedEnergyDataFiles(): EnergyDataFile[];
-export declare function getProcessedEnergyDataFiles(searchString?: ''): EnergyDataFile[];
-export declare function getEnergyDataFilesToProcess(): EnergyDataFile[];
+export declare function getEnergyDataFiles(filters: GetEnergyDataFilesFilters, options: GetEnergyDataFilesOptions): Promise<EnergyDataFile[]>;
+export declare function getPendingEnergyDataFiles(): Promise<EnergyDataFile[]>;
+export declare function getFailedEnergyDataFiles(): Promise<EnergyDataFile[]>;
+export declare function getProcessedEnergyDataFiles(searchString?: ''): Promise<EnergyDataFile[]>;
+export declare function getEnergyDataFilesToProcess(): Promise<EnergyDataFile[]>;
 export {};

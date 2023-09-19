@@ -1,9 +1,6 @@
-import sqlite from 'better-sqlite3';
-import { databasePath } from '../helpers/functions.database.js';
-export function getEnergyDataStatistics() {
-    const emileDB = sqlite(databasePath, {
-        readonly: true
-    });
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
+export async function getEnergyDataStatistics() {
+    const emileDB = await getConnectionWhenAvailable(true);
     const statistics = emileDB
         .prepare(`select count(dataId) as dataIdCount,
         count(distinct assetId) as assetIdDistinctCount,

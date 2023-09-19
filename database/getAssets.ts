@@ -1,9 +1,9 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable @typescript-eslint/indent */
 
-import sqlite from 'better-sqlite3'
+import type sqlite from 'better-sqlite3'
 
-import { databasePath } from '../helpers/functions.database.js'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 import type { Asset } from '../types/recordTypes.js'
 
 interface GetAssetsFilters {
@@ -14,11 +14,11 @@ interface GetAssetsOptions {
   includeEnergyDataStats?: boolean
 }
 
-export function getAssets(
+export async function getAssets(
   filters: GetAssetsFilters,
   options?: GetAssetsOptions,
   connectedEmileDB?: sqlite.Database
-): Asset[] {
+): Promise<Asset[]> {
   let sql = `select a.assetId, a.assetName, a.latitude, a.longitude,
     a.categoryId, c.category, c.fontAwesomeIconClasses
     ${
@@ -55,9 +55,7 @@ export function getAssets(
 
   const emileDB =
     connectedEmileDB === undefined
-      ? sqlite(databasePath, {
-          readonly: true
-        })
+      ? await getConnectionWhenAvailable(true)
       : connectedEmileDB
 
   const assets = emileDB.prepare(sql).all(sqlParameters) as Asset[]

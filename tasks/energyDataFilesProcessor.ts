@@ -42,7 +42,7 @@ async function processFiles(): Promise<void> {
   isRunning = true
   runAgainOnComplete = false
 
-  const dataFiles = getEnergyDataFilesToProcess()
+  const dataFiles = await getEnergyDataFilesToProcess()
 
   if (dataFiles.length > 0) {
     debug(`${dataFiles.length} files to process.`)

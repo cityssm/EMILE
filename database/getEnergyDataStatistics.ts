@@ -1,6 +1,4 @@
-import sqlite from 'better-sqlite3'
-
-import { databasePath } from '../helpers/functions.database.js'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 
 interface EnergyDataStatistics {
   dataIdCount: number
@@ -13,10 +11,8 @@ interface EnergyDataStatistics {
   endTimeSecondsMax: number
 }
 
-export function getEnergyDataStatistics(): EnergyDataStatistics {
-  const emileDB = sqlite(databasePath, {
-    readonly: true
-  })
+export async function getEnergyDataStatistics(): Promise<EnergyDataStatistics> {
+  const emileDB = await getConnectionWhenAvailable(true)
 
   const statistics = emileDB
     .prepare(

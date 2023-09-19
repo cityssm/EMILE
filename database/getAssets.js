@@ -1,6 +1,5 @@
-import sqlite from 'better-sqlite3';
-import { databasePath } from '../helpers/functions.database.js';
-export function getAssets(filters, options, connectedEmileDB) {
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
+export async function getAssets(filters, options, connectedEmileDB) {
     let sql = `select a.assetId, a.assetName, a.latitude, a.longitude,
     a.categoryId, c.category, c.fontAwesomeIconClasses
     ${options?.includeEnergyDataStats ?? false
@@ -28,9 +27,7 @@ export function getAssets(filters, options, connectedEmileDB) {
     }
     sql += ' order by c.orderNumber, c.category, a.assetName';
     const emileDB = connectedEmileDB === undefined
-        ? sqlite(databasePath, {
-            readonly: true
-        })
+        ? await getConnectionWhenAvailable(true)
         : connectedEmileDB;
     const assets = emileDB.prepare(sql).all(sqlParameters);
     if (connectedEmileDB === undefined) {

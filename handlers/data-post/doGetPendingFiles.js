@@ -1,7 +1,7 @@
 import { getPendingEnergyDataFiles, getProcessedEnergyDataFiles } from '../../database/getEnergyDataFiles.js';
-export function handler(request, response) {
-    const pendingFiles = getPendingEnergyDataFiles();
-    const processedFiles = getProcessedEnergyDataFiles('');
+export async function handler(request, response) {
+    const pendingFiles = await getPendingEnergyDataFiles();
+    const processedFiles = await getProcessedEnergyDataFiles('');
     response.json({
         success: true,
         pendingFiles,

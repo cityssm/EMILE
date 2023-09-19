@@ -31,7 +31,7 @@ async function deleteUnrecordedFiles() {
             }
             continue;
         }
-        const trackedFiles = getEnergyDataFiles({
+        const trackedFiles = await getEnergyDataFiles({
             systemFolderPath
         }, {
             includeSystemFileAndFolder: true,

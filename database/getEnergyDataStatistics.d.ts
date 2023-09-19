@@ -5,5 +5,5 @@ interface EnergyDataStatistics {
     timeSecondsMin: number;
     endTimeSecondsMax: number;
 }
-export declare function getEnergyDataStatistics(): EnergyDataStatistics;
+export declare function getEnergyDataStatistics(): Promise<EnergyDataStatistics>;
 export {};

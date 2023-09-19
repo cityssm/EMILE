@@ -4,7 +4,7 @@ import { getPendingEnergyDataFiles } from '../../database/getEnergyDataFiles.js'
 import { updateEnergyDataFileAsReadyToProcess } from '../../database/updateEnergyDataFile.js'
 import type { RunFileProcessorWorkerMessage } from '../../types/applicationTypes.js'
 
-export function handler(request: Request, response: Response): void {
+export async function handler(request: Request, response: Response): Promise<void> {
   const success = updateEnergyDataFileAsReadyToProcess(
     request.body.fileId,
     request.session.user as EmileUser
@@ -18,7 +18,7 @@ export function handler(request: Request, response: Response): void {
     } satisfies RunFileProcessorWorkerMessage)
   }
 
-  const pendingFiles = getPendingEnergyDataFiles()
+  const pendingFiles = await getPendingEnergyDataFiles()
 
   response.json({
     success,
