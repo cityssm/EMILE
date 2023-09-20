@@ -1,7 +1,7 @@
 import { powerOfTenMultipliers } from '@cityssm/green-button-parser/lookups.js';
 import { dateStringToDate } from '@cityssm/utils-datetime';
 import sqlite from 'better-sqlite3';
-import { databasePath, getConnectionWhenAvailable } from '../helpers/functions.database.js';
+import { databasePath, getConnectionWhenAvailable, getTempTableName } from '../helpers/functions.database.js';
 function userFunction_getPowerOfTenMultiplierName(powerOfTenMultiplier) {
     if (powerOfTenMultiplier === 0) {
         return '';
@@ -131,10 +131,16 @@ export async function getEnergyData(filters, options) {
         sql +=
             " group by d.assetId, d.dataTypeId, substr(datetime(d.timeSeconds, 'unixepoch', 'localtime'), 1, 10), d.powerOfTenMultiplier";
     }
-    sql += ' order by d.assetId, d.dataTypeId, timeSeconds';
+    const orderBy = ' order by assetId, dataTypeId, timeSeconds';
     const emileDB = await getConnectionWhenAvailable(true);
     emileDB.function('userFunction_getPowerOfTenMultiplierName', userFunction_getPowerOfTenMultiplierName);
-    const data = emileDB.prepare(sql).all(sqlParameters);
+    const tempTableName = getTempTableName();
+    emileDB
+        .prepare(`create temp table ${tempTableName} as ${sql}`)
+        .run(sqlParameters);
+    const data = emileDB
+        .prepare(`select * from ${tempTableName} ${orderBy}`)
+        .all();
     emileDB.close();
     return data;
 }

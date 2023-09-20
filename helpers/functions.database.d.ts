@@ -9,3 +9,4 @@ export declare function backupDatabase(): Promise<string | false>;
 export declare function deleteDatabaseBackupFile(fileName: string): Promise<boolean>;
 export declare function getBackedUpDatabaseFiles(): Promise<DatabaseFile[]>;
 export declare function getConnectionWhenAvailable(readOnly?: boolean): Promise<sqlite.Database>;
+export declare function getTempTableName(): string;

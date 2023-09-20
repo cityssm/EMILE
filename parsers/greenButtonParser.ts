@@ -29,7 +29,7 @@ export class GreenButtonParser extends BaseParser {
         atomXml
       )
 
-      recordGreenButtonData(greenButtonJson, {
+      await recordGreenButtonData(greenButtonJson, {
         assetId: this.energyDataFile.assetId ?? undefined,
         fileId: this.energyDataFile.fileId
       })

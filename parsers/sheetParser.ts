@@ -248,7 +248,7 @@ export class SheetParser extends BaseParser {
           continue
         }
 
-        addEnergyData(
+        await addEnergyData(
           {
             assetId,
             dataTypeId: energyDataType.dataTypeId,

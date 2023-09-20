@@ -3,4 +3,4 @@ export declare const greenButtonAssetAliasType: import("../types/recordTypes.js"
 export declare function recordGreenButtonData(greenButtonJson: GreenButtonTypes.GreenButtonJson, options: {
     assetId?: number;
     fileId?: number;
-}): number;
+}): Promise<number>;

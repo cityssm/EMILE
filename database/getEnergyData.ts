@@ -10,7 +10,8 @@ import sqlite from 'better-sqlite3'
 
 import {
   databasePath,
-  getConnectionWhenAvailable
+  getConnectionWhenAvailable,
+  getTempTableName
 } from '../helpers/functions.database.js'
 import type { EnergyData } from '../types/recordTypes.js'
 
@@ -197,7 +198,7 @@ export async function getEnergyData(
       " group by d.assetId, d.dataTypeId, substr(datetime(d.timeSeconds, 'unixepoch', 'localtime'), 1, 10), d.powerOfTenMultiplier"
   }
 
-  sql += ' order by d.assetId, d.dataTypeId, timeSeconds'
+  const orderBy = ' order by assetId, dataTypeId, timeSeconds'
 
   const emileDB = await getConnectionWhenAvailable(true)
 
@@ -206,7 +207,15 @@ export async function getEnergyData(
     userFunction_getPowerOfTenMultiplierName
   )
 
-  const data = emileDB.prepare(sql).all(sqlParameters) as EnergyData[]
+  const tempTableName = getTempTableName()
+
+  emileDB
+    .prepare(`create temp table ${tempTableName} as ${sql}`)
+    .run(sqlParameters)
+
+  const data = emileDB
+    .prepare(`select * from ${tempTableName} ${orderBy}`)
+    .all() as EnergyData[]
 
   emileDB.close()
 

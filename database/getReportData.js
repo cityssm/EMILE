@@ -2,6 +2,7 @@ import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
 import { getEnergyData } from './getEnergyData.js';
 export async function getReportData(reportName, reportParameters = {}) {
     let sql = '';
+    let useTempTable = false;
     switch (reportName) {
         case 'assets-all': {
             sql = 'select * from Assets';
@@ -56,6 +57,7 @@ export async function getReportData(reportName, reportParameters = {}) {
             });
         }
         case 'energyData-fullyJoined': {
+            useTempTable = true;
             sql = `select d.dataId,
           c.category,
           a.assetName, a.latitude, a.longitude,
@@ -133,7 +135,15 @@ export async function getReportData(reportName, reportParameters = {}) {
         }
     }
     const emileDB = await getConnectionWhenAvailable(true);
-    const resultRows = emileDB.prepare(sql).all();
+    let resultRows = [];
+    if (useTempTable) {
+        const tempTableName = `tmp_${Date.now()}`;
+        emileDB.prepare(`create temp table ${tempTableName} as ${sql}`).run();
+        resultRows = emileDB.prepare(`select * from ${tempTableName}`).all();
+    }
+    else {
+        resultRows = emileDB.prepare(sql).all();
+    }
     emileDB.close();
     return resultRows;
 }

@@ -76,7 +76,7 @@ function getEnergyDataTypeAndPowerOfTenMultiplier(greenButtonJson, intervalBlock
             : powerOfTenMultiplier
     };
 }
-export function recordGreenButtonData(greenButtonJson, options) {
+export async function recordGreenButtonData(greenButtonJson, options) {
     let recordCount = 0;
     const intervalBlockEntries = greenButtonHelpers.getEntriesByContentType(greenButtonJson, 'IntervalBlock');
     if (intervalBlockEntries.length === 0) {
@@ -107,7 +107,7 @@ export function recordGreenButtonData(greenButtonJson, options) {
                             durationSeconds: intervalReading.timePeriod.duration
                         }, emileDB);
                         if (currentDataPoint === undefined) {
-                            addEnergyData({
+                            await addEnergyData({
                                 assetId,
                                 dataTypeId: energyDataTypeAndPower.energyDataType.dataTypeId,
                                 fileId: options.fileId,

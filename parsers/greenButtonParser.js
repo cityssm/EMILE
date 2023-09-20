@@ -10,7 +10,7 @@ export class GreenButtonParser extends BaseParser {
         try {
             const atomXml = (await fs.readFile(path.join(this.energyDataFile.systemFolderPath, this.energyDataFile.systemFileName)));
             const greenButtonJson = await greenButtonParser.atomToGreenButtonJson(atomXml);
-            recordGreenButtonData(greenButtonJson, {
+            await recordGreenButtonData(greenButtonJson, {
                 assetId: this.energyDataFile.assetId ?? undefined,
                 fileId: this.energyDataFile.fileId
             });

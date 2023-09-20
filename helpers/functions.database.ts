@@ -112,3 +112,7 @@ export async function getConnectionWhenAvailable(
     return await getConnectionWhenAvailable(readOnly)
   }
 }
+
+export function getTempTableName(): string {
+  return `tmp_${Date.now()}`
+}

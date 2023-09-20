@@ -9,6 +9,7 @@ export async function getReportData(
   reportParameters: ReportParameters = {}
 ): Promise<unknown[] | undefined> {
   let sql = ''
+  let useTempTable = false
 
   switch (reportName) {
     /*
@@ -100,6 +101,8 @@ export async function getReportData(
     }
 
     case 'energyData-fullyJoined': {
+      useTempTable = true
+
       sql = `select d.dataId,
           c.category,
           a.assetName, a.latitude, a.longitude,
@@ -196,7 +199,15 @@ export async function getReportData(
 
   const emileDB = await getConnectionWhenAvailable(true)
 
-  const resultRows = emileDB.prepare(sql).all()
+  let resultRows: unknown[] = []
+
+  if (useTempTable) {
+    const tempTableName = `tmp_${Date.now()}`
+    emileDB.prepare(`create temp table ${tempTableName} as ${sql}`).run()
+    resultRows = emileDB.prepare(`select * from ${tempTableName}`).all()
+  } else {
+    resultRows = emileDB.prepare(sql).all()
+  }
 
   emileDB.close()
 

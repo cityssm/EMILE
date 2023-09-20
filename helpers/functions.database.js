@@ -70,3 +70,6 @@ export async function getConnectionWhenAvailable(readOnly = false) {
         return await getConnectionWhenAvailable(readOnly);
     }
 }
+export function getTempTableName() {
+    return `tmp_${Date.now()}`;
+}

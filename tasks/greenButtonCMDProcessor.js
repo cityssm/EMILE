@@ -1,13 +1,13 @@
 import fs from 'node:fs';
 import { helpers as greenButtonHelpers } from '@cityssm/green-button-parser';
-import * as greenButtonSubscriber from '@cityssm/green-button-subscriber';
+import { GreenButtonSubscriber } from '@cityssm/green-button-subscriber';
 import Debug from 'debug';
 import exitHook from 'exit-hook';
 import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async';
 import { getConfigProperty } from '../helpers/functions.config.js';
 import { recordGreenButtonData } from '../helpers/functions.greenButton.js';
 const debug = Debug('emile:tasks:greenButtonCMDProcessor');
-const pollingIntervalMillis = (86400 * 1000) + 60000;
+const pollingIntervalMillis = 86400 * 1000 + 60000;
 const updatedMinsCacheFile = 'data/caches/greenButtonCMDProcessor.json';
 let updatedMins = {};
 try {
@@ -35,7 +35,7 @@ async function processGreenButtonSubscriptions() {
             break;
         }
         debug(`Loading authorizations for subscription: ${subscriptionKey} ...`);
-        greenButtonSubscriber.setConfiguration(greenButtonSubscription.configuration);
+        const greenButtonSubscriber = new GreenButtonSubscriber(greenButtonSubscription.configuration);
         const authorizations = await greenButtonSubscriber.getAuthorizations();
         if (authorizations === undefined) {
             debug(`Unable to retieve authorizations: ${subscriptionKey}`);
@@ -77,7 +77,7 @@ async function processGreenButtonSubscriptions() {
                 continue;
             }
             try {
-                recordGreenButtonData(usageData, {});
+                await recordGreenButtonData(usageData, {});
                 updatedMins[authorizationId] = usageData.updatedDate?.getTime() ?? 0;
                 saveCache();
             }

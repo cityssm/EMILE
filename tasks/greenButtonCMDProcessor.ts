@@ -3,7 +3,7 @@
 import fs from 'node:fs'
 
 import { helpers as greenButtonHelpers } from '@cityssm/green-button-parser'
-import * as greenButtonSubscriber from '@cityssm/green-button-subscriber'
+import { GreenButtonSubscriber } from '@cityssm/green-button-subscriber'
 import Debug from 'debug'
 import exitHook from 'exit-hook'
 import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async'
@@ -17,7 +17,7 @@ const debug = Debug('emile:tasks:greenButtonCMDProcessor')
  * Task
  */
 
-const pollingIntervalMillis = (86_400 * 1000) + 60_000
+const pollingIntervalMillis = 86_400 * 1000 + 60_000
 
 const updatedMinsCacheFile = 'data/caches/greenButtonCMDProcessor.json'
 
@@ -62,7 +62,7 @@ async function processGreenButtonSubscriptions(): Promise<void> {
 
     debug(`Loading authorizations for subscription: ${subscriptionKey} ...`)
 
-    greenButtonSubscriber.setConfiguration(
+    const greenButtonSubscriber = new GreenButtonSubscriber(
       greenButtonSubscription.configuration
     )
 
@@ -136,7 +136,7 @@ async function processGreenButtonSubscriptions(): Promise<void> {
       }
 
       try {
-        recordGreenButtonData(usageData, {})
+        await recordGreenButtonData(usageData, {})
         updatedMins[authorizationId] = usageData.updatedDate?.getTime() ?? 0
         saveCache()
       } catch (error) {

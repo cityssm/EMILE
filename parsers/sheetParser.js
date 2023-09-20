@@ -118,7 +118,7 @@ export class SheetParser extends BaseParser {
                     debug(`Skipping data value for asset ${assetId ?? ''}: '${dataValue}'`);
                     continue;
                 }
-                addEnergyData({
+                await addEnergyData({
                     assetId,
                     dataTypeId: energyDataType.dataTypeId,
                     fileId: this.energyDataFile.fileId,

@@ -159,13 +159,13 @@ function getEnergyDataTypeAndPowerOfTenMultiplier(
   }
 }
 
-export function recordGreenButtonData(
+export async function recordGreenButtonData(
   greenButtonJson: GreenButtonTypes.GreenButtonJson,
   options: {
     assetId?: number
     fileId?: number
   }
-): number {
+): Promise<number> {
   let recordCount = 0
 
   const intervalBlockEntries = greenButtonHelpers.getEntriesByContentType(
@@ -232,7 +232,7 @@ export function recordGreenButtonData(
             )
 
             if (currentDataPoint === undefined) {
-              addEnergyData(
+              await addEnergyData(
                 {
                   assetId,
                   dataTypeId: energyDataTypeAndPower.energyDataType.dataTypeId,

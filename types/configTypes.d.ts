@@ -1,5 +1,5 @@
 import type { ADWebAuthConfig } from '@cityssm/ad-web-auth-connector/types.js';
-import type { Configuration as GreenButtonSubscriberConfiguration } from '@cityssm/green-button-subscriber';
+import type { GreenButtonSubscriberConfiguration } from '@cityssm/green-button-subscriber';
 export interface Config {
     application: {
         applicationName?: string;
