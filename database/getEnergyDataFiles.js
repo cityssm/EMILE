@@ -1,4 +1,4 @@
-import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
+import { getConnectionWhenAvailable, getTempTableName } from '../helpers/functions.database.js';
 function buildWhereClause(filters) {
     let sqlWhereClause = '';
     const sqlParameters = [];
@@ -41,7 +41,7 @@ export async function getEnergyDataFiles(filters, options) {
     processedTimeMillis, isFailed, processedMessage,
     f.recordCreate_timeMillis, f.recordUpdate_timeMillis`;
     const { sqlParameters, sqlWhereClause } = buildWhereClause(filters);
-    let sql = `select ${groupByColumnNames},
+    const sql = `select ${groupByColumnNames},
     count(d.dataId) as energyDataCount,
     count(distinct d.assetId) as assetIdCount,
     min(d.timeSeconds) as timeSecondsMin,
@@ -54,13 +54,19 @@ export async function getEnergyDataFiles(filters, options) {
         ? ' 1 = 1'
         : 'f.recordDelete_timeMillis is null'}
     ${sqlWhereClause}
-    group by ${groupByColumnNames}
-    order by f.recordUpdate_timeMillis desc`;
+    group by ${groupByColumnNames}`;
+    let orderBy = ' order by recordUpdate_timeMillis desc';
     if (options.limit !== -1) {
-        sql += ` limit ${options.limit}`;
+        orderBy += ` limit ${options.limit}`;
     }
     const emileDB = await getConnectionWhenAvailable(true);
-    const dataFiles = emileDB.prepare(sql).all(sqlParameters);
+    const tempTableName = getTempTableName();
+    emileDB
+        .prepare(`create temp table ${tempTableName} as ${sql}`)
+        .run(sqlParameters);
+    const dataFiles = emileDB
+        .prepare(`select * from ${tempTableName} ${orderBy}`)
+        .all();
     emileDB.close();
     for (const dataFile of dataFiles) {
         if (dataFile.parserPropertiesJson !== undefined &&

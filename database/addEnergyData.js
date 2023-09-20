@@ -7,7 +7,7 @@ export async function addEnergyData(data, sessionUser, connectedEmileDB) {
         ? await getConnectionWhenAvailable()
         : connectedEmileDB;
     let result;
-    for (let retries = 0; retries <= 5; retries += 1) {
+    while (true) {
         try {
             const rightNowMillis = Date.now();
             result = emileDB
@@ -21,7 +21,7 @@ export async function addEnergyData(data, sessionUser, connectedEmileDB) {
             break;
         }
         catch {
-            debug('Waiting 1s ...');
+            debug('Waiting 1 second ...');
             await delay(1000);
         }
     }

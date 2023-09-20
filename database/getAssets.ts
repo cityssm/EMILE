@@ -3,7 +3,10 @@
 
 import type sqlite from 'better-sqlite3'
 
-import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
+import {
+  getConnectionWhenAvailable,
+  getTempTableName
+} from '../helpers/functions.database.js'
 import type { Asset } from '../types/recordTypes.js'
 
 interface GetAssetsFilters {
@@ -20,7 +23,7 @@ export async function getAssets(
   connectedEmileDB?: sqlite.Database
 ): Promise<Asset[]> {
   let sql = `select a.assetId, a.assetName, a.latitude, a.longitude,
-    a.categoryId, c.category, c.fontAwesomeIconClasses
+    a.categoryId, c.category, c.fontAwesomeIconClasses, c.orderNumber
     ${
       options?.includeEnergyDataStats ?? false
         ? ', s.timeSecondsMin, s.endTimeSecondsMax'
@@ -51,14 +54,22 @@ export async function getAssets(
     sqlParameters.push(filters.groupId)
   }
 
-  sql += ' order by c.orderNumber, c.category, a.assetName'
+  const orderBy = ' order by orderNumber, category, assetName'
 
   const emileDB =
     connectedEmileDB === undefined
       ? await getConnectionWhenAvailable(true)
       : connectedEmileDB
 
-  const assets = emileDB.prepare(sql).all(sqlParameters) as Asset[]
+  const tempTableName = getTempTableName()
+
+  emileDB
+    .prepare(`create temp table ${tempTableName} as ${sql}`)
+    .run(sqlParameters)
+
+  const assets = emileDB
+    .prepare(`select * from ${tempTableName} ${orderBy}`)
+    .all() as Asset[]
 
   if (connectedEmileDB === undefined) {
     emileDB.close()

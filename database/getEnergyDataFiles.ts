@@ -1,7 +1,10 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable @typescript-eslint/indent */
 
-import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
+import {
+  getConnectionWhenAvailable,
+  getTempTableName
+} from '../helpers/functions.database.js'
 import type { EnergyDataFile } from '../types/recordTypes.js'
 
 interface GetEnergyDataFilesFilters {
@@ -85,7 +88,7 @@ export async function getEnergyDataFiles(
 
   const { sqlParameters, sqlWhereClause } = buildWhereClause(filters)
 
-  let sql = `select ${groupByColumnNames},
+  const sql = `select ${groupByColumnNames},
     count(d.dataId) as energyDataCount,
     count(distinct d.assetId) as assetIdCount,
     min(d.timeSeconds) as timeSecondsMin,
@@ -100,16 +103,25 @@ export async function getEnergyDataFiles(
         : 'f.recordDelete_timeMillis is null'
     }
     ${sqlWhereClause}
-    group by ${groupByColumnNames}
-    order by f.recordUpdate_timeMillis desc`
+    group by ${groupByColumnNames}`
+
+  let orderBy = ' order by recordUpdate_timeMillis desc'
 
   if (options.limit !== -1) {
-    sql += ` limit ${options.limit}`
+    orderBy += ` limit ${options.limit}`
   }
 
   const emileDB = await getConnectionWhenAvailable(true)
 
-  const dataFiles = emileDB.prepare(sql).all(sqlParameters) as EnergyDataFile[]
+  const tempTableName = getTempTableName()
+
+  emileDB
+    .prepare(`create temp table ${tempTableName} as ${sql}`)
+    .run(sqlParameters)
+
+  const dataFiles = emileDB
+    .prepare(`select * from ${tempTableName} ${orderBy}`)
+    .all() as EnergyDataFile[]
 
   emileDB.close()
 

@@ -1,4 +1,4 @@
-import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
+import { getConnectionWhenAvailable, getTempTableName } from '../helpers/functions.database.js';
 import { getEnergyData } from './getEnergyData.js';
 export async function getReportData(reportName, reportParameters = {}) {
     let sql = '';
@@ -38,6 +38,7 @@ export async function getReportData(reportName, reportParameters = {}) {
             break;
         }
         case 'energyData-all': {
+            useTempTable = true;
             sql = 'select * from EnergyData';
             break;
         }
@@ -137,7 +138,7 @@ export async function getReportData(reportName, reportParameters = {}) {
     const emileDB = await getConnectionWhenAvailable(true);
     let resultRows = [];
     if (useTempTable) {
-        const tempTableName = `tmp_${Date.now()}`;
+        const tempTableName = getTempTableName();
         emileDB.prepare(`create temp table ${tempTableName} as ${sql}`).run();
         resultRows = emileDB.prepare(`select * from ${tempTableName}`).all();
     }

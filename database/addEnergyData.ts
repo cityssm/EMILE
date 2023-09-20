@@ -17,9 +17,9 @@ export async function addEnergyData(
       ? await getConnectionWhenAvailable()
       : connectedEmileDB
 
-  let result: sqlite.RunResult | undefined
+  let result: sqlite.RunResult
 
-  for (let retries = 0; retries <= 5; retries += 1) {
+  while (true) {
     try {
       const rightNowMillis = Date.now()
 
@@ -46,9 +46,10 @@ export async function addEnergyData(
           rightNowMillis
         )
 
+      // exit loop when successful
       break
     } catch {
-      debug('Waiting 1s ...')
+      debug('Waiting 1 second ...')
       await delay(1000)
     }
   }
