@@ -98,7 +98,7 @@ declare const cityssm: cityssmGlobal
 
       rowElement.innerHTML = `<td>${backupFile.fileName}</td>
         <td>${backupFile.lastModifiedTime}</td>
-        <td class="has-text-right">${backupFile.sizeInMegabytes} MB</td>
+        <td class="has-text-right">${backupFile.sizeInMegabytes.toFixed(2)} MB</td>
         <td>
           <div class="field is-grouped">
             <div class="control">

@@ -90,7 +90,7 @@
   </div>
   <% if (Object.keys(greenButtonSubscriptions).length > 0) { %>
     <div class="tab-content is-hidden" id="tab--subscriptions">
-      <h2 class="title is-4">Green Button Connect My Data</h2>
+      <h2 class="title is-4">Green Button® Connect My Data</h2>
 
       <table class="table is-fullwidth is-striped is-fade-hoverable has-sticky-header">
         <thead>
@@ -139,11 +139,11 @@
 <%- include('_footerA'); -%>
 
 <script>
-  exports.Emile.assets = <%- JSON.stringify(assets) %>;
+  exports.Emile.assets = <%- JSON.stringify(assets ?? []) %>;
 
-  exports.pendingFiles = <%- JSON.stringify(pendingFiles) %>;
-  exports.processedFiles = <%- JSON.stringify(processedFiles) %>;
-  exports.parserClassesAndConfigurations = <%- JSON.stringify(parserClassesAndConfigurations) %>;
+  exports.pendingFiles = <%- JSON.stringify(pendingFiles ?? []) %>;
+  exports.processedFiles = <%- JSON.stringify(processedFiles ?? []) %>;
+  exports.parserClassesAndConfigurations = <%- JSON.stringify(parserClassesAndConfigurations ?? []) %>;
 </script>
 <script src="<%= urlPrefix %>/javascripts/data.min.js"></script>
 
