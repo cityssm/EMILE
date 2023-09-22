@@ -61,3 +61,5 @@ available for managing municipal operations.
 ## Trademarks
 
 ® GREEN BUTTON is a registered trademark owned by Departments of the U.S. Government.
+
+The City of Sault Ste. Marie is a [Liaison member of the Green Button Alliance](https://www.greenbuttonalliance.org/members/sault-ste-marie).

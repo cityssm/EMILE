@@ -14,7 +14,7 @@ Filter and view energy data in charts and tables.
 [**Assets**](assets.md)<br />
 Manage tracked assets. Create groups of assets for easier reporting.
 
-[**Data Sources**](data.md)<br />
+[**Data Sources**](dataSources.md)<br />
 Add new energy data from supporting input files.
 
 [**Reports**](reports.md)<br />
