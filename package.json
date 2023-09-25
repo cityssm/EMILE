@@ -96,7 +96,7 @@
     "@types/gulp": "^4.0.13",
     "@types/gulp-changed": "^0.0.36",
     "@types/gulp-minify": "^3.1.2",
-    "@types/gulp-sass": "^5.0.1",
+    "@types/gulp-sass": "^5.0.2",
     "@types/http-errors": "^2.0.2",
     "@types/mocha": "^10.0.1",
     "@types/multer": "^1.4.7",
