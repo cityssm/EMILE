@@ -38,6 +38,8 @@ async function updateSsmPucAssetNames(): Promise<void> {
 
   const assetCategories = getAssetCategories()
 
+  const addressAlias = getAssetAliasTypeByAliasTypeKey('civicAddress')
+
   const gasAccountNumberAlias =
     getAssetAliasTypeByAliasTypeKey('accountNumber.gas')
 
@@ -52,15 +54,10 @@ async function updateSsmPucAssetNames(): Promise<void> {
       return possibleCategory.category === assetRow.category.trim()
     })
 
-    let hasUtilityApiAuthorizationNumber = false
+    if ((assetRow.utilityApiAuthorizationNumber ?? '') !== '') {
+      const utilityApiUrlLike = `https://utilityapi.com/DataCustodian/espi/1_1/resource/Subscription/${assetRow.utilityApiAuthorizationNumber}/%`
 
-    if (
-      assetRow.utilityApiAuthorizationNumber !== undefined &&
-      assetRow.utilityApiAuthorizationNumber !== ''
-    ) {
-      hasUtilityApiAuthorizationNumber = true
-
-      emileDB
+      const result = emileDB
         .prepare(
           `update Assets
             set categoryId = ?,
@@ -68,7 +65,7 @@ async function updateSsmPucAssetNames(): Promise<void> {
             recordUpdate_userName = ?,
             recordUpdate_timeMillis = ?
             where recordDelete_timeMillis is null
-            and assetName like 'https://utilityapi.com/DataCustodian/espi/1_1/resource/Subscription/${assetRow.utilityApiAuthorizationNumber}/%'`
+            and assetName like '${utilityApiUrlLike}'`
         )
         .run(
           assetCategory?.categoryId,
@@ -76,6 +73,51 @@ async function updateSsmPucAssetNames(): Promise<void> {
           updateUser.userName,
           Date.now()
         )
+
+      if (result.changes > 0) {
+        const asset = emileDB
+          .prepare(
+            `select assetId from AssetAliases
+              where assetAlias like '${utilityApiUrlLike}'`
+          )
+          .get() as { assetId: number }
+
+        if ((assetRow.address ?? '') !== '') {
+          addAssetAlias(
+            {
+              assetId: asset.assetId,
+              aliasTypeId: addressAlias?.aliasTypeId,
+              assetAlias: assetRow.address
+            },
+            updateUser,
+            emileDB
+          )
+        }
+
+        if ((assetRow.accountNumberElectricity ?? '') !== '') {
+          addAssetAlias(
+            {
+              assetId: asset.assetId,
+              aliasTypeId: electricityAccountNumberAlias?.aliasTypeId,
+              assetAlias: (assetRow.accountNumberElectricity ?? 0).toString()
+            },
+            updateUser,
+            emileDB
+          )
+        }
+
+        if ((assetRow.accountNumberGas ?? '') !== '') {
+          addAssetAlias(
+            {
+              assetId: asset.assetId,
+              aliasTypeId: gasAccountNumberAlias?.aliasTypeId,
+              assetAlias: assetRow.accountNumberGas
+            },
+            updateUser,
+            emileDB
+          )
+        }
+      }
     }
 
     /*
