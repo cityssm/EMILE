@@ -199,6 +199,7 @@ function initializeAssetAliasTypes(emileDB) {
     if (result === undefined) {
         addAssetAliasType({
             aliasType: 'Civic Address',
+            aliasTypeKey: 'civicAddress',
             orderNumber: 1
         }, initializeDatabaseUser);
         addAssetAliasType({

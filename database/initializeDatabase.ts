@@ -304,12 +304,13 @@ function initializeAssetAliasTypes(emileDB: sqlite.Database): void {
 
   const result = emileDB
     .prepare('select aliasTypeId from AssetAliasTypes limit 1')
-    .get()
+    .get() 
 
   if (result === undefined) {
     addAssetAliasType(
       {
         aliasType: 'Civic Address',
+        aliasTypeKey: 'civicAddress',
         orderNumber: 1
       },
       initializeDatabaseUser
