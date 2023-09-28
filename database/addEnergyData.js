@@ -1,6 +1,7 @@
 import Debug from 'debug';
 import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
 import { delay } from '../helpers/functions.utilities.js';
+import { ensureEnergyDataTableExists } from './manageEnergyDataTables.js';
 const debug = Debug('emile:database:addEnergyData');
 export async function addEnergyData(data, sessionUser, connectedEmileDB) {
     const emileDB = connectedEmileDB === undefined
@@ -10,8 +11,9 @@ export async function addEnergyData(data, sessionUser, connectedEmileDB) {
     while (true) {
         try {
             const rightNowMillis = Date.now();
+            const tableName = await ensureEnergyDataTableExists(data.assetId);
             result = emileDB
-                .prepare(`insert into EnergyData (
+                .prepare(`insert into ${tableName} (
             assetId, dataTypeId, fileId,
             timeSeconds, durationSeconds, dataValue, powerOfTenMultiplier,
             recordCreate_userName, recordCreate_timeMillis,

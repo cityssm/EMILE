@@ -13,6 +13,7 @@ interface AssetRow {
   assetName: string
   address: string
   accountNumberElectricity?: number | ''
+  utilityApiAuthorizationNumber?: number | ''
   accountNumberGas?: string
   services: string
 }
@@ -24,7 +25,7 @@ const updateUser = {
   isAdmin: false
 }
 
-function updateSsmPucAssetNames(): void {
+async function updateSsmPucAssetNames(): Promise<void> {
   const workbook = XLSX.readFile('./temp/assetNames.xlsx', {})
 
   const worksheet = workbook.Sheets[workbook.SheetNames[0]]
@@ -51,13 +52,13 @@ function updateSsmPucAssetNames(): void {
       return possibleCategory.category === assetRow.category.trim()
     })
 
-    let hasElectricityAccountNumber = false
+    let hasUtilityApiAuthorizationNumber = false
 
     if (
-      assetRow.accountNumberElectricity !== undefined &&
-      assetRow.accountNumberElectricity !== ''
+      assetRow.utilityApiAuthorizationNumber !== undefined &&
+      assetRow.utilityApiAuthorizationNumber !== ''
     ) {
-      hasElectricityAccountNumber = true
+      hasUtilityApiAuthorizationNumber = true
 
       emileDB
         .prepare(
@@ -67,17 +68,17 @@ function updateSsmPucAssetNames(): void {
             recordUpdate_userName = ?,
             recordUpdate_timeMillis = ?
             where recordDelete_timeMillis is null
-            and assetName = ?`
+            and assetName like 'https://utilityapi.com/DataCustodian/espi/1_1/resource/Subscription/${assetRow.utilityApiAuthorizationNumber}/%'`
         )
         .run(
           assetCategory?.categoryId,
           assetRow.assetName.trim(),
           updateUser.userName,
-          Date.now(),
-          assetRow.accountNumberElectricity.toString()
+          Date.now()
         )
     }
 
+    /*
     if (
       assetRow.accountNumberGas !== undefined &&
       assetRow.accountNumberGas !== ''
@@ -98,7 +99,7 @@ function updateSsmPucAssetNames(): void {
       }
 
       if (assetId === undefined) {
-        assetId = addAsset(
+        assetId = await addAsset(
           {
             assetName: assetRow.assetName,
             categoryId: assetCategory?.categoryId
@@ -118,9 +119,11 @@ function updateSsmPucAssetNames(): void {
         emileDB
       )
     }
+
+    */
   }
 
   emileDB.close()
 }
 
-updateSsmPucAssetNames()
+await updateSsmPucAssetNames()

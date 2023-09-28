@@ -33,10 +33,10 @@ const greenButtonUser: EmileUser = {
   isAdmin: false
 }
 
-function getAssetIdFromIntervalBlock(
+async function getAssetIdFromIntervalBlock(
   intervalBlockEntry: GreenButtonTypes.GreenButtonEntryWithIntervalBlockContent,
   connectedEmileDB: sqlite.Database
-): number {
+): Promise<number> {
   let assetId: number
 
   let assetAlias = intervalBlockEntry.links.self ?? ''
@@ -70,7 +70,7 @@ function getAssetIdFromIntervalBlock(
       )
     }
 
-    assetId = addAsset(
+    assetId = await addAsset(
       {
         assetName: assetAlias,
         categoryId: assetCategory.categoryId
@@ -190,7 +190,7 @@ export async function recordGreenButtonData(
       let assetId = options.assetId
 
       if ((assetId ?? '') === '') {
-        assetId = getAssetIdFromIntervalBlock(intervalBlockEntry, emileDB)
+        assetId = await getAssetIdFromIntervalBlock(intervalBlockEntry, emileDB)
       }
 
       /*

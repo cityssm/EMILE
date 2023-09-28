@@ -79,7 +79,7 @@ export class SheetParser extends BaseParser {
                         if (assetCategory === undefined) {
                             throw new Error(`Cannot create asset ${assetAlias} with no asset categories available.`);
                         }
-                        assetId = addAsset({
+                        assetId = await addAsset({
                             assetName: assetAlias,
                             categoryId: assetCategory.categoryId
                         }, SheetParser.parserUser, emileDB);

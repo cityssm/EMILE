@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { type RequestHandler, Router } from 'express'
 
 import handler_assets from '../handlers/assets-get/assets.js'
 import handler_doAddAsset from '../handlers/assets-post/doAddAsset.js'
@@ -18,19 +18,35 @@ import { updatePostHandler } from '../handlers/permissions.js'
 
 export const router = Router()
 
-router.get('/', handler_assets)
+router.get('/', handler_assets as RequestHandler)
 
 // Assets
 
-router.post('/doAddAsset', updatePostHandler, handler_doAddAsset)
+router.post(
+  '/doAddAsset',
+  updatePostHandler,
+  handler_doAddAsset as RequestHandler
+)
 
 router.post('/doGetAsset', handler_doGetAsset)
 
-router.post('/doUpdateAsset', updatePostHandler, handler_doUpdateAsset)
+router.post(
+  '/doUpdateAsset',
+  updatePostHandler,
+  handler_doUpdateAsset as RequestHandler
+)
 
-router.post('/doMergeAssets', updatePostHandler, handler_doMergeAssets)
+router.post(
+  '/doMergeAssets',
+  updatePostHandler,
+  handler_doMergeAssets as RequestHandler
+)
 
-router.post('/doDeleteAsset', updatePostHandler, handler_doDeleteAsset)
+router.post(
+  '/doDeleteAsset',
+  updatePostHandler,
+  handler_doDeleteAsset as RequestHandler
+)
 
 // Asset Aliases
 
@@ -46,7 +62,7 @@ router.post(
 
 router.post('/doAddAssetGroup', updatePostHandler, handler_doAddAssetGroup)
 
-router.post('/doGetAssetGroup', handler_doGetAssetGroup)
+router.post('/doGetAssetGroup', handler_doGetAssetGroup as RequestHandler)
 
 router.post(
   '/doUpdateAssetGroup',
@@ -57,13 +73,13 @@ router.post(
 router.post(
   '/doAddAssetGroupMember',
   updatePostHandler,
-  handler_doAddAssetGroupMember
+  handler_doAddAssetGroupMember as RequestHandler
 )
 
 router.post(
   '/doDeleteAssetGroupMember',
   updatePostHandler,
-  handler_doDeleteAssetGroupMember
+  handler_doDeleteAssetGroupMember as RequestHandler
 )
 
 router.post(

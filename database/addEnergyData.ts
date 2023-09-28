@@ -5,6 +5,8 @@ import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 import { delay } from '../helpers/functions.utilities.js'
 import type { EnergyData } from '../types/recordTypes.js'
 
+import { ensureEnergyDataTableExists } from './manageEnergyDataTables.js'
+
 const debug = Debug('emile:database:addEnergyData')
 
 export async function addEnergyData(
@@ -23,9 +25,13 @@ export async function addEnergyData(
     try {
       const rightNowMillis = Date.now()
 
+      const tableName = await ensureEnergyDataTableExists(
+        data.assetId as number
+      )
+
       result = emileDB
         .prepare(
-          `insert into EnergyData (
+          `insert into ${tableName} (
             assetId, dataTypeId, fileId,
             timeSeconds, durationSeconds, dataValue, powerOfTenMultiplier,
             recordCreate_userName, recordCreate_timeMillis,

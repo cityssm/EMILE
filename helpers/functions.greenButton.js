@@ -18,7 +18,7 @@ const greenButtonUser = {
     canUpdate: true,
     isAdmin: false
 };
-function getAssetIdFromIntervalBlock(intervalBlockEntry, connectedEmileDB) {
+async function getAssetIdFromIntervalBlock(intervalBlockEntry, connectedEmileDB) {
     let assetId;
     let assetAlias = intervalBlockEntry.links.self ?? '';
     if (assetAlias === undefined) {
@@ -34,7 +34,7 @@ function getAssetIdFromIntervalBlock(intervalBlockEntry, connectedEmileDB) {
         if (assetCategory === undefined) {
             throw new Error(`Cannot create asset ${assetAlias} with no asset categories available.`);
         }
-        assetId = addAsset({
+        assetId = await addAsset({
             assetName: assetAlias,
             categoryId: assetCategory.categoryId
         }, greenButtonUser, connectedEmileDB);
@@ -88,7 +88,7 @@ export async function recordGreenButtonData(greenButtonJson, options) {
         for (const intervalBlockEntry of intervalBlockEntries) {
             let assetId = options.assetId;
             if ((assetId ?? '') === '') {
-                assetId = getAssetIdFromIntervalBlock(intervalBlockEntry, emileDB);
+                assetId = await getAssetIdFromIntervalBlock(intervalBlockEntry, emileDB);
             }
             const energyDataTypeAndPower = getEnergyDataTypeAndPowerOfTenMultiplier(greenButtonJson, intervalBlockEntry, emileDB);
             if (energyDataTypeAndPower === undefined ||

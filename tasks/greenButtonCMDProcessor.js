@@ -35,6 +35,9 @@ async function processGreenButtonSubscriptions() {
             break;
         }
         debug(`Loading authorizations for subscription: ${subscriptionKey} ...`);
+        if (updatedMins[subscriptionKey] === undefined) {
+            updatedMins[subscriptionKey] = {};
+        }
         const greenButtonSubscriber = new GreenButtonSubscriber(greenButtonSubscription.configuration);
         const authorizations = await greenButtonSubscriber.getAuthorizations();
         if (authorizations === undefined) {
@@ -56,7 +59,7 @@ async function processGreenButtonSubscriptions() {
                 debug(`Skipping authorization id: ${subscriptionKey}, ${authorizationId}`);
                 continue;
             }
-            const updatedMinMillis = updatedMins[authorizationId];
+            const updatedMinMillis = updatedMins[subscriptionKey][authorizationId];
             let updatedMin;
             if ((updatedMinMillis ?? undefined) === undefined) {
                 updatedMin = new Date();
@@ -78,7 +81,8 @@ async function processGreenButtonSubscriptions() {
             }
             try {
                 await recordGreenButtonData(usageData, {});
-                updatedMins[authorizationId] = usageData.updatedDate?.getTime() ?? 0;
+                updatedMins[subscriptionKey][authorizationId] =
+                    usageData.updatedDate?.getTime() ?? 0;
                 saveCache();
             }
             catch (error) {

@@ -371,20 +371,22 @@ Object.defineProperty(exports, "__esModule", { value: true });
           <input class="selectedAssetId" id="selectedAssetId_${asset.assetId}" type="checkbox" value="${asset.assetId}" />
           </td>`;
             }
+            const endTimeSecondsDate = new Date(((_e = asset.endTimeSecondsMax) !== null && _e !== void 0 ? _e : 0) * 1000);
+            const highlightCell = asset.endTimeSecondsMax === null || Date.now() - endTimeSecondsDate.getTime() >= 32 * 86400 * 1000;
             rowElement.insertAdjacentHTML('beforeend', `<td class="has-width-10 has-text-centered">
-        <i class="${(_e = asset.fontAwesomeIconClasses) !== null && _e !== void 0 ? _e : 'fas fa-bolt'}" aria-hidden="true"></i>
+        <i class="${(_f = asset.fontAwesomeIconClasses) !== null && _f !== void 0 ? _f : 'fas fa-bolt'}" aria-hidden="true"></i>
         </td>
         <td data-field="category"></td>
         <td><a data-field="assetName" href="#"></a></td>
         <td>
           ${asset.timeSecondsMin === null
                 ? '<span class="has-text-grey">(No Data)</span>'
-                : new Date(((_f = asset.timeSecondsMin) !== null && _f !== void 0 ? _f : 0) * 1000).toLocaleString()}
+                : new Date(((_g = asset.timeSecondsMin) !== null && _g !== void 0 ? _g : 0) * 1000).toLocaleString()}
         </td>
-        <td>
+        <td ${highlightCell ? ' class="has-background-warning" title="Past Date"' : ''}>
           ${asset.endTimeSecondsMax === null
                 ? ''
-                : new Date(((_g = asset.endTimeSecondsMax) !== null && _g !== void 0 ? _g : 0) * 1000).toLocaleString()}
+                : endTimeSecondsDate.toLocaleString()}
         </td>
         <td class="has-width-10 has-text-centered has-text-nowrap">
           ${((_h = asset.latitude) !== null && _h !== void 0 ? _h : '') === '' || ((_j = asset.longitude) !== null && _j !== void 0 ? _j : '') === ''

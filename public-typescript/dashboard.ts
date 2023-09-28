@@ -290,7 +290,7 @@ declare const cityssm: cityssmGlobal
             charts[chartKey] = {
               chart,
               table,
-              exportLink: dashboardContainer.querySelector(
+              exportLink: panelElement.querySelector(
                 '.is-export-link'
               ) as HTMLAnchorElement,
               assetId: dataItem.assetId as number,

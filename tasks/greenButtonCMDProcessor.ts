@@ -3,6 +3,7 @@
 import fs from 'node:fs'
 
 import { helpers as greenButtonHelpers } from '@cityssm/green-button-parser'
+import type { GreenButtonJson } from '@cityssm/green-button-parser/types/entryTypes.js'
 import { GreenButtonSubscriber } from '@cityssm/green-button-subscriber'
 import Debug from 'debug'
 import exitHook from 'exit-hook'
@@ -21,7 +22,7 @@ const pollingIntervalMillis = 86_400 * 1000 + 60_000
 
 const updatedMinsCacheFile = 'data/caches/greenButtonCMDProcessor.json'
 
-let updatedMins: Record<string, number> = {}
+let updatedMins: Record<string, Record<string, number>> = {}
 
 try {
   updatedMins = JSON.parse(
@@ -62,6 +63,10 @@ async function processGreenButtonSubscriptions(): Promise<void> {
 
     debug(`Loading authorizations for subscription: ${subscriptionKey} ...`)
 
+    if (updatedMins[subscriptionKey] === undefined) {
+      updatedMins[subscriptionKey] = {}
+    }
+
     const greenButtonSubscriber = new GreenButtonSubscriber(
       greenButtonSubscription.configuration
     )
@@ -74,7 +79,7 @@ async function processGreenButtonSubscriptions(): Promise<void> {
     }
 
     const entries = greenButtonHelpers.getEntriesByContentType(
-      authorizations,
+      authorizations as GreenButtonJson,
       'Authorization'
     )
 
@@ -103,7 +108,7 @@ async function processGreenButtonSubscriptions(): Promise<void> {
         continue
       }
 
-      const updatedMinMillis = updatedMins[authorizationId]
+      const updatedMinMillis = updatedMins[subscriptionKey][authorizationId]
       let updatedMin: Date
 
       if ((updatedMinMillis ?? undefined) === undefined) {
@@ -136,8 +141,9 @@ async function processGreenButtonSubscriptions(): Promise<void> {
       }
 
       try {
-        await recordGreenButtonData(usageData, {})
-        updatedMins[authorizationId] = usageData.updatedDate?.getTime() ?? 0
+        await recordGreenButtonData(usageData as GreenButtonJson, {})
+        updatedMins[subscriptionKey][authorizationId] =
+          usageData.updatedDate?.getTime() ?? 0
         saveCache()
       } catch (error) {
         debug(`Error recording data: ${subscriptionKey}, ${authorizationId}`)

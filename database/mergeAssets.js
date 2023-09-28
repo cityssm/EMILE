@@ -1,6 +1,7 @@
 import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
 import { addAsset } from './addAsset.js';
 import { deleteAsset } from './deleteAsset.js';
+import { ensureEnergyDataTableExists } from './manageEnergyDataTables.js';
 export async function mergeAssets(assetForm, sessionUser) {
     const emileDB = await getConnectionWhenAvailable();
     let latitude;
@@ -11,12 +12,13 @@ export async function mergeAssets(assetForm, sessionUser) {
         latitude = Number.parseFloat(latitudeLongitudeSplit[0]);
         longitude = Number.parseFloat(latitudeLongitudeSplit[1]);
     }
-    const newAssetId = addAsset({
+    const newAssetId = await addAsset({
         categoryId: Number.parseInt(assetForm.categoryId, 10),
         assetName: assetForm.assetName,
         latitude,
         longitude
     }, sessionUser, emileDB);
+    const newAssetTableName = await ensureEnergyDataTableExists(newAssetId);
     const mergeAssetIds = assetForm.assetIds.split(',');
     const rightNowMillis = Date.now();
     for (const mergeAssetId of mergeAssetIds) {
@@ -37,14 +39,32 @@ export async function mergeAssets(assetForm, sessionUser) {
           and assetId = ?
           and groupId not in (select groupId from AssetGroupMembers where assetId = ?)`)
             .run(newAssetId, sessionUser.userName, rightNowMillis, mergeAssetId, newAssetId);
+        const mergeAssetTableName = await ensureEnergyDataTableExists(mergeAssetId, emileDB);
         emileDB
-            .prepare(`update EnergyData
-          set assetId = ?,
-          recordUpdate_userName = ?,
-          recordUpdate_timeMillis = ?
-          where recordDelete_timeMillis is null
-          and assetId = ?`)
-            .run(newAssetId, sessionUser.userName, rightNowMillis, mergeAssetId);
+            .prepare(`insert into ${newAssetTableName}
+          (assetId, dataTypeId, fileId,
+            timeSeconds, durationSeconds,
+            dataValue, powerOfTenMultiplier,
+            recordCreate_userName, recordCreate_timeMillis,
+            recordUpdate_userName, recordUpdate_timeMillis)
+
+          select
+            ? as assetId,
+            dataTypeId, fileId,
+            timeSeconds, durationSeconds,
+            dataValue, powerOfTenMultiplier,
+            recordCreate_userName, recordCreate_timeMillis,
+            ? as recordUpdate_userName,
+            ? as recordUpdate_timeMillis
+          from ${mergeAssetTableName}
+          where recordDelete_timeMillis is null`)
+            .run(newAssetId, sessionUser.userName, rightNowMillis);
+        emileDB
+            .prepare(`update ${mergeAssetTableName}
+          set recordDelete_userName = ?,
+          recordDelete_timeMillis = ?
+          where recordDelete_timeMillis is null`)
+            .run(sessionUser.userName, rightNowMillis);
         deleteAsset(mergeAssetId, sessionUser, emileDB);
     }
     emileDB.close();

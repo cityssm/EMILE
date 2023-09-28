@@ -604,6 +604,9 @@ interface ErrorResponse {
           </td>`
       }
 
+      const endTimeSecondsDate = new Date((asset.endTimeSecondsMax ?? 0) * 1000)
+      const highlightCell = asset.endTimeSecondsMax === null || Date.now() - endTimeSecondsDate.getTime() >= 32 * 86_400 * 1000
+
       rowElement.insertAdjacentHTML(
         'beforeend',
         `<td class="has-width-10 has-text-centered">
@@ -620,11 +623,11 @@ interface ErrorResponse {
               : new Date((asset.timeSecondsMin ?? 0) * 1000).toLocaleString()
           }
         </td>
-        <td>
+        <td ${highlightCell ? ' class="has-background-warning" title="Past Date"' : ''}>
           ${
             asset.endTimeSecondsMax === null
               ? ''
-              : new Date((asset.endTimeSecondsMax ?? 0) * 1000).toLocaleString()
+              : endTimeSecondsDate.toLocaleString()
           }
         </td>
         <td class="has-width-10 has-text-centered has-text-nowrap">

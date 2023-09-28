@@ -10,6 +10,7 @@ import { addEnergyReadingType } from './addEnergyReadingType.js';
 import { addEnergyServiceCategory } from './addEnergyServiceCategory.js';
 import { addEnergyUnit } from './addEnergyUnit.js';
 import { addUser } from './addUser.js';
+import { refreshEnergyDataTableView } from './manageEnergyDataTables.js';
 const debug = Debug('emile:database:initializeDatabase');
 const initializeDatabaseUser = {
     userName: 'system.initialize',
@@ -17,7 +18,7 @@ const initializeDatabaseUser = {
     canUpdate: true,
     isAdmin: true
 };
-const recordColumns = ` recordCreate_userName varchar(30) not null,
+export const recordColumns = ` recordCreate_userName varchar(30) not null,
     recordCreate_timeMillis integer not null,
     recordUpdate_userName varchar(30) not null,
     recordUpdate_timeMillis integer not null,
@@ -217,7 +218,7 @@ function initializeAssetAliasTypes(emileDB) {
         }, initializeDatabaseUser);
     }
 }
-export function initializeDatabase() {
+export async function initializeDatabase() {
     const emileDB = sqlite(databasePath);
     const row = emileDB
         .prepare(`select name from sqlite_master
@@ -299,25 +300,7 @@ export function initializeDatabase() {
         primary key (groupId, assetId)
       )`)
         .run();
-    emileDB
-        .prepare(`create table if not exists EnergyData (
-        dataId integer primary key autoincrement,
-        assetId integer not null references Assets (assetId),
-        dataTypeId integer not null references EnergyDataTypes (dataTypeId),
-        fileId integer references EnergyDataFiles (fileId),
-        timeSeconds integer not null check (timeSeconds > 0),
-        durationSeconds integer not null check (durationSeconds > 0),
-        endTimeSeconds integer not null generated always as (timeSeconds + durationSeconds) virtual,
-        dataValue decimal(10, 2) not null,
-        powerOfTenMultiplier integer not null default 0,
-        ${recordColumns}
-      )`)
-        .run();
-    emileDB
-        .prepare(`create index if not exists idx_EnergyData on EnergyData
-        (assetId, dataTypeId, timeSeconds)
-        where recordDelete_timeMillis is null`)
-        .run();
+    await refreshEnergyDataTableView(emileDB);
     emileDB
         .prepare(`create table if not exists Users (
         userName varchar(30) primary key,

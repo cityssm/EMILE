@@ -12,6 +12,7 @@ import { addEnergyReadingType } from './addEnergyReadingType.js'
 import { addEnergyServiceCategory } from './addEnergyServiceCategory.js'
 import { addEnergyUnit } from './addEnergyUnit.js'
 import { addUser } from './addUser.js'
+import { refreshEnergyDataTableView } from './manageEnergyDataTables.js'
 
 const debug = Debug('emile:database:initializeDatabase')
 
@@ -22,7 +23,7 @@ const initializeDatabaseUser: EmileUser = {
   isAdmin: true
 }
 
-const recordColumns = ` recordCreate_userName varchar(30) not null,
+export const recordColumns = ` recordCreate_userName varchar(30) not null,
     recordCreate_timeMillis integer not null,
     recordUpdate_userName varchar(30) not null,
     recordUpdate_timeMillis integer not null,
@@ -343,7 +344,7 @@ function initializeAssetAliasTypes(emileDB: sqlite.Database): void {
   }
 }
 
-export function initializeDatabase(): void {
+export async function initializeDatabase(): Promise<void> {
   const emileDB = sqlite(databasePath)
 
   const row = emileDB
@@ -480,30 +481,7 @@ export function initializeDatabase(): void {
    * Energy Data
    */
 
-  emileDB
-    .prepare(
-      `create table if not exists EnergyData (
-        dataId integer primary key autoincrement,
-        assetId integer not null references Assets (assetId),
-        dataTypeId integer not null references EnergyDataTypes (dataTypeId),
-        fileId integer references EnergyDataFiles (fileId),
-        timeSeconds integer not null check (timeSeconds > 0),
-        durationSeconds integer not null check (durationSeconds > 0),
-        endTimeSeconds integer not null generated always as (timeSeconds + durationSeconds) virtual,
-        dataValue decimal(10, 2) not null,
-        powerOfTenMultiplier integer not null default 0,
-        ${recordColumns}
-      )`
-    )
-    .run()
-
-  emileDB
-    .prepare(
-      `create index if not exists idx_EnergyData on EnergyData
-        (assetId, dataTypeId, timeSeconds)
-        where recordDelete_timeMillis is null`
-    )
-    .run()
+  await refreshEnergyDataTableView(emileDB)
 
   /*
    * Users

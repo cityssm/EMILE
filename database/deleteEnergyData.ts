@@ -1,16 +1,22 @@
-import sqlite from 'better-sqlite3'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 
-import { databasePath, getConnectionWhenAvailable } from '../helpers/functions.database.js'
+import {
+  ensureEnergyDataTableExists,
+  reloadEnergyDataTableNames
+} from './manageEnergyDataTables.js'
 
-export function deleteEnergyData(
+export async function deleteEnergyData(
+  assetId: number | string,
   dataId: number | string,
   sessionUser: EmileUser
-): boolean {
-  const emileDB = sqlite(databasePath)
+): Promise<boolean> {
+  const emileDB = await getConnectionWhenAvailable()
+
+  const tableName = await ensureEnergyDataTableExists(assetId, emileDB)
 
   const result = emileDB
     .prepare(
-      `update EnergyData
+      `update ${tableName}
         set recordDelete_userName = ?,
         recordDelete_timeMillis = ?
         where recordDelete_timeMillis is null
@@ -29,17 +35,25 @@ export async function deleteEnergyDataByFileId(
 ): Promise<boolean> {
   const emileDB = await getConnectionWhenAvailable()
 
-  const result = emileDB
-    .prepare(
-      `update EnergyData
-        set recordDelete_userName = ?,
-        recordDelete_timeMillis = ?
-        where recordDelete_timeMillis is null
-        and fileId = ?`
-    )
-    .run(sessionUser.userName, Date.now(), fileId)
+  const tableNames = await reloadEnergyDataTableNames(emileDB)
+
+  let count = 0
+
+  for (const tableName of tableNames) {
+    const result = emileDB
+      .prepare(
+        `update ${tableName}
+          set recordDelete_userName = ?,
+          recordDelete_timeMillis = ?
+          where recordDelete_timeMillis is null
+          and fileId = ?`
+      )
+      .run(sessionUser.userName, Date.now(), fileId)
+
+    count += result.changes
+  }
 
   emileDB.close()
 
-  return result.changes > 0
+  return count > 0
 }

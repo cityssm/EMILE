@@ -2,6 +2,7 @@ import { powerOfTenMultipliers } from '@cityssm/green-button-parser/lookups.js';
 import { dateStringToDate } from '@cityssm/utils-datetime';
 import sqlite from 'better-sqlite3';
 import { databasePath, getConnectionWhenAvailable, getTempTableName } from '../helpers/functions.database.js';
+import { ensureEnergyDataTableExists } from './manageEnergyDataTables.js';
 function userFunction_getPowerOfTenMultiplierName(powerOfTenMultiplier) {
     if (powerOfTenMultiplier === 0) {
         return '';
@@ -61,7 +62,7 @@ export async function getEnergyData(filters, options) {
         filters.startDateString !== filters.endDateString;
     const columnNames = options?.formatForExport ?? false
         ? `d.dataId,
-        c.category, a.assetName, 
+        c.category, a.assetName,
         ts.serviceCategory,
         userFunction_getPowerOfTenMultiplierName(d.powerOfTenMultiplier) as powerOfTenMultiplierName,
         tu.unit,
@@ -103,9 +104,13 @@ export async function getEnergyData(filters, options) {
         d.fileId, f.originalFileName,
         d.timeSeconds, d.durationSeconds, d.endTimeSeconds,
         d.dataValue, d.powerOfTenMultiplier`;
+    const emileDB = await getConnectionWhenAvailable(true);
+    const tableName = (filters.assetId ?? '') === ''
+        ? 'EnergyData'
+        : await ensureEnergyDataTableExists(filters.assetId, emileDB);
     const { sqlParameters, sqlWhereClause } = buildWhereClause(filters);
     let sql = `select ${columnNames}
-    from EnergyData d
+    from ${tableName} d
     left join Assets a
       on d.assetId = a.assetId
     left join AssetCategories c
@@ -131,8 +136,9 @@ export async function getEnergyData(filters, options) {
         sql +=
             " group by d.assetId, d.dataTypeId, substr(datetime(d.timeSeconds, 'unixepoch', 'localtime'), 1, 10), d.powerOfTenMultiplier";
     }
-    const orderBy = ' order by assetId, dataTypeId, timeSeconds';
-    const emileDB = await getConnectionWhenAvailable(true);
+    const orderBy = options?.formatForExport ?? false
+        ? ''
+        : ' order by assetId, dataTypeId, timeSeconds';
     emileDB.function('userFunction_getPowerOfTenMultiplierName', userFunction_getPowerOfTenMultiplierName);
     const tempTableName = getTempTableName();
     emileDB

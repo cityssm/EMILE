@@ -1,8 +1,5 @@
 import sqlite from 'better-sqlite3';
 import XLSX from 'xlsx';
-import { addAsset } from '../database/addAsset.js';
-import { addAssetAlias } from '../database/addAssetAlias.js';
-import { getAssetByAssetAlias } from '../database/getAsset.js';
 import { getAssetAliasTypeByAliasTypeKey } from '../database/getAssetAliasType.js';
 import { getAssetCategories } from '../database/getAssetCategories.js';
 import { databasePath } from '../helpers/functions.database.js';
@@ -12,7 +9,7 @@ const updateUser = {
     canUpdate: true,
     isAdmin: false
 };
-function updateSsmPucAssetNames() {
+async function updateSsmPucAssetNames() {
     const workbook = XLSX.readFile('./temp/assetNames.xlsx', {});
     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
     const assetRows = XLSX.utils.sheet_to_json(worksheet, {
@@ -27,10 +24,10 @@ function updateSsmPucAssetNames() {
         const assetCategory = assetCategories.find((possibleCategory) => {
             return possibleCategory.category === assetRow.category.trim();
         });
-        let hasElectricityAccountNumber = false;
-        if (assetRow.accountNumberElectricity !== undefined &&
-            assetRow.accountNumberElectricity !== '') {
-            hasElectricityAccountNumber = true;
+        let hasUtilityApiAuthorizationNumber = false;
+        if (assetRow.utilityApiAuthorizationNumber !== undefined &&
+            assetRow.utilityApiAuthorizationNumber !== '') {
+            hasUtilityApiAuthorizationNumber = true;
             emileDB
                 .prepare(`update Assets
             set categoryId = ?,
@@ -38,32 +35,10 @@ function updateSsmPucAssetNames() {
             recordUpdate_userName = ?,
             recordUpdate_timeMillis = ?
             where recordDelete_timeMillis is null
-            and assetName = ?`)
-                .run(assetCategory?.categoryId, assetRow.assetName.trim(), updateUser.userName, Date.now(), assetRow.accountNumberElectricity.toString());
-        }
-        if (assetRow.accountNumberGas !== undefined &&
-            assetRow.accountNumberGas !== '') {
-            let assetId;
-            const gasAccountNumber = assetRow.accountNumberGas.replace("'", '');
-            if (hasElectricityAccountNumber) {
-                const asset = getAssetByAssetAlias(assetRow.accountNumberElectricity?.toString() ?? '', electricityAccountNumberAlias?.aliasTypeId);
-                if (asset !== undefined) {
-                    assetId = asset.assetId ?? 0;
-                }
-            }
-            if (assetId === undefined) {
-                assetId = addAsset({
-                    assetName: assetRow.assetName,
-                    categoryId: assetCategory?.categoryId
-                }, updateUser, emileDB);
-            }
-            addAssetAlias({
-                aliasTypeId: gasAccountNumberAlias?.aliasTypeId,
-                assetId: assetId ?? 0,
-                assetAlias: gasAccountNumber
-            }, updateUser, emileDB);
+            and assetName like 'https://utilityapi.com/DataCustodian/espi/1_1/resource/Subscription/${assetRow.utilityApiAuthorizationNumber}/%'`)
+                .run(assetCategory?.categoryId, assetRow.assetName.trim(), updateUser.userName, Date.now());
         }
     }
     emileDB.close();
 }
-updateSsmPucAssetNames();
+await updateSsmPucAssetNames();

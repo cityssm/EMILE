@@ -41,7 +41,7 @@ router.post('/doDeleteUser', handler_doDeleteUser)
 router.get('/database', handler_database as RequestHandler)
 
 router.post('/doBackupDatabase', handler_doBackupDatabase as RequestHandler)
-router.post('/doCleanupDatabase', handler_doCleanupDatabase)
+router.post('/doCleanupDatabase', handler_doCleanupDatabase as RequestHandler)
 
 router.post('/doDeleteBackupFile', handler_doDeleteBackupFile as RequestHandler)
 

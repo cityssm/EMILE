@@ -183,7 +183,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
                     charts[chartKey] = {
                         chart,
                         table,
-                        exportLink: dashboardContainer.querySelector('.is-export-link'),
+                        exportLink: panelElement.querySelector('.is-export-link'),
                         assetId: dataItem.assetId,
                         dataTypeId: dataItem.dataTypeId,
                         timeSecondsMin: dataItem.timeSeconds,

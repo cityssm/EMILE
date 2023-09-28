@@ -1,4 +1,10 @@
-import { type NextFunction, type Request, type Response, Router } from 'express'
+import {
+  type NextFunction,
+  type Request,
+  type Response,
+  Router,
+  type RequestHandler
+} from 'express'
 
 import { isValidUserReportKey } from '../database/isValidUserReportKey.js'
 import handler_reportName from '../handlers/reports-get/reportName.js'
@@ -44,8 +50,12 @@ function sessionOrReportKeyHandler(
   )
 }
 
-router.get('/', sessionHandler, handler_reports)
+router.get('/', sessionHandler, handler_reports as RequestHandler)
 
-router.all('/:reportName', sessionOrReportKeyHandler, handler_reportName)
+router.all(
+  '/:reportName',
+  sessionOrReportKeyHandler,
+  handler_reportName as RequestHandler
+)
 
 export default router

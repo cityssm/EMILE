@@ -2,6 +2,7 @@ import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 
 import { addAsset } from './addAsset.js'
 import { deleteAsset } from './deleteAsset.js'
+import { ensureEnergyDataTableExists } from './manageEnergyDataTables.js'
 
 interface MergeAssetsForm {
   assetIds: string
@@ -28,7 +29,7 @@ export async function mergeAssets(
     longitude = Number.parseFloat(latitudeLongitudeSplit[1])
   }
 
-  const newAssetId = addAsset(
+  const newAssetId = await addAsset(
     {
       categoryId: Number.parseInt(assetForm.categoryId, 10),
       assetName: assetForm.assetName,
@@ -38,6 +39,8 @@ export async function mergeAssets(
     sessionUser,
     emileDB
   )
+
+  const newAssetTableName = await ensureEnergyDataTableExists(newAssetId)
 
   const mergeAssetIds = assetForm.assetIds.split(',')
 
@@ -75,17 +78,43 @@ export async function mergeAssets(
         newAssetId
       )
 
-    // Move over data
+    const mergeAssetTableName = await ensureEnergyDataTableExists(
+      mergeAssetId,
+      emileDB
+    )
+
+    // Copy over data
     emileDB
       .prepare(
-        `update EnergyData
-          set assetId = ?,
-          recordUpdate_userName = ?,
-          recordUpdate_timeMillis = ?
-          where recordDelete_timeMillis is null
-          and assetId = ?`
+        `insert into ${newAssetTableName}
+          (assetId, dataTypeId, fileId,
+            timeSeconds, durationSeconds,
+            dataValue, powerOfTenMultiplier,
+            recordCreate_userName, recordCreate_timeMillis,
+            recordUpdate_userName, recordUpdate_timeMillis)
+
+          select
+            ? as assetId,
+            dataTypeId, fileId,
+            timeSeconds, durationSeconds,
+            dataValue, powerOfTenMultiplier,
+            recordCreate_userName, recordCreate_timeMillis,
+            ? as recordUpdate_userName,
+            ? as recordUpdate_timeMillis
+          from ${mergeAssetTableName}
+          where recordDelete_timeMillis is null`
       )
-      .run(newAssetId, sessionUser.userName, rightNowMillis, mergeAssetId)
+      .run(newAssetId, sessionUser.userName, rightNowMillis)
+
+    // Delete old data
+    emileDB
+      .prepare(
+        `update ${mergeAssetTableName}
+          set recordDelete_userName = ?,
+          recordDelete_timeMillis = ?
+          where recordDelete_timeMillis is null`
+      )
+      .run(sessionUser.userName, rightNowMillis)
 
     // Delete asset
     deleteAsset(mergeAssetId, sessionUser, emileDB)

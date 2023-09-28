@@ -148,7 +148,7 @@ export class SheetParser extends BaseParser {
               )
             }
 
-            assetId = addAsset(
+            assetId = await addAsset(
               {
                 assetName: assetAlias,
                 categoryId: assetCategory.categoryId
