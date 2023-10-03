@@ -1,3 +1,6 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable @typescript-eslint/indent */
+
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
@@ -32,20 +35,55 @@ async function refreshReportDataCaches(): Promise<void> {
 
     debug(`Getting report data: ${reportName} ...`)
 
-    const data = await getReportData(reportName) ?? []
+    const data = (await getReportData(reportName)) ?? { data: [] }
 
-    debug(`Converting ${data.length ?? 0} rows to CSV: ${reportName}`)
+    debug(`Converting ${data.data.length ?? 0} rows to CSV: ${reportName}`)
 
-    const csv = papaparse.unparse(data)
+    if (data.header === undefined) {
+      const csv = papaparse.unparse(data.data)
 
-    debug(`Writing report data: ${reportName} ...`)
+      debug(`Writing report data: ${reportName} ...`)
 
-    try {
-      await fs.writeFile(path.join(reportCacheFolder, `${reportName}.csv`), csv)
-      debug(`Report data written successfully: ${reportName}.csv`)
-    } catch (error) {
-      debug(`Error writing report data: ${reportName}`)
-      debug(error)
+      try {
+        await fs.writeFile(
+          path.join(reportCacheFolder, `${reportName}.csv`),
+          csv
+        )
+        debug(`Report data written successfully: ${reportName}.csv`)
+      } catch (error) {
+        debug(`Error writing report data: ${reportName}`)
+        debug(error)
+      }
+    } else {
+      const sliceSize = 50_000
+
+      const dataWithHeader = [data.header, ...data.data]
+
+      for (
+        let sliceStart = 0;
+        sliceStart < dataWithHeader.length;
+        sliceStart += sliceSize
+      ) {
+        const csv = papaparse.unparse(
+          dataWithHeader.slice(sliceStart, sliceStart + sliceSize)
+        )
+
+        try {
+          await (sliceStart === 0
+            ? fs.writeFile(
+                path.join(reportCacheFolder, `${reportName}.csv`),
+                csv
+              )
+            : fs.appendFile(
+                path.join(reportCacheFolder, `${reportName}.csv`),
+                csv
+              ))
+          debug(`Report data written successfully: ${reportName}.csv`)
+        } catch (error) {
+          debug(`Error writing report data: ${reportName}`)
+          debug(error)
+        }
+      }
     }
   }
 }

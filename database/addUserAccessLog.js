@@ -1,10 +1,9 @@
 import { isLocal } from '@cityssm/is-private-network-address';
-import sqlite from 'better-sqlite3';
-import { databasePath } from '../helpers/functions.database.js';
-export function addUserAccessLog(sessionUser, requestIp) {
-    const emileDB = sqlite(databasePath);
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
+export async function addUserAccessLog(sessionUser, requestIp) {
     const ipAddress = isLocal(requestIp) ? 'localhost' : requestIp;
     const rightNowMillis = Date.now();
+    const emileDB = await getConnectionWhenAvailable();
     const result = emileDB
         .prepare(`insert into UserAccessLog
         (userName, ipAddress, accessTimeMillis)

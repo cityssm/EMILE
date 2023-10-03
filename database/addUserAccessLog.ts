@@ -1,16 +1,15 @@
 import { isLocal } from '@cityssm/is-private-network-address'
-import sqlite from 'better-sqlite3'
 
-import { databasePath } from '../helpers/functions.database.js'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 
-export function addUserAccessLog(
+export async function addUserAccessLog(
   sessionUser: EmileUser,
   requestIp: string
-): boolean {
-  const emileDB = sqlite(databasePath)
-
+): Promise<boolean> {
   const ipAddress = isLocal(requestIp) ? 'localhost' : requestIp
   const rightNowMillis = Date.now()
+
+  const emileDB = await getConnectionWhenAvailable()
 
   const result = emileDB
     .prepare(

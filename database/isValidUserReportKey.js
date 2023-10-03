@@ -6,6 +6,7 @@ const accessMillis = getConfigProperty('settings.reportKeyAccessDays') * 86400 *
 export function isValidUserReportKey(reportKey, requestIp) {
     const emileDB = sqlite(databasePath, { readonly: true });
     const ipAddress = isLocal(requestIp) ? 'localhost' : requestIp;
+    console.log(ipAddress);
     const result = emileDB
         .prepare(`select u.userName
         from UserAccessLog l

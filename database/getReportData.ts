@@ -7,12 +7,19 @@ import { getEnergyData } from './getEnergyData.js'
 
 export type ReportParameters = Record<string, string | number>
 
+interface GetReportDataReturn {
+  data: unknown[]
+  header?: string[]
+}
+
 export async function getReportData(
   reportName: string,
   reportParameters: ReportParameters = {}
-): Promise<unknown[] | undefined> {
+): Promise<GetReportDataReturn | undefined> {
   let sql = ''
+  let header: string[] | undefined
   let useTempTable = false
+  let useRaw = false
 
   switch (reportName) {
     /*
@@ -86,7 +93,7 @@ export async function getReportData(
     }
 
     case 'energyData-formatted-filtered': {
-      return await getEnergyData(
+      const data = await getEnergyData(
         {
           assetId: reportParameters.assetId,
           categoryId: reportParameters.categoryId,
@@ -102,10 +109,50 @@ export async function getReportData(
           formatForExport: true
         }
       )
+
+      return {
+        data
+      }
     }
 
     case 'energyData-fullyJoined': {
       useTempTable = true
+      useRaw = true
+
+      header = [
+        'dataId',
+        'category',
+        'assetName',
+        'latitude',
+        'longitude',
+        'serviceCategory',
+        'unit',
+        'unitLong',
+        'readingType',
+        'commodity',
+        'accumulationBehaviour',
+        'startDateTime',
+        'endDateTime',
+        'dataValueEvaluated',
+
+        'dataValue',
+        'powerOfTenMultiplier',
+
+        'recordCreate_userName',
+        'recordCreate_timeMillis',
+        'recordUpdate_userName',
+        'recordUpdate_timeMillis',
+        'categoryId',
+        'assetId',
+        'dataTypeId',
+        'serviceCategoryId',
+        'unitId',
+        'readingTypeId',
+        'commodityId',
+        'accumulationBehaviourId',
+        'timeSeconds',
+        'durationSeconds'
+      ]
 
       sql = `select d.dataId,
           c.category,
@@ -208,14 +255,24 @@ export async function getReportData(
   if (useTempTable) {
     const tempTableName = getTempTableName()
     emileDB.prepare(`create temp table ${tempTableName} as ${sql}`).run()
-    resultRows = emileDB.prepare(`select * from ${tempTableName}`).all()
+
+    let statement = emileDB.prepare(`select * from ${tempTableName}`)
+
+    if (useRaw) {
+      statement = statement.raw()
+    }
+
+    resultRows = statement.all()
   } else {
     resultRows = emileDB.prepare(sql).all()
   }
 
   emileDB.close()
 
-  return resultRows
+  return {
+    data: resultRows,
+    header
+  }
 }
 
 export default getReportData

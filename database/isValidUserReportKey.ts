@@ -15,6 +15,8 @@ export function isValidUserReportKey(
 
   const ipAddress = isLocal(requestIp) ? 'localhost' : requestIp
 
+  console.log(ipAddress)
+
   const result = emileDB
     .prepare(
       `select u.userName

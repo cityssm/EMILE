@@ -171,3 +171,51 @@ export function getEnergyDataPoint(filters, connectedEmileDB) {
     }
     return dataPoint;
 }
+export async function getEnergyDataFullyJoined() {
+    const emileDB = await getConnectionWhenAvailable();
+    const tempTableName = getTempTableName();
+    const sql = `select d.dataId,
+        c.category,
+        a.assetName, a.latitude, a.longitude,
+        ts.serviceCategory,
+        tu.unit, tu.unitLong,
+        tr.readingType,
+        tc.commodity,
+        ta.accumulationBehaviour,
+        datetime(d.timeSeconds, 'unixepoch', 'localtime') as startDateTime,
+        datetime(d.endTimeSeconds, 'unixepoch', 'localtime') as endDateTime,
+      
+        d.dataValue * power(10, d.powerOfTenMultiplier) as dataValueEvaluated,
+      
+        d.dataValue,
+        d.powerOfTenMultiplier,
+      
+        d.recordCreate_userName, d.recordCreate_timeMillis,
+        d.recordUpdate_userName, d.recordUpdate_timeMillis,
+        a.categoryId, a.assetId, d.dataTypeId, t.serviceCategoryId, t.unitId, t.readingTypeId, t.commodityId, t.accumulationBehaviourId,
+        d.timeSeconds, d.durationSeconds
+      
+      from EnergyData d
+      left join Assets a
+        on d.assetId = a.assetId
+      left join AssetCategories c
+        on a.categoryId = c.categoryId
+      left join EnergyDataTypes t
+        on d.dataTypeId = t.dataTypeId
+      left join EnergyServiceCategories ts
+        on t.serviceCategoryId = ts.serviceCategoryId
+      left join EnergyUnits tu
+        on t.unitId = tu.unitId
+      left join EnergyReadingTypes tr
+        on t.readingTypeId = tr.readingTypeId
+      left join EnergyCommodities tc
+        on t.commodityId = tc.commodityId
+      left join EnergyAccumulationBehaviours ta
+        on t.accumulationBehaviourId = ta.accumulationBehaviourId
+      left join EnergyDataFiles f
+        on d.fileId = f.fileId
+      where d.recordDelete_timeMillis is null
+        and a.recordDelete_timeMillis is null`;
+    emileDB.prepare(`create temp table ${tempTableName} as ${sql}`).run();
+    return emileDB.prepare(`select * from ${tempTableName}`).raw().all();
+}

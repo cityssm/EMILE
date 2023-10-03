@@ -16,17 +16,36 @@ async function refreshReportDataCaches() {
             break;
         }
         debug(`Getting report data: ${reportName} ...`);
-        const data = await getReportData(reportName) ?? [];
-        debug(`Converting ${data.length ?? 0} rows to CSV: ${reportName}`);
-        const csv = papaparse.unparse(data);
-        debug(`Writing report data: ${reportName} ...`);
-        try {
-            await fs.writeFile(path.join(reportCacheFolder, `${reportName}.csv`), csv);
-            debug(`Report data written successfully: ${reportName}.csv`);
+        const data = (await getReportData(reportName)) ?? { data: [] };
+        debug(`Converting ${data.data.length ?? 0} rows to CSV: ${reportName}`);
+        if (data.header === undefined) {
+            const csv = papaparse.unparse(data.data);
+            debug(`Writing report data: ${reportName} ...`);
+            try {
+                await fs.writeFile(path.join(reportCacheFolder, `${reportName}.csv`), csv);
+                debug(`Report data written successfully: ${reportName}.csv`);
+            }
+            catch (error) {
+                debug(`Error writing report data: ${reportName}`);
+                debug(error);
+            }
         }
-        catch (error) {
-            debug(`Error writing report data: ${reportName}`);
-            debug(error);
+        else {
+            const sliceSize = 50000;
+            const dataWithHeader = [data.header, ...data.data];
+            for (let sliceStart = 0; sliceStart < dataWithHeader.length; sliceStart += sliceSize) {
+                const csv = papaparse.unparse(dataWithHeader.slice(sliceStart, sliceStart + sliceSize));
+                try {
+                    await (sliceStart === 0
+                        ? fs.writeFile(path.join(reportCacheFolder, `${reportName}.csv`), csv)
+                        : fs.appendFile(path.join(reportCacheFolder, `${reportName}.csv`), csv));
+                    debug(`Report data written successfully: ${reportName}.csv`);
+                }
+                catch (error) {
+                    debug(`Error writing report data: ${reportName}`);
+                    debug(error);
+                }
+            }
         }
     }
 }

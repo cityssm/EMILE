@@ -23,7 +23,10 @@ export async function handler(request, response) {
             });
             return;
         }
-        csv = papaparse.unparse(rows);
+        csv =
+            rows.header === undefined
+                ? papaparse.unparse(rows.data)
+                : papaparse.unparse([rows.header, ...rows.data]);
     }
     const disposition = hasActiveSession(request) ? 'attachment' : 'inline';
     response.setHeader('Content-Disposition', `${disposition}; filename=${reportName}-${Date.now().toString()}.csv`);

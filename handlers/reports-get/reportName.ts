@@ -14,7 +14,10 @@ import {
 } from '../../helpers/functions.reports.js'
 import { hasActiveSession } from '../../helpers/functions.session.js'
 
-export async function handler(request: Request, response: Response): Promise<void> {
+export async function handler(
+  request: Request,
+  response: Response
+): Promise<void> {
   const reportName: string = request.params.reportName
 
   let csv = ''
@@ -30,7 +33,10 @@ export async function handler(request: Request, response: Response): Promise<voi
   }
 
   if ((csv ?? '') === '') {
-    const rows = await getReportData(reportName, request.query as ReportParameters)
+    const rows = await getReportData(
+      reportName,
+      request.query as ReportParameters
+    )
 
     if (rows === undefined) {
       response.status(404).json({
@@ -41,7 +47,10 @@ export async function handler(request: Request, response: Response): Promise<voi
       return
     }
 
-    csv = papaparse.unparse(rows)
+    csv =
+      rows.header === undefined
+        ? papaparse.unparse(rows.data)
+        : papaparse.unparse([rows.header, ...rows.data])
   }
 
   const disposition = hasActiveSession(request) ? 'attachment' : 'inline'
