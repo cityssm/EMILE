@@ -6,7 +6,7 @@ import { getAssets } from '../../database/getAssets.js'
 export async function handler(request: Request, response: Response): Promise<void> {
   const assetId = await addAsset(request.body, request.session.user as EmileUser)
 
-  const assets = await getAssets({}, { includeEnergyDataStats: true })
+  const assets = await getAssets({})
 
   response.json({
     success: true,

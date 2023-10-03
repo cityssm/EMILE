@@ -9,7 +9,7 @@ export async function handler(
 ): Promise<void> {
   const success = updateAsset(request.body, request.session.user as EmileUser)
 
-  const assets = await getAssets({}, { includeEnergyDataStats: true })
+  const assets = await getAssets({})
 
   response.json({
     success,

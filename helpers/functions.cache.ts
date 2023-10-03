@@ -4,6 +4,10 @@ import Debug from 'debug'
 
 import { getAssetAliasTypes as getAssetAliasTypesFromDatabase } from '../database/getAssetAliasTypes.js'
 import { getAssetCategories as getAssetCategoriesFromDatabase } from '../database/getAssetCategories.js'
+import {
+  type EnergyDataStatistics,
+  getEnergyDataStatistics as getEnergyDataStatisticsFromDatabase
+} from '../database/getEnergyDataStatistics.js'
 import type {
   ClearCacheWorkerMessage,
   CacheTableName
@@ -43,6 +47,20 @@ export function getAssetAliasTypes(): AssetAliasType[] {
 }
 
 /*
+ * Energy Data Statistics
+ */
+
+let energyDataStatistics: EnergyDataStatistics | undefined
+
+export async function getEnergyDataStatistics(): Promise<EnergyDataStatistics> {
+  if (energyDataStatistics === undefined) {
+    debug('Cache miss: EnergyDataStatistics')
+    energyDataStatistics = await getEnergyDataStatisticsFromDatabase()
+  }
+  return energyDataStatistics
+}
+
+/*
  * Clear Caches
  */
 
@@ -58,6 +76,10 @@ export function clearCacheByTableName(
     }
     case 'AssetCategories': {
       assetCategories = []
+      break
+    }
+    case 'EnergyData': {
+      energyDataStatistics = undefined
       break
     }
     default: {

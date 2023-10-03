@@ -12,7 +12,7 @@ export async function handler(
     request.session.user as EmileUser
   )
 
-  const assets = await getAssets({}, { includeEnergyDataStats: true })
+  const assets = await getAssets({})
 
   response.json({
     success,

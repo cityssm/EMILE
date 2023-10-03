@@ -304,7 +304,7 @@ function initializeAssetAliasTypes(emileDB: sqlite.Database): void {
 
   const result = emileDB
     .prepare('select aliasTypeId from AssetAliasTypes limit 1')
-    .get() 
+    .get()
 
   if (result === undefined) {
     addAssetAliasType(
@@ -423,6 +423,8 @@ export async function initializeDatabase(): Promise<void> {
         categoryId integer not null references AssetCategories (categoryId),
         latitude decimal(8, 6) check (latitude >= -90 and latitude <= 90),
         longitude decimal(9, 6) check (longitude >= -180 and longitude <= 180),
+        timeSecondsMin integer,
+        endTimeSecondsMax integer,
         ${recordColumns}
       )`
     )

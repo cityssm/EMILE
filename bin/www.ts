@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url'
 import Debug from 'debug'
 
 import { initializeDatabase } from '../database/initializeDatabase.js'
+import { updateAllAssetTimeSeconds } from '../database/updateAsset.js'
 import { getConfigProperty } from '../helpers/functions.config.js'
 import type { WorkerMessage } from '../types/applicationTypes.js'
 
@@ -24,7 +25,7 @@ debug(`Primary title: ${process.title}`)
  * Initialize Database
  */
 
-initializeDatabase()
+await initializeDatabase()
 
 /*
  * Start Processes
@@ -100,6 +101,10 @@ cluster.on('exit', (worker) => {
   }
 })
 
+// Refresh stats
+
+void updateAllAssetTimeSeconds()
+
 if (process.env.STARTUP_TEST === 'true') {
   const killSeconds = 10
 
@@ -119,7 +124,10 @@ if (process.env.STARTUP_TEST === 'true') {
 
   fileProcessorChildProcess = fork('./tasks/energyDataFilesProcessor.js')
 
-  if (Object.keys(getConfigProperty('subscriptions.greenButton')).length > 0) {
+  if (
+    (process.env.GREENBUTTON_CMD ?? 'true') === 'true' &&
+    Object.keys(getConfigProperty('subscriptions.greenButton')).length > 0
+  ) {
     fork('./tasks/greenButtonCMDProcessor.js')
   }
 }

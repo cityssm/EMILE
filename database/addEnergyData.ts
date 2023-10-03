@@ -1,11 +1,13 @@
 import type sqlite from 'better-sqlite3'
 import Debug from 'debug'
 
+import { clearCacheByTableName } from '../helpers/functions.cache.js'
 import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 import { delay } from '../helpers/functions.utilities.js'
 import type { EnergyData } from '../types/recordTypes.js'
 
 import { ensureEnergyDataTableExists } from './manageEnergyDataTables.js'
+import { updateAssetTimeSeconds } from './updateAsset.js'
 
 const debug = Debug('emile:database:addEnergyData')
 
@@ -60,9 +62,13 @@ export async function addEnergyData(
     }
   }
 
+  await updateAssetTimeSeconds(data.assetId as number, emileDB)
+
   if (connectedEmileDB === undefined) {
     emileDB.close()
   }
+
+  clearCacheByTableName('EnergyData')
 
   return result.lastInsertRowid as number
 }

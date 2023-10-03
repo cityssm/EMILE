@@ -13,34 +13,15 @@ interface GetAssetsFilters {
   groupId?: number | string
 }
 
-interface GetAssetsOptions {
-  includeEnergyDataStats?: boolean
-}
-
 export async function getAssets(
   filters: GetAssetsFilters,
-  options?: GetAssetsOptions,
   connectedEmileDB?: sqlite.Database
 ): Promise<Asset[]> {
   let sql = `select a.assetId, a.assetName, a.latitude, a.longitude,
-    a.categoryId, c.category, c.fontAwesomeIconClasses, c.orderNumber
-    ${
-      options?.includeEnergyDataStats ?? false
-        ? ', s.timeSecondsMin, s.endTimeSecondsMax'
-        : ''
-    }
+    a.categoryId, c.category, c.fontAwesomeIconClasses, c.orderNumber,
+    a.timeSecondsMin, a.endTimeSecondsMax
     from Assets a
     left join AssetCategories c on a.categoryId = c.categoryId
-    ${
-      options?.includeEnergyDataStats ?? false
-        ? ` left join (
-              select assetId, min(timeSeconds) as timeSecondsMin,
-              max(endTimeSeconds) as endTimeSecondsMax
-              from EnergyData
-              where recordDelete_timeMillis is null
-              group by assetId) s on a.assetId = s.assetId`
-        : ''
-    }
     where a.recordDelete_timeMillis is null`
 
   const sqlParameters: unknown[] = []

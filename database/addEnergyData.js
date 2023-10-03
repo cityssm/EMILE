@@ -1,7 +1,9 @@
 import Debug from 'debug';
+import { clearCacheByTableName } from '../helpers/functions.cache.js';
 import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
 import { delay } from '../helpers/functions.utilities.js';
 import { ensureEnergyDataTableExists } from './manageEnergyDataTables.js';
+import { updateAssetTimeSeconds } from './updateAsset.js';
 const debug = Debug('emile:database:addEnergyData');
 export async function addEnergyData(data, sessionUser, connectedEmileDB) {
     const emileDB = connectedEmileDB === undefined
@@ -27,8 +29,10 @@ export async function addEnergyData(data, sessionUser, connectedEmileDB) {
             await delay(1000);
         }
     }
+    await updateAssetTimeSeconds(data.assetId, emileDB);
     if (connectedEmileDB === undefined) {
         emileDB.close();
     }
+    clearCacheByTableName('EnergyData');
     return result.lastInsertRowid;
 }

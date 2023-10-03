@@ -2,8 +2,7 @@ import type { Request, Response } from 'express'
 
 import { getAssetGroups } from '../../database/getAssetGroups.js'
 import { getAssets } from '../../database/getAssets.js'
-import { getEnergyDataStatistics } from '../../database/getEnergyDataStatistics.js'
-import { getAssetCategories } from '../../helpers/functions.cache.js'
+import { getAssetCategories, getEnergyDataStatistics } from '../../helpers/functions.cache.js'
 
 export async function handler(
   request: Request,

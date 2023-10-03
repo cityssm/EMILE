@@ -71,5 +71,5 @@ export async function getConnectionWhenAvailable(readOnly = false) {
     }
 }
 export function getTempTableName() {
-    return `tmp_${Date.now()}`;
+    return `tmp_${Date.now()}_${Math.round(Math.random() * 10000)}`;
 }

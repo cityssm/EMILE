@@ -22,7 +22,6 @@ export async function getAssetGroup(
   if (assetGroup !== undefined) {
     assetGroup.groupMembers = await getAssets(
       { groupId: assetGroup.groupId },
-      {},
       emileDB
     )
   }

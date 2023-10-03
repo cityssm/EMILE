@@ -1,12 +1,7 @@
 import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 
-interface EnergyDataStatistics {
-  dataIdCount: number
-
-  assetIdDistinctCount: number
-
-  fileIdDistinctCount: number
-
+export interface EnergyDataStatistics {
+  assetIdCount: number
   timeSecondsMin: number
   endTimeSecondsMax: number
 }
@@ -16,12 +11,11 @@ export async function getEnergyDataStatistics(): Promise<EnergyDataStatistics> {
 
   const statistics = emileDB
     .prepare(
-      `select count(dataId) as dataIdCount,
-        count(distinct assetId) as assetIdDistinctCount,
-        count(distinct fileId) as fileIdDistinctCount,
-        min(timeSeconds) as timeSecondsMin,
-        max(endTimeSeconds) as endTimeSecondsMax
-        from EnergyData
+      `select 
+        count(assetId) as assetIdCount,
+        min(timeSecondsMin) as timeSecondsMin,
+        max(endTimeSecondsMax) as endTimeSecondsMax
+        from Assets
         where recordDelete_timeMillis is null`
     )
     .get() as EnergyDataStatistics

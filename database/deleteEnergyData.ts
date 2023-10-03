@@ -1,9 +1,11 @@
+import { clearCacheByTableName } from '../helpers/functions.cache.js'
 import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 
 import {
   ensureEnergyDataTableExists,
   reloadEnergyDataTableNames
 } from './manageEnergyDataTables.js'
+import { updateAssetTimeSeconds } from './updateAsset.js'
 
 export async function deleteEnergyData(
   assetId: number | string,
@@ -24,7 +26,11 @@ export async function deleteEnergyData(
     )
     .run(sessionUser.userName, Date.now(), dataId)
 
+  await updateAssetTimeSeconds(assetId, emileDB)
+
   emileDB.close()
+
+  clearCacheByTableName('EnergyData')
 
   return result.changes > 0
 }
@@ -50,10 +56,20 @@ export async function deleteEnergyDataByFileId(
       )
       .run(sessionUser.userName, Date.now(), fileId)
 
-    count += result.changes
+    if (result.changes > 0) {
+      const assetId = tableName.slice(
+        Math.max(0, tableName.lastIndexOf('_') + 1)
+      )
+
+      await updateAssetTimeSeconds(assetId, emileDB)
+
+      count += result.changes
+    }
   }
 
   emileDB.close()
+
+  clearCacheByTableName('EnergyData')
 
   return count > 0
 }

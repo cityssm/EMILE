@@ -57,9 +57,9 @@ export interface Asset extends Partial<RecordUserNameDateTime>, Partial<AssetCat
     assetName: string;
     latitude?: number | null;
     longitude?: number | null;
+    timeSecondsMin?: number | null;
+    endTimeSecondsMax?: number | null;
     assetAliases?: AssetAlias[];
-    timeSecondsMin?: number;
-    endTimeSecondsMax?: number;
 }
 export interface AssetGroup extends Partial<RecordUserNameDateTime> {
     groupId: number;
@@ -83,8 +83,8 @@ export interface EnergyDataFile extends Partial<RecordUserNameDateTime>, Partial
     processedMessage?: string;
     energyDataCount?: number;
     assetIdCount?: number;
-    timeSecondsMin?: number;
-    endTimeSecondsMax?: number;
+    timeSecondsMin?: number | null;
+    endTimeSecondsMax?: number | null;
 }
 export interface EnergyDataType extends Partial<RecordUserNameDateTime>, Partial<EnergyServiceCategory>, Partial<EnergyUnit>, Partial<EnergyReadingType>, Partial<EnergyCommodity>, Partial<EnergyAccumulationBehaviour> {
     dataTypeId?: number;

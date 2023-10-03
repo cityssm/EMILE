@@ -11,7 +11,7 @@ export async function handler(
   request: Request,
   response: Response
 ): Promise<void> {
-  const assets = await getAssets({}, { includeEnergyDataStats: true })
+  const assets = await getAssets({})
   const assetGroups = getAssetGroups(request.session.user as EmileUser)
   const assetCategories = getAssetCategories()
 

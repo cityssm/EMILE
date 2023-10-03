@@ -6,12 +6,13 @@ import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Debug from 'debug';
 import { initializeDatabase } from '../database/initializeDatabase.js';
+import { updateAllAssetTimeSeconds } from '../database/updateAsset.js';
 import { getConfigProperty } from '../helpers/functions.config.js';
 const debug = Debug(`emile:www:${process.pid}`);
 process.title = `${getConfigProperty('application.applicationName')} (Primary)`;
 debug(`Primary pid:   ${process.pid}`);
 debug(`Primary title: ${process.title}`);
-initializeDatabase();
+await initializeDatabase();
 const processCount = Math.min(getConfigProperty('application.maximumProcesses'), os.cpus().length);
 debug(`Launching ${processCount} processes`);
 const directoryName = dirname(fileURLToPath(import.meta.url));
@@ -63,6 +64,7 @@ cluster.on('exit', (worker) => {
         activeWorkers.set(newWorker.process.pid, newWorker);
     }
 });
+void updateAllAssetTimeSeconds();
 if (process.env.STARTUP_TEST === 'true') {
     const killSeconds = 10;
     debug(`Killing processes in ${killSeconds} seconds...`);
@@ -76,7 +78,8 @@ else {
     fork('./tasks/deletedFilesProcessor.js');
     fork('./tasks/reportDataCache.js');
     fileProcessorChildProcess = fork('./tasks/energyDataFilesProcessor.js');
-    if (Object.keys(getConfigProperty('subscriptions.greenButton')).length > 0) {
+    if ((process.env.GREENBUTTON_CMD ?? 'true') === 'true' &&
+        Object.keys(getConfigProperty('subscriptions.greenButton')).length > 0) {
         fork('./tasks/greenButtonCMDProcessor.js');
     }
 }

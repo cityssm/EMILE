@@ -2,6 +2,7 @@ import cluster from 'node:cluster';
 import Debug from 'debug';
 import { getAssetAliasTypes as getAssetAliasTypesFromDatabase } from '../database/getAssetAliasTypes.js';
 import { getAssetCategories as getAssetCategoriesFromDatabase } from '../database/getAssetCategories.js';
+import { getEnergyDataStatistics as getEnergyDataStatisticsFromDatabase } from '../database/getEnergyDataStatistics.js';
 const debug = Debug(`emile:functions.cache:${process.pid}`);
 let assetCategories = [];
 export function getAssetCategories() {
@@ -19,6 +20,14 @@ export function getAssetAliasTypes() {
     }
     return assetAliasTypes;
 }
+let energyDataStatistics;
+export async function getEnergyDataStatistics() {
+    if (energyDataStatistics === undefined) {
+        debug('Cache miss: EnergyDataStatistics');
+        energyDataStatistics = await getEnergyDataStatisticsFromDatabase();
+    }
+    return energyDataStatistics;
+}
 export function clearCacheByTableName(tableName, relayMessage = true) {
     switch (tableName) {
         case 'AssetAliasTypes': {
@@ -27,6 +36,10 @@ export function clearCacheByTableName(tableName, relayMessage = true) {
         }
         case 'AssetCategories': {
             assetCategories = [];
+            break;
+        }
+        case 'EnergyData': {
+            energyDataStatistics = undefined;
             break;
         }
         default: {

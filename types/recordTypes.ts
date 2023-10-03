@@ -105,10 +105,9 @@ export interface Asset
   assetName: string
   latitude?: number | null
   longitude?: number | null
+  timeSecondsMin?: number | null
+  endTimeSecondsMax?: number | null
   assetAliases?: AssetAlias[]
-
-  timeSecondsMin?: number
-  endTimeSecondsMax?: number
 }
 
 export interface AssetGroup extends Partial<RecordUserNameDateTime> {
@@ -145,8 +144,8 @@ export interface EnergyDataFile
 
   energyDataCount?: number
   assetIdCount?: number
-  timeSecondsMin?: number
-  endTimeSecondsMax?: number
+  timeSecondsMin?: number | null
+  endTimeSecondsMax?: number | null
 }
 
 export interface EnergyDataType

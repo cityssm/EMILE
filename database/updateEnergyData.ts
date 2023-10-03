@@ -1,5 +1,6 @@
 import sqlite from 'better-sqlite3'
 
+import { clearCacheByTableName } from '../helpers/functions.cache.js'
 import { databasePath } from '../helpers/functions.database.js'
 
 export function updateEnergyDataValue(
@@ -39,6 +40,8 @@ export function updateEnergyDataValue(
   if (connectedEmileDB === undefined) {
     emileDB.close()
   }
+
+  clearCacheByTableName('EnergyData')
 
   return result.changes > 0
 }

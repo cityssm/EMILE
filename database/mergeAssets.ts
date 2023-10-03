@@ -1,3 +1,4 @@
+import { clearCacheByTableName } from '../helpers/functions.cache.js'
 import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 
 import { addAsset } from './addAsset.js'
@@ -115,6 +116,8 @@ export async function mergeAssets(
           where recordDelete_timeMillis is null`
       )
       .run(sessionUser.userName, rightNowMillis)
+
+    clearCacheByTableName('EnergyData')
 
     // Delete asset
     deleteAsset(mergeAssetId, sessionUser, emileDB)

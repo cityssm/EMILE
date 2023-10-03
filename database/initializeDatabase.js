@@ -270,6 +270,8 @@ export async function initializeDatabase() {
         categoryId integer not null references AssetCategories (categoryId),
         latitude decimal(8, 6) check (latitude >= -90 and latitude <= 90),
         longitude decimal(9, 6) check (longitude >= -180 and longitude <= 180),
+        timeSecondsMin integer,
+        endTimeSecondsMax integer,
         ${recordColumns}
       )`)
         .run();
