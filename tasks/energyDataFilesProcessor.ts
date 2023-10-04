@@ -15,6 +15,8 @@ import type { RunFileProcessorWorkerMessage } from '../types/applicationTypes.js
 
 const debug = Debug('emile:tasks:energyDataFilesProcessor')
 
+process.title = 'EMILE - energyDataFilesProcessor'
+
 const processorUser: EmileUser = {
   userName: 'system.fileProcessor',
   canLogin: false,

@@ -26,6 +26,8 @@ import {
 
 const debug = Debug('emile:tasks:uploadedFilesProcessor')
 
+process.title = 'EMILE - uploadedFilesProcessor'
+
 const processorUser: EmileUser = {
   userName: 'system.uploadProcessor',
   canLogin: false,

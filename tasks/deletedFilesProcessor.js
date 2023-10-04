@@ -6,6 +6,7 @@ import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async';
 import { getEnergyDataFiles } from '../database/getEnergyDataFiles.js';
 import { importedFolderRoot } from '../helpers/functions.files.js';
 const debug = Debug('emile:tasks:deletedFilesProcessor');
+process.title = 'EMILE - deletedFilesProcessor';
 let terminateTask = false;
 async function deleteUnrecordedFiles() {
     const dateFolders = await fs.readdir(importedFolderRoot, {

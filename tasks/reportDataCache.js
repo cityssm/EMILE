@@ -7,6 +7,7 @@ import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async';
 import { getReportData } from '../database/getReportData.js';
 import { reportCacheFolder, reportsToCache } from '../helpers/functions.reports.js';
 const debug = Debug('emile:tasks:reportDataCache');
+process.title = 'EMILE - reportDataCache';
 const pollingIntervalMillis = 3600 * 1000 + 60000;
 let terminateTask = false;
 async function refreshReportDataCaches() {

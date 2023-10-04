@@ -9,6 +9,7 @@ import { GreenButtonParser } from '../parsers/greenButtonParser.js';
 import { getParserClasses } from '../parsers/parserHelpers.js';
 import { SheetParser } from '../parsers/sheetParser.js';
 const debug = Debug('emile:tasks:energyDataFilesProcessor');
+process.title = 'EMILE - energyDataFilesProcessor';
 const processorUser = {
     userName: 'system.fileProcessor',
     canLogin: false,

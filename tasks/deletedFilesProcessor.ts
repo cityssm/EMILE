@@ -17,6 +17,8 @@ import { importedFolderRoot } from '../helpers/functions.files.js'
 
 const debug = Debug('emile:tasks:deletedFilesProcessor')
 
+process.title = 'EMILE - deletedFilesProcessor'
+
 /*
  * Task
  */

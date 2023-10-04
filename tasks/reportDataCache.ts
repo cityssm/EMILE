@@ -17,6 +17,8 @@ import {
 
 const debug = Debug('emile:tasks:reportDataCache')
 
+process.title = 'EMILE - reportDataCache'
+
 /*
  * Task
  */

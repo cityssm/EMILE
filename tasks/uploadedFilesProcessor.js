@@ -8,6 +8,7 @@ import { addEnergyDataFile } from '../database/addEnergyDataFile.js';
 import { importedFolderRoot, uploadsFolder } from '../helpers/functions.files.js';
 import { fileExtensions as allowedFileExtensions, getDefaultParserPropertiesByFileName } from '../parsers/parserHelpers.js';
 const debug = Debug('emile:tasks:uploadedFilesProcessor');
+process.title = 'EMILE - uploadedFilesProcessor';
 const processorUser = {
     userName: 'system.uploadProcessor',
     canLogin: false,

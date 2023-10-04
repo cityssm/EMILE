@@ -15,6 +15,8 @@ import { recordGreenButtonData } from '../helpers/functions.greenButton.js'
 
 const debug = Debug('emile:tasks:greenButtonCMDProcessor')
 
+process.title = 'EMILE - greenButtonCMDProcessor'
+
 /*
  * Task
  */
