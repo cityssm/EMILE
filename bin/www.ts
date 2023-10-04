@@ -102,7 +102,6 @@ cluster.on('exit', (worker) => {
 })
 
 // Refresh stats
-
 void updateAllAssetTimeSeconds()
 
 if (process.env.STARTUP_TEST === 'true') {
@@ -117,17 +116,25 @@ if (process.env.STARTUP_TEST === 'true') {
     process.exit(0)
   }, 10_000)
 } else {
-  fork('./tasks/uploadedFilesProcessor.js')
-  fork('./tasks/deletedFilesProcessor.js')
-
-  fork('./tasks/reportDataCache.js')
+  const lowPriority = 19
 
   fileProcessorChildProcess = fork('./tasks/energyDataFilesProcessor.js')
+  os.setPriority(fileProcessorChildProcess.pid as number, lowPriority)
+
+  let childProcess = fork('./tasks/uploadedFilesProcessor.js')
+  os.setPriority(childProcess.pid as number, lowPriority)
+
+  childProcess = fork('./tasks/deletedFilesProcessor.js')
+  os.setPriority(childProcess.pid as number, lowPriority)
+
+  childProcess = fork('./tasks/reportDataCache.js')
+  os.setPriority(childProcess.pid as number, lowPriority)
 
   if (
     (process.env.GREENBUTTON_CMD ?? 'true') === 'true' &&
     Object.keys(getConfigProperty('subscriptions.greenButton')).length > 0
   ) {
-    fork('./tasks/greenButtonCMDProcessor.js')
+    childProcess = fork('./tasks/greenButtonCMDProcessor.js')
+    os.setPriority(childProcess.pid as number, lowPriority)
   }
 }
