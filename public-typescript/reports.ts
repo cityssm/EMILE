@@ -24,8 +24,8 @@ declare const bulmaJS: BulmaJS
   function refreshPowerQueryReportUrl(): void {
     const reportUrl = `${window.location.href.slice(
       0,
-      Math.max(0, window.location.href.indexOf(window.location.pathname) + 1)
-    )}${Emile.urlPrefix}reports/energyData-fullyJoined?reportKey=${reportKey}`
+      Math.max(0, window.location.href.indexOf(window.location.pathname))
+    )}${Emile.urlPrefix}/reports/energyData-fullyJoined?reportKey=${reportKey}`
 
     powerQueryReportUrlElement.value = reportUrl
   }

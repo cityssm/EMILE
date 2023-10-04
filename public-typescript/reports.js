@@ -10,7 +10,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
     const reportKey = (_a = powerQueryTabElement === null || powerQueryTabElement === void 0 ? void 0 : powerQueryTabElement.dataset.reportKey) !== null && _a !== void 0 ? _a : '';
     const powerQueryReportUrlElement = document.querySelector('#powerQuery--reportUrl');
     function refreshPowerQueryReportUrl() {
-        const reportUrl = `${window.location.href.slice(0, Math.max(0, window.location.href.indexOf(window.location.pathname) + 1))}${Emile.urlPrefix}reports/energyData-fullyJoined?reportKey=${reportKey}`;
+        const reportUrl = `${window.location.href.slice(0, Math.max(0, window.location.href.indexOf(window.location.pathname)))}${Emile.urlPrefix}/reports/energyData-fullyJoined?reportKey=${reportKey}`;
         powerQueryReportUrlElement.value = reportUrl;
     }
     if (powerQueryTabElement !== null) {
