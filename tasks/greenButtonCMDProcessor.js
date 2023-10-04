@@ -45,18 +45,18 @@ async function processGreenButtonSubscriptions() {
             debug(`Unable to retieve authorizations: ${subscriptionKey}`);
             continue;
         }
-        const entries = greenButtonHelpers.getEntriesByContentType(authorizations, 'Authorization');
-        if (entries.length === 0) {
+        const authorizationEntries = greenButtonHelpers.getEntriesByContentType(authorizations, 'Authorization');
+        if (authorizationEntries.length === 0) {
             debug(`Subscription contains no authorizations: ${subscriptionKey}`);
             continue;
         }
-        for (const entry of entries) {
-            const authorizationId = entry.links.selfUid ?? '';
+        for (const authorizationEntry of authorizationEntries) {
+            const authorizationId = authorizationEntry.links.selfUid ?? '';
             if (authorizationId === '' ||
                 (greenButtonSubscription.authorizationIdsToExclude ?? []).includes(authorizationId) ||
                 (greenButtonSubscription.authorizationIdsToInclude !== undefined &&
                     !greenButtonSubscription.authorizationIdsToInclude.includes(authorizationId)) ||
-                entry.content.Authorization.status_value !== 'Active') {
+                authorizationEntry.content.Authorization.status_value !== 'Active') {
                 debug(`Skipping authorization id: ${subscriptionKey}, ${authorizationId}`);
                 continue;
             }

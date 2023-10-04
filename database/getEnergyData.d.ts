@@ -20,6 +20,6 @@ export declare function getEnergyDataPoint(filters: {
     dataTypeId: number;
     timeSeconds: number;
     durationSeconds: number;
-}, connectedEmileDB?: sqlite.Database): EnergyData | undefined;
+}, connectedEmileDB?: sqlite.Database): Promise<EnergyData | undefined>;
 export declare function getEnergyDataFullyJoined(): Promise<unknown[]>;
 export {};

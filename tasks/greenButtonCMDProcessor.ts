@@ -84,18 +84,18 @@ async function processGreenButtonSubscriptions(): Promise<void> {
       continue
     }
 
-    const entries = greenButtonHelpers.getEntriesByContentType(
+    const authorizationEntries = greenButtonHelpers.getEntriesByContentType(
       authorizations as GreenButtonJson,
       'Authorization'
     )
 
-    if (entries.length === 0) {
+    if (authorizationEntries.length === 0) {
       debug(`Subscription contains no authorizations: ${subscriptionKey}`)
       continue
     }
 
-    for (const entry of entries) {
-      const authorizationId = entry.links.selfUid ?? ''
+    for (const authorizationEntry of authorizationEntries) {
+      const authorizationId = authorizationEntry.links.selfUid ?? ''
 
       if (
         authorizationId === '' ||
@@ -106,7 +106,7 @@ async function processGreenButtonSubscriptions(): Promise<void> {
           !greenButtonSubscription.authorizationIdsToInclude.includes(
             authorizationId
           )) ||
-        entry.content.Authorization.status_value !== 'Active'
+        authorizationEntry.content.Authorization.status_value !== 'Active'
       ) {
         debug(
           `Skipping authorization id: ${subscriptionKey}, ${authorizationId}`
@@ -167,7 +167,8 @@ async function processGreenButtonSubscriptions(): Promise<void> {
       } finally {
         updatedMins[subscriptionKey][authorizationId] = {
           polledMillis: Date.now(),
-          updatedMillis: usageData.updatedDate?.getTime() ?? timeMillis.updatedMillis ?? 0
+          updatedMillis:
+            usageData.updatedDate?.getTime() ?? timeMillis.updatedMillis ?? 0
         }
         saveCache()
       }

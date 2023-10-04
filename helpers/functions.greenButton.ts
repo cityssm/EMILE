@@ -225,7 +225,7 @@ export async function recordGreenButtonData(
             intervalReading.timePeriod !== undefined &&
             intervalReading.value !== undefined
           ) {
-            const currentDataPoint = getEnergyDataPoint(
+            const currentDataPoint = await getEnergyDataPoint(
               {
                 assetId: assetId as number,
                 dataTypeId: energyDataTypeAndPower.energyDataType

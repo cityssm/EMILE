@@ -235,7 +235,7 @@ export async function getEnergyData(
   return data
 }
 
-export function getEnergyDataPoint(
+export async function getEnergyDataPoint(
   filters: {
     assetId: number
     dataTypeId: number
@@ -243,7 +243,7 @@ export function getEnergyDataPoint(
     durationSeconds: number
   },
   connectedEmileDB?: sqlite.Database
-): EnergyData | undefined {
+): Promise<EnergyData | undefined> {
   const emileDB =
     connectedEmileDB === undefined
       ? sqlite(databasePath, {
@@ -251,13 +251,14 @@ export function getEnergyDataPoint(
         })
       : connectedEmileDB
 
+  const tableName = await ensureEnergyDataTableExists(filters.assetId, emileDB)
+
   const dataPoint = emileDB
     .prepare(
       `select dataId, assetId, dataTypeId, fileId,
         timeSeconds, durationSeconds, dataValue, powerOfTenMultiplier
-        from EnergyData
+        from ${tableName}
         where recordDelete_timeMillis is null
-        and assetId = ?
         and dataTypeId = ?
         and timeSeconds = ?
         and durationSeconds = ?`
