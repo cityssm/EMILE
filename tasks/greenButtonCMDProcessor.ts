@@ -165,7 +165,7 @@ async function processGreenButtonSubscriptions(): Promise<void> {
       } finally {
         updatedMins[subscriptionKey][authorizationId] = {
           polledMillis: Date.now(),
-          updatedMillis: timeMillis.updatedMillis ?? 0
+          updatedMillis: usageData.updatedDate?.getTime() ?? timeMillis.updatedMillis ?? 0
         }
         saveCache()
       }
