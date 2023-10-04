@@ -5,8 +5,7 @@ import type { ServiceConfig } from 'node-windows'
 const _dirname = '.'
 
 export const serviceConfig: ServiceConfig = {
-  name: 'MonTY',
-  description:
-    'MONitor and Track Your...',
+  name: 'EMILE',
+  description: 'Energy Monitoring in Less Effort',
   script: path.join(_dirname, 'bin', 'www.js')
 }
