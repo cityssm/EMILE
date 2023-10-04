@@ -1,7 +1,9 @@
 import sqlite from 'better-sqlite3';
+import Debug from 'debug';
 import { databasePath, getConnectionWhenAvailable, getTempTableName } from '../helpers/functions.database.js';
 import { getAssets } from './getAssets.js';
 import { ensureEnergyDataTableExists } from './manageEnergyDataTables.js';
+const debug = Debug('emile:database:updateAsset');
 export function updateAsset(asset, sessionUser) {
     const emileDB = sqlite(databasePath);
     const result = emileDB
@@ -36,14 +38,14 @@ export async function updateAssetTimeSeconds(assetId, connectedEmileDB) {
         try {
             emileDB
                 .prepare(`update Assets
-        set timeSecondsMin = ?,
-        endTimeSecondsMax = ?
-        where assetId = ?`)
+            set timeSecondsMin = ?,
+            endTimeSecondsMax = ?
+            where assetId = ?`)
                 .run(result?.timeSecondsMin ?? undefined, result?.endTimeSecondsMax ?? undefined, assetId);
             break;
         }
         catch {
-            console.log('Try again');
+            debug('Try again');
         }
     }
     if (connectedEmileDB === undefined) {

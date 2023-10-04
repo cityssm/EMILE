@@ -6,6 +6,7 @@ import {
   type types as GreenButtonTypes
 } from '@cityssm/green-button-parser'
 import sqlite from 'better-sqlite3'
+import Debug from 'debug'
 
 import { addAsset } from '../database/addAsset.js'
 import { addAssetAlias } from '../database/addAssetAlias.js'
@@ -19,6 +20,8 @@ import { databasePath } from '../helpers/functions.database.js'
 import type { EnergyDataType } from '../types/recordTypes.js'
 
 import { getAssetCategories } from './functions.cache.js'
+
+const debug = Debug('emile:functions.greenButton')
 
 const greenButtonAliasTypeKey = 'GreenButtonParser.IntervalBlock.link'
 
@@ -52,7 +55,7 @@ async function getAssetIdFromIntervalBlock(
     )
   }
 
-  console.log(`assetAlias: ${assetAlias}`)
+  debug(`assetAlias: ${assetAlias}`)
 
   const asset = await getAssetByAssetAlias(
     assetAlias,

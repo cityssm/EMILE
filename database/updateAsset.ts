@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/indent */
 
 import sqlite from 'better-sqlite3'
+import Debug from 'debug'
 
 import {
   databasePath,
@@ -12,6 +13,8 @@ import type { Asset } from '../types/recordTypes.js'
 
 import { getAssets } from './getAssets.js'
 import { ensureEnergyDataTableExists } from './manageEnergyDataTables.js'
+
+const debug = Debug('emile:database:updateAsset')
 
 export function updateAsset(asset: Asset, sessionUser: EmileUser): boolean {
   const emileDB = sqlite(databasePath)
@@ -78,9 +81,9 @@ export async function updateAssetTimeSeconds(
       emileDB
         .prepare(
           `update Assets
-        set timeSecondsMin = ?,
-        endTimeSecondsMax = ?
-        where assetId = ?`
+            set timeSecondsMin = ?,
+            endTimeSecondsMax = ?
+            where assetId = ?`
         )
         .run(
           result?.timeSecondsMin ?? undefined,
@@ -90,8 +93,7 @@ export async function updateAssetTimeSeconds(
 
       break
     } catch {
-      console.log('Try again')
-      // try again
+      debug('Try again')
     }
   }
 

@@ -1,5 +1,6 @@
 import { helpers as greenButtonHelpers } from '@cityssm/green-button-parser';
 import sqlite from 'better-sqlite3';
+import Debug from 'debug';
 import { addAsset } from '../database/addAsset.js';
 import { addAssetAlias } from '../database/addAssetAlias.js';
 import { addEnergyData } from '../database/addEnergyData.js';
@@ -10,6 +11,7 @@ import { getEnergyDataTypeByGreenButtonIds } from '../database/getEnergyDataType
 import { updateEnergyDataValue } from '../database/updateEnergyData.js';
 import { databasePath } from '../helpers/functions.database.js';
 import { getAssetCategories } from './functions.cache.js';
+const debug = Debug('emile:functions.greenButton');
 const greenButtonAliasTypeKey = 'GreenButtonParser.IntervalBlock.link';
 export const greenButtonAssetAliasType = getAssetAliasTypeByAliasTypeKey(greenButtonAliasTypeKey);
 const greenButtonUser = {
@@ -27,7 +29,7 @@ async function getAssetIdFromIntervalBlock(intervalBlockEntry, connectedEmileDB)
     if (assetAlias.includes('/MeterReading/')) {
         assetAlias = assetAlias.slice(0, Math.max(0, assetAlias.indexOf('/MeterReading/')));
     }
-    console.log(`assetAlias: ${assetAlias}`);
+    debug(`assetAlias: ${assetAlias}`);
     const asset = await getAssetByAssetAlias(assetAlias, greenButtonAssetAliasType?.aliasTypeId, connectedEmileDB);
     if (asset === undefined) {
         const assetCategory = getAssetCategories()[0];
