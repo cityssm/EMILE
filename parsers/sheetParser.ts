@@ -136,7 +136,7 @@ export class SheetParser extends BaseParser {
             throw new Error('No asset alias available.')
           }
 
-          const asset = getAssetByAssetAlias(assetAlias, aliasTypeId, emileDB)
+          const asset = await getAssetByAssetAlias(assetAlias, aliasTypeId, emileDB)
 
           // Create asset
           if (asset === undefined) {

@@ -54,7 +54,7 @@ async function getAssetIdFromIntervalBlock(
 
   console.log(`assetAlias: ${assetAlias}`)
 
-  const asset = getAssetByAssetAlias(
+  const asset = await getAssetByAssetAlias(
     assetAlias,
     greenButtonAssetAliasType?.aliasTypeId,
     connectedEmileDB
@@ -95,16 +95,17 @@ async function getAssetIdFromIntervalBlock(
   return assetId
 }
 
-function getEnergyDataTypeAndPowerOfTenMultiplier(
+async function getEnergyDataTypeAndPowerOfTenMultiplier(
   greenButtonJson: GreenButtonTypes.GreenButtonJson,
   intervalBlockEntry: GreenButtonTypes.GreenButtonEntryWithIntervalBlockContent,
   connectedEmileDB: sqlite.Database
-):
+): Promise<
   | undefined
   | {
       energyDataType?: EnergyDataType
       powerOfTenMultiplier: number
-    } {
+    }
+> {
   const meterReadingEntry =
     greenButtonHelpers.getMeterReadingEntryFromIntervalBlockEntry(
       greenButtonJson,
@@ -138,7 +139,7 @@ function getEnergyDataTypeAndPowerOfTenMultiplier(
     readingType.content.ReadingType.powerOfTenMultiplier ?? '0'
 
   return {
-    energyDataType: getEnergyDataTypeByGreenButtonIds(
+    energyDataType: await getEnergyDataTypeByGreenButtonIds(
       {
         serviceCategoryId:
           usagePoint.content.UsagePoint.ServiceCategory?.kind.toString() ?? '',
@@ -197,11 +198,12 @@ export async function recordGreenButtonData(
        * Ensure a dataTypeId is available
        */
 
-      const energyDataTypeAndPower = getEnergyDataTypeAndPowerOfTenMultiplier(
-        greenButtonJson,
-        intervalBlockEntry,
-        emileDB
-      )
+      const energyDataTypeAndPower =
+        await getEnergyDataTypeAndPowerOfTenMultiplier(
+          greenButtonJson,
+          intervalBlockEntry,
+          emileDB
+        )
 
       if (
         energyDataTypeAndPower === undefined ||

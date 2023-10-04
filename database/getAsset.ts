@@ -2,8 +2,9 @@
 /* eslint-disable @typescript-eslint/indent */
 
 import sqlite from 'better-sqlite3'
+import NodeCache from 'node-cache'
 
-import { databasePath } from '../helpers/functions.database.js'
+import { databasePath, getConnectionWhenAvailable } from '../helpers/functions.database.js'
 import type { Asset } from '../types/recordTypes.js'
 
 import { getAssetAliases } from './getAssetAliases.js'
@@ -46,16 +47,30 @@ export function getAsset(
   return asset
 }
 
-export function getAssetByAssetAlias(
+const assetAliasCache = new NodeCache({
+  stdTTL: 30
+})
+
+function getAssetAliasCacheKey(assetAlias: string, aliasTypeId?: number | string): string {
+  return `${aliasTypeId ?? ''}::::${assetAlias}`
+}
+
+export async function getAssetByAssetAlias(
   assetAlias: string,
   aliasTypeId?: number | string,
   connectedEmileDB?: sqlite.Database
-): Asset | undefined {
+): Promise<Asset | undefined> {
+  const assetAliasCacheKey = getAssetAliasCacheKey(assetAlias, aliasTypeId)
+
+  let asset = assetAliasCache.get<Asset>(assetAliasCacheKey)
+
+  if (asset !== undefined) {
+    return asset
+  }
+
   const emileDB =
     connectedEmileDB === undefined
-      ? sqlite(databasePath, {
-          readonly: true
-        })
+      ? await getConnectionWhenAvailable()
       : connectedEmileDB
 
   let sql = `select assetId from AssetAliases
@@ -70,8 +85,6 @@ export function getAssetByAssetAlias(
     sqlParameters.push(aliasTypeId)
   }
 
-  let asset: Asset | undefined
-
   const assetId = emileDB.prepare(sql).get(sqlParameters) as
     | { assetId: number }
     | undefined
@@ -83,6 +96,8 @@ export function getAssetByAssetAlias(
   if (connectedEmileDB === undefined) {
     emileDB.close()
   }
+
+  assetAliasCache.set(assetAliasCacheKey, asset)
 
   return asset
 }

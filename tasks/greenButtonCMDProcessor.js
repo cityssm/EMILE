@@ -59,18 +59,30 @@ async function processGreenButtonSubscriptions() {
                 debug(`Skipping authorization id: ${subscriptionKey}, ${authorizationId}`);
                 continue;
             }
-            const updatedMinMillis = updatedMins[subscriptionKey][authorizationId];
+            let timeMillis = updatedMins[subscriptionKey][authorizationId];
+            if (timeMillis === undefined) {
+                timeMillis = {
+                    polledMillis: 0,
+                    updatedMillis: 0
+                };
+            }
+            else if (typeof timeMillis === 'number') {
+                timeMillis = {
+                    polledMillis: timeMillis,
+                    updatedMillis: timeMillis
+                };
+            }
+            if (timeMillis.polledMillis + pollingIntervalMillis > Date.now()) {
+                debug(`Skipping recently refreshed authorization id: ${subscriptionKey}, ${authorizationId}`);
+                continue;
+            }
             let updatedMin;
-            if ((updatedMinMillis ?? undefined) === undefined) {
+            if (timeMillis.updatedMillis === 0) {
                 updatedMin = new Date();
                 updatedMin.setFullYear(updatedMin.getFullYear() - 1);
             }
             else {
-                updatedMin = new Date(updatedMinMillis);
-            }
-            if (updatedMin.getTime() + pollingIntervalMillis > Date.now()) {
-                debug(`Skipping recently refreshed authorization id: ${subscriptionKey}, ${authorizationId}`);
-                continue;
+                updatedMin = new Date(timeMillis.updatedMillis);
             }
             const usageData = await greenButtonSubscriber.getBatchSubscriptionsByAuthorization(authorizationId, {
                 updatedMin
@@ -81,13 +93,17 @@ async function processGreenButtonSubscriptions() {
             }
             try {
                 await recordGreenButtonData(usageData, {});
-                updatedMins[subscriptionKey][authorizationId] =
-                    usageData.updatedDate?.getTime() ?? 0;
-                saveCache();
             }
             catch (error) {
                 debug(`Error recording data: ${subscriptionKey}, ${authorizationId}`);
                 debug(error);
+            }
+            finally {
+                updatedMins[subscriptionKey][authorizationId] = {
+                    polledMillis: Date.now(),
+                    updatedMillis: timeMillis.updatedMillis ?? 0
+                };
+                saveCache();
             }
         }
     }

@@ -1,4 +1,5 @@
 /* eslint-disable eslint-comments/disable-enable-pair, unicorn/filename-case */
+/* eslint-disable @typescript-eslint/indent */
 
 import fs from 'node:fs'
 
@@ -22,7 +23,10 @@ const pollingIntervalMillis = 86_400 * 1000 + 60_000
 
 const updatedMinsCacheFile = 'data/caches/greenButtonCMDProcessor.json'
 
-let updatedMins: Record<string, Record<string, number>> = {}
+let updatedMins: Record<
+  string,
+  Record<string, { polledMillis: number; updatedMillis: number }>
+> = {}
 
 try {
   updatedMins = JSON.parse(
@@ -108,21 +112,34 @@ async function processGreenButtonSubscriptions(): Promise<void> {
         continue
       }
 
-      const updatedMinMillis = updatedMins[subscriptionKey][authorizationId]
-      let updatedMin: Date
+      let timeMillis = updatedMins[subscriptionKey][authorizationId]
 
-      if ((updatedMinMillis ?? undefined) === undefined) {
-        updatedMin = new Date()
-        updatedMin.setFullYear(updatedMin.getFullYear() - 1)
-      } else {
-        updatedMin = new Date(updatedMinMillis)
+      if (timeMillis === undefined) {
+        timeMillis = {
+          polledMillis: 0,
+          updatedMillis: 0
+        }
+      } else if (typeof timeMillis === 'number') {
+        timeMillis = {
+          polledMillis: timeMillis,
+          updatedMillis: timeMillis
+        }
       }
 
-      if (updatedMin.getTime() + pollingIntervalMillis > Date.now()) {
+      if (timeMillis.polledMillis + pollingIntervalMillis > Date.now()) {
         debug(
           `Skipping recently refreshed authorization id: ${subscriptionKey}, ${authorizationId}`
         )
         continue
+      }
+
+      let updatedMin: Date
+
+      if (timeMillis.updatedMillis === 0) {
+        updatedMin = new Date()
+        updatedMin.setFullYear(updatedMin.getFullYear() - 1)
+      } else {
+        updatedMin = new Date(timeMillis.updatedMillis)
       }
 
       const usageData =
@@ -142,12 +159,15 @@ async function processGreenButtonSubscriptions(): Promise<void> {
 
       try {
         await recordGreenButtonData(usageData as GreenButtonJson, {})
-        updatedMins[subscriptionKey][authorizationId] =
-          usageData.updatedDate?.getTime() ?? 0
-        saveCache()
       } catch (error) {
         debug(`Error recording data: ${subscriptionKey}, ${authorizationId}`)
         debug(error)
+      } finally {
+        updatedMins[subscriptionKey][authorizationId] = {
+          polledMillis: Date.now(),
+          updatedMillis: timeMillis.updatedMillis ?? 0
+        }
+        saveCache()
       }
     }
   }

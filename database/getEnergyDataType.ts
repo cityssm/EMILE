@@ -2,8 +2,12 @@
 /* eslint-disable @typescript-eslint/indent */
 
 import sqlite from 'better-sqlite3'
+import NodeCache from 'node-cache'
 
-import { databasePath } from '../helpers/functions.database.js'
+import {
+  databasePath,
+  getConnectionWhenAvailable
+} from '../helpers/functions.database.js'
 import type { EnergyDataType } from '../types/recordTypes.js'
 
 import { addEnergyDataType } from './addEnergyDataType.js'
@@ -70,20 +74,49 @@ export function getEnergyDataType(
   return energyDataType
 }
 
-export function getEnergyDataTypeByGreenButtonIds(
-  greenButtonIds: {
-    serviceCategoryId: string
-    unitId: string
-    readingTypeId?: string
-    commodityId?: string
-    accumulationBehaviourId?: string
-  },
+interface EnergyDataTypeGreenButtonIds {
+  serviceCategoryId: string
+  unitId: string
+  readingTypeId?: string
+  commodityId?: string
+  accumulationBehaviourId?: string
+}
+
+const energyDataTypeByGreenButtonCache = new NodeCache({
+  stdTTL: 60
+})
+
+function getEnergyDataTypeByGreenButtonCacheKey(
+  greenButtonIds: EnergyDataTypeGreenButtonIds
+): string {
+  return `${greenButtonIds.serviceCategoryId}:${greenButtonIds.unitId}:${
+    greenButtonIds.readingTypeId ?? ''
+  }:${greenButtonIds.commodityId ?? ''}:${
+    greenButtonIds.accumulationBehaviourId ?? ''
+  }`
+}
+
+export async function getEnergyDataTypeByGreenButtonIds(
+  greenButtonIds: EnergyDataTypeGreenButtonIds,
   sessionUser: EmileUser,
   createIfUnavailable = true,
   connectedEmileDB?: sqlite.Database
-): EnergyDataType | undefined {
+): Promise<EnergyDataType | undefined> {
+  const energyDataTypeByGreenButtonCacheKey =
+    getEnergyDataTypeByGreenButtonCacheKey(greenButtonIds)
+
+  let energyDataType = energyDataTypeByGreenButtonCache.get<EnergyDataType>(
+    energyDataTypeByGreenButtonCacheKey
+  )
+
+  if (energyDataType !== undefined) {
+    return energyDataType
+  }
+
   const emileDB =
-    connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB
+    connectedEmileDB === undefined
+      ? await getConnectionWhenAvailable()
+      : connectedEmileDB
 
   let sql = `select t.dataTypeId,
       t.serviceCategoryId, s.serviceCategory,
@@ -111,22 +144,28 @@ export function getEnergyDataTypeByGreenButtonIds(
     greenButtonIds.unitId
   ]
 
-  if (greenButtonIds.readingTypeId !== undefined) {
+  if (greenButtonIds.readingTypeId === undefined) {
+    sql += ' and t.readingTypeId is null'
+  } else {
     sql += ' and r.greenButtonId = ?'
     sqlParameters.push(greenButtonIds.readingTypeId)
   }
 
-  if (greenButtonIds.commodityId !== undefined) {
+  if (greenButtonIds.commodityId === undefined) {
+    sql += ' and t.commodityId is null'
+  } else {
     sql += ' and c.greenButtonId = ?'
     sqlParameters.push(greenButtonIds.commodityId)
   }
 
-  if (greenButtonIds.accumulationBehaviourId !== undefined) {
+  if (greenButtonIds.accumulationBehaviourId === undefined) {
+    sql += ' and t.accumulationBehaviourId is null'
+  } else {
     sql += ' and a.greenButtonId = ?'
     sqlParameters.push(greenButtonIds.accumulationBehaviourId)
   }
 
-  let energyDataType = emileDB.prepare(sql).get(sqlParameters) as
+  energyDataType = emileDB.prepare(sql).get(sqlParameters) as
     | EnergyDataType
     | undefined
 
@@ -189,6 +228,11 @@ export function getEnergyDataTypeByGreenButtonIds(
   if (connectedEmileDB === undefined) {
     emileDB.close()
   }
+
+  energyDataTypeByGreenButtonCache.set(
+    energyDataTypeByGreenButtonCacheKey,
+    energyDataType
+  )
 
   return energyDataType
 }

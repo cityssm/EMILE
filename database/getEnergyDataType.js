@@ -1,5 +1,6 @@
 import sqlite from 'better-sqlite3';
-import { databasePath } from '../helpers/functions.database.js';
+import NodeCache from 'node-cache';
+import { databasePath, getConnectionWhenAvailable } from '../helpers/functions.database.js';
 import { addEnergyDataType } from './addEnergyDataType.js';
 import { getEnergyAccumulationBehaviourByGreenButtonId, getEnergyAccumulationBehaviourByName } from './getEnergyAccumulationBehaviour.js';
 import { getEnergyCommodityByGreenButtonId, getEnergyCommodityByName } from './getEnergyCommodity.js';
@@ -38,8 +39,21 @@ export function getEnergyDataType(dataTypeId, connectedEmileDB) {
     }
     return energyDataType;
 }
-export function getEnergyDataTypeByGreenButtonIds(greenButtonIds, sessionUser, createIfUnavailable = true, connectedEmileDB) {
-    const emileDB = connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB;
+const energyDataTypeByGreenButtonCache = new NodeCache({
+    stdTTL: 60
+});
+function getEnergyDataTypeByGreenButtonCacheKey(greenButtonIds) {
+    return `${greenButtonIds.serviceCategoryId}:${greenButtonIds.unitId}:${greenButtonIds.readingTypeId ?? ''}:${greenButtonIds.commodityId ?? ''}:${greenButtonIds.accumulationBehaviourId ?? ''}`;
+}
+export async function getEnergyDataTypeByGreenButtonIds(greenButtonIds, sessionUser, createIfUnavailable = true, connectedEmileDB) {
+    const energyDataTypeByGreenButtonCacheKey = getEnergyDataTypeByGreenButtonCacheKey(greenButtonIds);
+    let energyDataType = energyDataTypeByGreenButtonCache.get(energyDataTypeByGreenButtonCacheKey);
+    if (energyDataType !== undefined) {
+        return energyDataType;
+    }
+    const emileDB = connectedEmileDB === undefined
+        ? await getConnectionWhenAvailable()
+        : connectedEmileDB;
     let sql = `select t.dataTypeId,
       t.serviceCategoryId, s.serviceCategory,
       t.unitId, u.unit, u.unitLong,
@@ -64,19 +78,28 @@ export function getEnergyDataTypeByGreenButtonIds(greenButtonIds, sessionUser, c
         greenButtonIds.serviceCategoryId,
         greenButtonIds.unitId
     ];
-    if (greenButtonIds.readingTypeId !== undefined) {
+    if (greenButtonIds.readingTypeId === undefined) {
+        sql += ' and t.readingTypeId is null';
+    }
+    else {
         sql += ' and r.greenButtonId = ?';
         sqlParameters.push(greenButtonIds.readingTypeId);
     }
-    if (greenButtonIds.commodityId !== undefined) {
+    if (greenButtonIds.commodityId === undefined) {
+        sql += ' and t.commodityId is null';
+    }
+    else {
         sql += ' and c.greenButtonId = ?';
         sqlParameters.push(greenButtonIds.commodityId);
     }
-    if (greenButtonIds.accumulationBehaviourId !== undefined) {
+    if (greenButtonIds.accumulationBehaviourId === undefined) {
+        sql += ' and t.accumulationBehaviourId is null';
+    }
+    else {
         sql += ' and a.greenButtonId = ?';
         sqlParameters.push(greenButtonIds.accumulationBehaviourId);
     }
-    let energyDataType = emileDB.prepare(sql).get(sqlParameters);
+    energyDataType = emileDB.prepare(sql).get(sqlParameters);
     if (energyDataType === undefined && createIfUnavailable) {
         const serviceCategory = getEnergyServiceCategoryByGreenButtonId(greenButtonIds.serviceCategoryId, emileDB);
         const unit = getEnergyUnitByGreenButtonId(greenButtonIds.unitId, emileDB);
@@ -111,6 +134,7 @@ export function getEnergyDataTypeByGreenButtonIds(greenButtonIds, sessionUser, c
     if (connectedEmileDB === undefined) {
         emileDB.close();
     }
+    energyDataTypeByGreenButtonCache.set(energyDataTypeByGreenButtonCacheKey, energyDataType);
     return energyDataType;
 }
 export function getEnergyDataTypeByNames(names, sessionUser, createIfUnavailable = true, connectedEmileDB) {

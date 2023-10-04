@@ -28,7 +28,7 @@ async function getAssetIdFromIntervalBlock(intervalBlockEntry, connectedEmileDB)
         assetAlias = assetAlias.slice(0, Math.max(0, assetAlias.indexOf('/MeterReading/')));
     }
     console.log(`assetAlias: ${assetAlias}`);
-    const asset = getAssetByAssetAlias(assetAlias, greenButtonAssetAliasType?.aliasTypeId, connectedEmileDB);
+    const asset = await getAssetByAssetAlias(assetAlias, greenButtonAssetAliasType?.aliasTypeId, connectedEmileDB);
     if (asset === undefined) {
         const assetCategory = getAssetCategories()[0];
         if (assetCategory === undefined) {
@@ -49,7 +49,7 @@ async function getAssetIdFromIntervalBlock(intervalBlockEntry, connectedEmileDB)
     }
     return assetId;
 }
-function getEnergyDataTypeAndPowerOfTenMultiplier(greenButtonJson, intervalBlockEntry, connectedEmileDB) {
+async function getEnergyDataTypeAndPowerOfTenMultiplier(greenButtonJson, intervalBlockEntry, connectedEmileDB) {
     const meterReadingEntry = greenButtonHelpers.getMeterReadingEntryFromIntervalBlockEntry(greenButtonJson, intervalBlockEntry);
     if (meterReadingEntry === undefined) {
         throw new Error('Unable to find related MeterReading entry.');
@@ -64,7 +64,7 @@ function getEnergyDataTypeAndPowerOfTenMultiplier(greenButtonJson, intervalBlock
     }
     const powerOfTenMultiplier = readingType.content.ReadingType.powerOfTenMultiplier ?? '0';
     return {
-        energyDataType: getEnergyDataTypeByGreenButtonIds({
+        energyDataType: await getEnergyDataTypeByGreenButtonIds({
             serviceCategoryId: usagePoint.content.UsagePoint.ServiceCategory?.kind.toString() ?? '',
             unitId: readingType.content.ReadingType.uom?.toString() ?? '',
             readingTypeId: readingType.content.ReadingType.kind?.toString(),
@@ -90,7 +90,7 @@ export async function recordGreenButtonData(greenButtonJson, options) {
             if ((assetId ?? '') === '') {
                 assetId = await getAssetIdFromIntervalBlock(intervalBlockEntry, emileDB);
             }
-            const energyDataTypeAndPower = getEnergyDataTypeAndPowerOfTenMultiplier(greenButtonJson, intervalBlockEntry, emileDB);
+            const energyDataTypeAndPower = await getEnergyDataTypeAndPowerOfTenMultiplier(greenButtonJson, intervalBlockEntry, emileDB);
             if (energyDataTypeAndPower === undefined ||
                 energyDataTypeAndPower.energyDataType === undefined) {
                 throw new Error('Unable to retrieve EnergyDataType.');
