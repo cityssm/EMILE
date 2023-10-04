@@ -279,17 +279,24 @@ export function getEnergyDataTypeByNames(
     names.unit
   ]
 
-  if (names.readingType !== '') {
+  if (names.readingType === '') {
+    sql += " and (t.readingTypeId is null or r.readingType = '')"
+  } else {
     sql += ' and r.readingType = ?'
     sqlParameters.push(names.readingType)
   }
 
-  if (names.commodity !== '') {
+  if (names.commodity === '') {
+    sql += " and (t.commodityId is null or c.commodity = '')"
+  } else {
     sql += ' and c.commodity = ?'
     sqlParameters.push(names.commodity)
   }
 
-  if (names.accumulationBehaviour !== '') {
+  if (names.accumulationBehaviour === '') {
+    sql +=
+      " and (a.accumulationBehaviourId is null or a.accumulationBehaviour = '')"
+  } else {
     sql += ' and a.accumulationBehaviour = ?'
     sqlParameters.push(names.accumulationBehaviour)
   }
