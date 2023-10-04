@@ -264,7 +264,6 @@ export async function getEnergyDataPoint(
         and durationSeconds = ?`
     )
     .get(
-      filters.assetId,
       filters.dataTypeId,
       filters.timeSeconds,
       filters.durationSeconds
