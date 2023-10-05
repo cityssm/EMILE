@@ -24,20 +24,24 @@ process.title = 'EMILE - greenButtonCMDProcessor'
 const taskIntervalMillis = 3600 * 1000
 const pollingIntervalMillis = 86_400 * 1000 + 60_000
 
-const updatedMinsCacheFile = 'data/caches/greenButtonCMDProcessor.json'
+const lastUpdatedMinsCacheFile = 'data/caches/greenButtonCMDProcessor.json'
 
-let updatedMins: Record<
-  string,
-  Record<string, { polledMillis: number; updatedMillis: number }>
-> = {}
+const greenButtonSubscriptions = getConfigProperty('subscriptions.greenButton')
+
+interface LastUpdateMins {
+  polledMillis: number
+  updatedMillis: number
+}
+
+let lastUpdatedMins: Record<string, Record<string, LastUpdateMins>> = {}
 
 try {
-  updatedMins = JSON.parse(
-    fs.readFileSync(updatedMinsCacheFile) as unknown as string
+  lastUpdatedMins = JSON.parse(
+    fs.readFileSync(lastUpdatedMinsCacheFile) as unknown as string
   )
 } catch {
-  debug(`No cache file available: ${updatedMinsCacheFile}`)
-  updatedMins = {}
+  debug(`No cache file available: ${lastUpdatedMinsCacheFile}`)
+  lastUpdatedMins = {}
 }
 
 let terminateTask = false
@@ -46,13 +50,34 @@ let taskIsRunning = false
 function saveCache(): void {
   try {
     fs.writeFileSync(
-      updatedMinsCacheFile,
-      JSON.stringify(updatedMins, undefined, 2)
+      lastUpdatedMinsCacheFile,
+      JSON.stringify(lastUpdatedMins, undefined, 2)
     )
   } catch (error) {
-    debug(`Error saving cache file: ${updatedMinsCacheFile}`)
+    debug(`Error saving cache file: ${lastUpdatedMinsCacheFile}`)
     debug(error)
   }
+}
+
+function getLastPolledAndUpdatedMillis(
+  subscriptionKey: string,
+  authorizationId: string
+): LastUpdateMins {
+  let timeMillis = lastUpdatedMins[subscriptionKey][authorizationId]
+
+  if (timeMillis === undefined) {
+    timeMillis = {
+      polledMillis: 0,
+      updatedMillis: 0
+    }
+  } else if (typeof timeMillis === 'number') {
+    timeMillis = {
+      polledMillis: timeMillis,
+      updatedMillis: timeMillis
+    }
+  }
+
+  return timeMillis
 }
 
 async function processGreenButtonSubscriptions(): Promise<void> {
@@ -64,10 +89,6 @@ async function processGreenButtonSubscriptions(): Promise<void> {
   taskIsRunning = true
 
   try {
-    const greenButtonSubscriptions = getConfigProperty(
-      'subscriptions.greenButton'
-    )
-
     // eslint-disable-next-line no-labels
     subscriptionLoop: for (const [
       subscriptionKey,
@@ -76,6 +97,10 @@ async function processGreenButtonSubscriptions(): Promise<void> {
       if (terminateTask) {
         break
       }
+
+      /*
+       * Ensure subscription is within the allowable polling time range.
+       */
 
       if (
         (greenButtonSubscription.pollingHoursToExclude ?? []).includes(
@@ -88,13 +113,21 @@ async function processGreenButtonSubscriptions(): Promise<void> {
 
       debug(`Loading authorizations for subscription: ${subscriptionKey} ...`)
 
-      if (updatedMins[subscriptionKey] === undefined) {
-        updatedMins[subscriptionKey] = {}
+      /*
+       * Ensure a time cache record exists for the subscription.
+       */
+
+      if (lastUpdatedMins[subscriptionKey] === undefined) {
+        lastUpdatedMins[subscriptionKey] = {}
       }
 
       const greenButtonSubscriber = new GreenButtonSubscriber(
         greenButtonSubscription.configuration
       )
+
+      /*
+       * Get the Authorizations for the subscription.
+       */
 
       const authorizations = await greenButtonSubscriber.getAuthorizations()
 
@@ -127,6 +160,10 @@ async function processGreenButtonSubscriptions(): Promise<void> {
           continue subscriptionLoop
         }
 
+        /*
+         * Ensure the Authorization is supposed to be polled.
+         */
+
         const authorizationId = authorizationEntry.links.selfUid ?? ''
 
         if (
@@ -146,19 +183,14 @@ async function processGreenButtonSubscriptions(): Promise<void> {
           continue
         }
 
-        let timeMillis = updatedMins[subscriptionKey][authorizationId]
+        /*
+         * Ensure the Authorization was not polled too recently.
+         */
 
-        if (timeMillis === undefined) {
-          timeMillis = {
-            polledMillis: 0,
-            updatedMillis: 0
-          }
-        } else if (typeof timeMillis === 'number') {
-          timeMillis = {
-            polledMillis: timeMillis,
-            updatedMillis: timeMillis
-          }
-        }
+        const timeMillis = getLastPolledAndUpdatedMillis(
+          subscriptionKey,
+          authorizationId
+        )
 
         if (timeMillis.polledMillis + pollingIntervalMillis > Date.now()) {
           debug(
@@ -166,6 +198,10 @@ async function processGreenButtonSubscriptions(): Promise<void> {
           )
           continue
         }
+
+        /*
+         * Calculate the last updated time that should be used for retrieving data.
+         */
 
         let updatedMin: Date
 
@@ -175,6 +211,10 @@ async function processGreenButtonSubscriptions(): Promise<void> {
         } else {
           updatedMin = new Date(timeMillis.updatedMillis)
         }
+
+        /*
+         * Poll for usage data.
+         */
 
         const usageData =
           await greenButtonSubscriber.getBatchSubscriptionsByAuthorization(
@@ -191,13 +231,17 @@ async function processGreenButtonSubscriptions(): Promise<void> {
           continue
         }
 
+        /*
+         * Record the usage data.
+         */
+
         try {
           await recordGreenButtonData(usageData.json as GreenButtonJson, {})
         } catch (error) {
           debug(`Error recording data: ${subscriptionKey}, ${authorizationId}`)
           debug(error)
         } finally {
-          updatedMins[subscriptionKey][authorizationId] = {
+          lastUpdatedMins[subscriptionKey][authorizationId] = {
             polledMillis: Date.now(),
             updatedMillis:
               usageData.json?.updatedDate?.getTime() ??

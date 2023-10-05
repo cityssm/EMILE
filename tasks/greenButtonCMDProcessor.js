@@ -10,25 +10,42 @@ const debug = Debug('emile:tasks:greenButtonCMDProcessor');
 process.title = 'EMILE - greenButtonCMDProcessor';
 const taskIntervalMillis = 3600 * 1000;
 const pollingIntervalMillis = 86400 * 1000 + 60000;
-const updatedMinsCacheFile = 'data/caches/greenButtonCMDProcessor.json';
-let updatedMins = {};
+const lastUpdatedMinsCacheFile = 'data/caches/greenButtonCMDProcessor.json';
+const greenButtonSubscriptions = getConfigProperty('subscriptions.greenButton');
+let lastUpdatedMins = {};
 try {
-    updatedMins = JSON.parse(fs.readFileSync(updatedMinsCacheFile));
+    lastUpdatedMins = JSON.parse(fs.readFileSync(lastUpdatedMinsCacheFile));
 }
 catch {
-    debug(`No cache file available: ${updatedMinsCacheFile}`);
-    updatedMins = {};
+    debug(`No cache file available: ${lastUpdatedMinsCacheFile}`);
+    lastUpdatedMins = {};
 }
 let terminateTask = false;
 let taskIsRunning = false;
 function saveCache() {
     try {
-        fs.writeFileSync(updatedMinsCacheFile, JSON.stringify(updatedMins, undefined, 2));
+        fs.writeFileSync(lastUpdatedMinsCacheFile, JSON.stringify(lastUpdatedMins, undefined, 2));
     }
     catch (error) {
-        debug(`Error saving cache file: ${updatedMinsCacheFile}`);
+        debug(`Error saving cache file: ${lastUpdatedMinsCacheFile}`);
         debug(error);
     }
+}
+function getLastPolledAndUpdatedMillis(subscriptionKey, authorizationId) {
+    let timeMillis = lastUpdatedMins[subscriptionKey][authorizationId];
+    if (timeMillis === undefined) {
+        timeMillis = {
+            polledMillis: 0,
+            updatedMillis: 0
+        };
+    }
+    else if (typeof timeMillis === 'number') {
+        timeMillis = {
+            polledMillis: timeMillis,
+            updatedMillis: timeMillis
+        };
+    }
+    return timeMillis;
 }
 async function processGreenButtonSubscriptions() {
     if (taskIsRunning) {
@@ -37,7 +54,6 @@ async function processGreenButtonSubscriptions() {
     debug('Process started');
     taskIsRunning = true;
     try {
-        const greenButtonSubscriptions = getConfigProperty('subscriptions.greenButton');
         subscriptionLoop: for (const [subscriptionKey, greenButtonSubscription] of Object.entries(greenButtonSubscriptions)) {
             if (terminateTask) {
                 break;
@@ -47,8 +63,8 @@ async function processGreenButtonSubscriptions() {
                 continue;
             }
             debug(`Loading authorizations for subscription: ${subscriptionKey} ...`);
-            if (updatedMins[subscriptionKey] === undefined) {
-                updatedMins[subscriptionKey] = {};
+            if (lastUpdatedMins[subscriptionKey] === undefined) {
+                lastUpdatedMins[subscriptionKey] = {};
             }
             const greenButtonSubscriber = new GreenButtonSubscriber(greenButtonSubscription.configuration);
             const authorizations = await greenButtonSubscriber.getAuthorizations();
@@ -75,19 +91,7 @@ async function processGreenButtonSubscriptions() {
                     debug(`Skipping authorization id: ${subscriptionKey}, ${authorizationId}`);
                     continue;
                 }
-                let timeMillis = updatedMins[subscriptionKey][authorizationId];
-                if (timeMillis === undefined) {
-                    timeMillis = {
-                        polledMillis: 0,
-                        updatedMillis: 0
-                    };
-                }
-                else if (typeof timeMillis === 'number') {
-                    timeMillis = {
-                        polledMillis: timeMillis,
-                        updatedMillis: timeMillis
-                    };
-                }
+                const timeMillis = getLastPolledAndUpdatedMillis(subscriptionKey, authorizationId);
                 if (timeMillis.polledMillis + pollingIntervalMillis > Date.now()) {
                     debug(`Skipping recently refreshed authorization id: ${subscriptionKey}, ${authorizationId}`);
                     continue;
@@ -115,7 +119,7 @@ async function processGreenButtonSubscriptions() {
                     debug(error);
                 }
                 finally {
-                    updatedMins[subscriptionKey][authorizationId] = {
+                    lastUpdatedMins[subscriptionKey][authorizationId] = {
                         polledMillis: Date.now(),
                         updatedMillis: usageData.json?.updatedDate?.getTime() ??
                             timeMillis.updatedMillis ??
