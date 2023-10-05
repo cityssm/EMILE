@@ -42,14 +42,18 @@ export async function getEnergyDataFiles(filters, options) {
     f.recordCreate_timeMillis, f.recordUpdate_timeMillis`;
     const { sqlParameters, sqlWhereClause } = buildWhereClause(filters);
     const sql = `select ${groupByColumnNames},
-    count(d.dataId) as energyDataCount,
-    count(distinct d.assetId) as assetIdCount,
-    min(d.timeSeconds) as timeSecondsMin,
-    max(d.endTimeSeconds) as endTimeSecondsMax
+    ${filters.isProcessed ?? true
+        ? `count(d.dataId) as energyDataCount,
+            count(distinct d.assetId) as assetIdCount,
+            min(d.timeSeconds) as timeSecondsMin,
+            max(d.endTimeSeconds) as endTimeSecondsMax`
+        : ' 0 as energyDataCount, 0 as assetIdCount, null as timeSecondsMin, null and endTimeSecondsMax'}
     from EnergyDataFiles f
     left join Assets a on f.assetId = a.assetId
     left join AssetCategories c on a.categoryId = c.categoryId
-    left join EnergyData d on f.fileId = d.fileId and d.recordDelete_timeMillis is null
+    ${filters.isProcessed ?? true
+        ? ' left join EnergyData d on f.fileId = d.fileId and d.recordDelete_timeMillis is null'
+        : ''}
     where ${options.includeDeletedRecords ?? false
         ? ' 1 = 1'
         : 'f.recordDelete_timeMillis is null'}
