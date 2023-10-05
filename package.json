@@ -1,6 +1,6 @@
 {
   "name": "@cityssm/emile",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "type": "module",
   "description": "EMILE (Energy Monitoring in Less Effort) - An application to aggregate energy consumption data across several municipal assets and report usage to monitor and manage emissions. Makes bringing together Green Button and CSV data sources a breeze!",
   "exports": "./app.js",
