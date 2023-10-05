@@ -52,7 +52,7 @@
     "@cityssm/expressjs-server-js": "^2.3.3",
     "@cityssm/font-awesome-v5-iconclasses": "^0.1.0",
     "@cityssm/green-button-parser": "^0.7.0",
-    "@cityssm/green-button-subscriber": "^0.4.0",
+    "@cityssm/green-button-subscriber": "^0.5.0",
     "@cityssm/is-private-network-address": "^0.2.1",
     "@cityssm/utils-datetime": "^0.1.1",
     "@fortawesome/fontawesome-free": "^5.15.4",

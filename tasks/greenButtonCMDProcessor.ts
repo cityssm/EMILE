@@ -8,7 +8,7 @@ import type { GreenButtonJson } from '@cityssm/green-button-parser/types/entryTy
 import { GreenButtonSubscriber } from '@cityssm/green-button-subscriber'
 import Debug from 'debug'
 import exitHook from 'exit-hook'
-import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async'
+import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async/fixed'
 
 import { getConfigProperty } from '../helpers/functions.config.js'
 import { recordGreenButtonData } from '../helpers/functions.greenButton.js'
@@ -21,6 +21,7 @@ process.title = 'EMILE - greenButtonCMDProcessor'
  * Task
  */
 
+const taskIntervalMillis = 3600 * 1000
 const pollingIntervalMillis = 86_400 * 1000 + 60_000
 
 const updatedMinsCacheFile = 'data/caches/greenButtonCMDProcessor.json'
@@ -40,6 +41,7 @@ try {
 }
 
 let terminateTask = false
+let taskIsRunning = false
 
 function saveCache(): void {
   try {
@@ -54,125 +56,160 @@ function saveCache(): void {
 }
 
 async function processGreenButtonSubscriptions(): Promise<void> {
+  if (taskIsRunning) {
+    return
+  }
+
   debug('Process started')
+  taskIsRunning = true
 
-  const greenButtonSubscriptions = getConfigProperty(
-    'subscriptions.greenButton'
-  )
-
-  for (const [subscriptionKey, greenButtonSubscription] of Object.entries(
-    greenButtonSubscriptions
-  )) {
-    if (terminateTask) {
-      break
-    }
-
-    debug(`Loading authorizations for subscription: ${subscriptionKey} ...`)
-
-    if (updatedMins[subscriptionKey] === undefined) {
-      updatedMins[subscriptionKey] = {}
-    }
-
-    const greenButtonSubscriber = new GreenButtonSubscriber(
-      greenButtonSubscription.configuration
+  try {
+    const greenButtonSubscriptions = getConfigProperty(
+      'subscriptions.greenButton'
     )
 
-    const authorizations = await greenButtonSubscriber.getAuthorizations()
-
-    if (authorizations === undefined) {
-      debug(`Unable to retieve authorizations: ${subscriptionKey}`)
-      continue
-    }
-
-    const authorizationEntries = greenButtonHelpers.getEntriesByContentType(
-      authorizations as GreenButtonJson,
-      'Authorization'
-    )
-
-    if (authorizationEntries.length === 0) {
-      debug(`Subscription contains no authorizations: ${subscriptionKey}`)
-      continue
-    }
-
-    for (const authorizationEntry of authorizationEntries) {
-      const authorizationId = authorizationEntry.links.selfUid ?? ''
+    // eslint-disable-next-line no-labels
+    subscriptionLoop: for (const [
+      subscriptionKey,
+      greenButtonSubscription
+    ] of Object.entries(greenButtonSubscriptions)) {
+      if (terminateTask) {
+        break
+      }
 
       if (
-        authorizationId === '' ||
-        (greenButtonSubscription.authorizationIdsToExclude ?? []).includes(
-          authorizationId
-        ) ||
-        (greenButtonSubscription.authorizationIdsToInclude !== undefined &&
-          !greenButtonSubscription.authorizationIdsToInclude.includes(
-            authorizationId
-          )) ||
-        authorizationEntry.content.Authorization.status_value !== 'Active'
+        (greenButtonSubscription.pollingHoursToExclude ?? []).includes(
+          new Date().getHours()
+        )
       ) {
-        debug(
-          `Skipping authorization id: ${subscriptionKey}, ${authorizationId}`
-        )
+        debug(`Subscription cannot be polled at this hour: ${subscriptionKey}`)
         continue
       }
 
-      let timeMillis = updatedMins[subscriptionKey][authorizationId]
+      debug(`Loading authorizations for subscription: ${subscriptionKey} ...`)
 
-      if (timeMillis === undefined) {
-        timeMillis = {
-          polledMillis: 0,
-          updatedMillis: 0
-        }
-      } else if (typeof timeMillis === 'number') {
-        timeMillis = {
-          polledMillis: timeMillis,
-          updatedMillis: timeMillis
-        }
+      if (updatedMins[subscriptionKey] === undefined) {
+        updatedMins[subscriptionKey] = {}
       }
 
-      if (timeMillis.polledMillis + pollingIntervalMillis > Date.now()) {
-        debug(
-          `Skipping recently refreshed authorization id: ${subscriptionKey}, ${authorizationId}`
-        )
+      const greenButtonSubscriber = new GreenButtonSubscriber(
+        greenButtonSubscription.configuration
+      )
+
+      const authorizations = await greenButtonSubscriber.getAuthorizations()
+
+      if (authorizations === undefined) {
+        debug(`Unable to retieve authorizations: ${subscriptionKey}`)
         continue
       }
 
-      let updatedMin: Date
+      const authorizationEntries = greenButtonHelpers.getEntriesByContentType(
+        authorizations.json as GreenButtonJson,
+        'Authorization'
+      )
 
-      if (timeMillis.updatedMillis === 0) {
-        updatedMin = new Date()
-        updatedMin.setFullYear(updatedMin.getFullYear() - 1)
-      } else {
-        updatedMin = new Date(timeMillis.updatedMillis)
+      if (authorizationEntries.length === 0) {
+        debug(`Subscription contains no authorizations: ${subscriptionKey}`)
+        continue
       }
 
-      const usageData =
-        await greenButtonSubscriber.getBatchSubscriptionsByAuthorization(
-          authorizationId,
-          {
-            updatedMin
+      for (const authorizationEntry of authorizationEntries) {
+        if (
+          (greenButtonSubscription.pollingHoursToExclude ?? []).includes(
+            new Date().getHours()
+          )
+        ) {
+          debug(
+            `Subscription cannot be polled at this hour: ${subscriptionKey}`
+          )
+
+          // eslint-disable-next-line no-labels
+          continue subscriptionLoop
+        }
+
+        const authorizationId = authorizationEntry.links.selfUid ?? ''
+
+        if (
+          authorizationId === '' ||
+          (greenButtonSubscription.authorizationIdsToExclude ?? []).includes(
+            authorizationId
+          ) ||
+          (greenButtonSubscription.authorizationIdsToInclude !== undefined &&
+            !greenButtonSubscription.authorizationIdsToInclude.includes(
+              authorizationId
+            )) ||
+          authorizationEntry.content.Authorization.status_value !== 'Active'
+        ) {
+          debug(
+            `Skipping authorization id: ${subscriptionKey}, ${authorizationId}`
+          )
+          continue
+        }
+
+        let timeMillis = updatedMins[subscriptionKey][authorizationId]
+
+        if (timeMillis === undefined) {
+          timeMillis = {
+            polledMillis: 0,
+            updatedMillis: 0
           }
-        )
-
-      if (usageData === undefined) {
-        debug(
-          `Unable to retrieve subscription data: ${subscriptionKey}, ${authorizationId}`
-        )
-        continue
-      }
-
-      try {
-        await recordGreenButtonData(usageData as GreenButtonJson, {})
-      } catch (error) {
-        debug(`Error recording data: ${subscriptionKey}, ${authorizationId}`)
-        debug(error)
-      } finally {
-        updatedMins[subscriptionKey][authorizationId] = {
-          polledMillis: Date.now(),
-          updatedMillis:
-            usageData.updatedDate?.getTime() ?? timeMillis.updatedMillis ?? 0
+        } else if (typeof timeMillis === 'number') {
+          timeMillis = {
+            polledMillis: timeMillis,
+            updatedMillis: timeMillis
+          }
         }
-        saveCache()
+
+        if (timeMillis.polledMillis + pollingIntervalMillis > Date.now()) {
+          debug(
+            `Skipping recently refreshed authorization id: ${subscriptionKey}, ${authorizationId}`
+          )
+          continue
+        }
+
+        let updatedMin: Date
+
+        if (timeMillis.updatedMillis === 0) {
+          updatedMin = new Date()
+          updatedMin.setFullYear(updatedMin.getFullYear() - 1)
+        } else {
+          updatedMin = new Date(timeMillis.updatedMillis)
+        }
+
+        const usageData =
+          await greenButtonSubscriber.getBatchSubscriptionsByAuthorization(
+            authorizationId,
+            {
+              updatedMin
+            }
+          )
+
+        if (usageData === undefined) {
+          debug(
+            `Unable to retrieve subscription data: ${subscriptionKey}, ${authorizationId}`
+          )
+          continue
+        }
+
+        try {
+          await recordGreenButtonData(usageData.json as GreenButtonJson, {})
+        } catch (error) {
+          debug(`Error recording data: ${subscriptionKey}, ${authorizationId}`)
+          debug(error)
+        } finally {
+          updatedMins[subscriptionKey][authorizationId] = {
+            polledMillis: Date.now(),
+            updatedMillis:
+              usageData.json?.updatedDate?.getTime() ??
+              timeMillis.updatedMillis ??
+              0
+          }
+          saveCache()
+        }
       }
     }
+  } finally {
+    taskIsRunning = false
   }
 }
 
@@ -187,7 +224,7 @@ await processGreenButtonSubscriptions().catch((error) => {
 
 const intervalID = setIntervalAsync(
   processGreenButtonSubscriptions,
-  pollingIntervalMillis
+  taskIntervalMillis
 )
 
 exitHook(() => {

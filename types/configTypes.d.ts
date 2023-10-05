@@ -82,4 +82,5 @@ export interface ConfigGreenButtonSubscription {
     configuration: GreenButtonSubscriberConfiguration;
     authorizationIdsToExclude?: string[];
     authorizationIdsToInclude?: string[];
+    pollingHoursToExclude?: number[];
 }
