@@ -11,6 +11,7 @@ _Pronounced like Emily_
 
 An application to collect and aggregate energy consumption data across several municipal assets
 and report usage to monitor and manage emissions.
+
 Makes bringing together Green Button® and CSV data sources a breeze!
 
 ## Available Inputs

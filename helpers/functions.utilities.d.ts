@@ -1,1 +1,1 @@
-export declare function delay(timeMillis: number): Promise<unknown>;
+export declare function delay(timeMillis: number, waitSource?: string): Promise<unknown>;

@@ -1,16 +1,14 @@
-import Debug from 'debug';
 import { clearCacheByTableName } from '../helpers/functions.cache.js';
-import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
+import { getConnectionWhenAvailable, queryMaxRetryCount } from '../helpers/functions.database.js';
 import { delay } from '../helpers/functions.utilities.js';
 import { ensureEnergyDataTableExists } from './manageEnergyDataTables.js';
 import { updateAssetTimeSeconds } from './updateAsset.js';
-const debug = Debug('emile:database:addEnergyData');
 export async function addEnergyData(data, sessionUser, connectedEmileDB) {
     const emileDB = connectedEmileDB === undefined
         ? await getConnectionWhenAvailable()
         : connectedEmileDB;
     let result;
-    while (true) {
+    for (let count = 0; count <= queryMaxRetryCount; count += 1) {
         try {
             const rightNowMillis = Date.now();
             const tableName = await ensureEnergyDataTableExists(data.assetId);
@@ -25,14 +23,18 @@ export async function addEnergyData(data, sessionUser, connectedEmileDB) {
             break;
         }
         catch {
-            debug('Waiting 1 second ...');
-            await delay(1000);
+            await delay(500, 'addEnergyData');
         }
     }
-    await updateAssetTimeSeconds(data.assetId, emileDB);
-    if (connectedEmileDB === undefined) {
-        emileDB.close();
+    if (result === undefined) {
+        throw new Error(`Database still locked after ${queryMaxRetryCount} retries.`);
     }
-    clearCacheByTableName('EnergyData');
-    return result.lastInsertRowid;
+    else {
+        await updateAssetTimeSeconds(data.assetId, emileDB);
+        if (connectedEmileDB === undefined) {
+            emileDB.close();
+        }
+        clearCacheByTableName('EnergyData');
+        return result.lastInsertRowid;
+    }
 }

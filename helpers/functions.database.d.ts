@@ -10,3 +10,4 @@ export declare function deleteDatabaseBackupFile(fileName: string): Promise<bool
 export declare function getBackedUpDatabaseFiles(): Promise<DatabaseFile[]>;
 export declare function getConnectionWhenAvailable(readOnly?: boolean): Promise<sqlite.Database>;
 export declare function getTempTableName(): string;
+export declare const queryMaxRetryCount = 20;

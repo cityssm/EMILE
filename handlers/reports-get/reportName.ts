@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
+import Debug from 'debug'
 import type { Request, Response } from 'express'
 import papaparse from 'papaparse'
 
@@ -13,6 +14,8 @@ import {
   reportsToCache
 } from '../../helpers/functions.reports.js'
 import { hasActiveSession } from '../../helpers/functions.session.js'
+
+const debug = Debug('emile:handlers:reportName')
 
 export async function handler(
   request: Request,
@@ -28,7 +31,7 @@ export async function handler(
         path.join(reportCacheFolder, `${reportName}.csv`)
       )) as unknown as string
     } catch {
-      // ignore
+      debug(`No cached report found: ${reportName}`)
     }
   }
 

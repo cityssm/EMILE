@@ -95,11 +95,15 @@ export async function getEnergyDataFiles(
             count(distinct d.assetId) as assetIdCount,
             min(d.timeSeconds) as timeSecondsMin,
             max(d.endTimeSeconds) as endTimeSecondsMax`
-        : ' 0 as energyDataCount, 0 as assetIdCount, null as timeSecondsMin, null and endTimeSecondsMax'
+        : ' 0 as energyDataCount, 0 as assetIdCount, null as timeSecondsMin, null as endTimeSecondsMax'
     }
     from EnergyDataFiles f
-    left join Assets a on f.assetId = a.assetId
-    left join AssetCategories c on a.categoryId = c.categoryId
+    ${
+      options.includeAssetDetails
+        ? ` left join Assets a on f.assetId = a.assetId
+            left join AssetCategories c on a.categoryId = c.categoryId`
+        : ''
+    }
     ${
       filters.isProcessed ?? true
         ? ' left join EnergyData d on f.fileId = d.fileId and d.recordDelete_timeMillis is null'

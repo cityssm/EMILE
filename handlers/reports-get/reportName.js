@@ -1,9 +1,11 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import Debug from 'debug';
 import papaparse from 'papaparse';
 import { getReportData } from '../../database/getReportData.js';
 import { reportCacheFolder, reportsToCache } from '../../helpers/functions.reports.js';
 import { hasActiveSession } from '../../helpers/functions.session.js';
+const debug = Debug('emile:handlers:reportName');
 export async function handler(request, response) {
     const reportName = request.params.reportName;
     let csv = '';
@@ -12,6 +14,7 @@ export async function handler(request, response) {
             csv = (await fs.readFile(path.join(reportCacheFolder, `${reportName}.csv`)));
         }
         catch {
+            debug(`No cached report found: ${reportName}`);
         }
     }
     if ((csv ?? '') === '') {

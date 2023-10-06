@@ -2,19 +2,18 @@
 /* eslint-disable @typescript-eslint/indent */
 
 import sqlite from 'better-sqlite3'
-import Debug from 'debug'
 
 import {
   databasePath,
   getConnectionWhenAvailable,
-  getTempTableName
+  getTempTableName,
+  queryMaxRetryCount
 } from '../helpers/functions.database.js'
+import { delay } from '../helpers/functions.utilities.js'
 import type { Asset } from '../types/recordTypes.js'
 
 import { getAssets } from './getAssets.js'
 import { ensureEnergyDataTableExists } from './manageEnergyDataTables.js'
-
-const debug = Debug('emile:database:updateAsset')
 
 export function updateAsset(asset: Asset, sessionUser: EmileUser): boolean {
   const emileDB = sqlite(databasePath)
@@ -76,7 +75,7 @@ export async function updateAssetTimeSeconds(
       }
     | undefined
 
-  for (let retries = 0; retries <= 10; retries += 1) {
+  for (let retries = 0; retries <= queryMaxRetryCount; retries += 1) {
     try {
       emileDB
         .prepare(
@@ -93,7 +92,7 @@ export async function updateAssetTimeSeconds(
 
       break
     } catch {
-      debug('Try again')
+      await delay(500, 'updateAssetTimeSeconds')
     }
   }
 

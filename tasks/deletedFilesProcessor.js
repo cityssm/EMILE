@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import Debug from 'debug';
 import exitHook from 'exit-hook';
-import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async';
+import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async/fixed';
 import { getEnergyDataFiles } from '../database/getEnergyDataFiles.js';
 import { importedFolderRoot } from '../helpers/functions.files.js';
 const debug = Debug('emile:tasks:deletedFilesProcessor');
@@ -59,10 +59,6 @@ async function deleteUnrecordedFiles() {
         }
     }
 }
-await deleteUnrecordedFiles().catch((error) => {
-    debug('Error running task.');
-    debug(error);
-});
 const intervalID = setIntervalAsync(deleteUnrecordedFiles, 2 * 86400 * 1000);
 exitHook(() => {
     terminateTask = true;

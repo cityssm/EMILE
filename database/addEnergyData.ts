@@ -1,29 +1,29 @@
 import type sqlite from 'better-sqlite3'
-import Debug from 'debug'
 
 import { clearCacheByTableName } from '../helpers/functions.cache.js'
-import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
+import {
+  getConnectionWhenAvailable,
+  queryMaxRetryCount
+} from '../helpers/functions.database.js'
 import { delay } from '../helpers/functions.utilities.js'
 import type { EnergyData } from '../types/recordTypes.js'
 
 import { ensureEnergyDataTableExists } from './manageEnergyDataTables.js'
 import { updateAssetTimeSeconds } from './updateAsset.js'
 
-const debug = Debug('emile:database:addEnergyData')
-
 export async function addEnergyData(
   data: Partial<EnergyData>,
   sessionUser: EmileUser,
   connectedEmileDB?: sqlite.Database
-): Promise<number> {
+): Promise<number | undefined> {
   const emileDB =
     connectedEmileDB === undefined
       ? await getConnectionWhenAvailable()
       : connectedEmileDB
 
-  let result: sqlite.RunResult
+  let result: sqlite.RunResult | undefined
 
-  while (true) {
+  for (let count = 0; count <= queryMaxRetryCount; count += 1) {
     try {
       const rightNowMillis = Date.now()
 
@@ -57,18 +57,23 @@ export async function addEnergyData(
       // exit loop when successful
       break
     } catch {
-      debug('Waiting 1 second ...')
-      await delay(1000)
+      await delay(500, 'addEnergyData')
     }
   }
 
-  await updateAssetTimeSeconds(data.assetId as number, emileDB)
+  if (result === undefined) {
+    throw new Error(
+      `Database still locked after ${queryMaxRetryCount} retries.`
+    )
+  } else {
+    await updateAssetTimeSeconds(data.assetId as number, emileDB)
 
-  if (connectedEmileDB === undefined) {
-    emileDB.close()
+    if (connectedEmileDB === undefined) {
+      emileDB.close()
+    }
+
+    clearCacheByTableName('EnergyData')
+
+    return result.lastInsertRowid as number
   }
-
-  clearCacheByTableName('EnergyData')
-
-  return result.lastInsertRowid as number
 }
