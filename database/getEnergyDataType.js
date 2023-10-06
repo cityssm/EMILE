@@ -45,37 +45,56 @@ const energyDataTypeByGreenButtonCache = new NodeCache({
 function getEnergyDataTypeByGreenButtonCacheKey(greenButtonIds) {
     return `${greenButtonIds.serviceCategoryId}:${greenButtonIds.unitId}:${greenButtonIds.readingTypeId ?? ''}:${greenButtonIds.commodityId ?? ''}:${greenButtonIds.accumulationBehaviourId ?? ''}`;
 }
-function getEnergyDataTypeRelatedIdsByGreenButtonIds(greenButtonIds, emileDB) {
-    const serviceCategory = getEnergyServiceCategoryByGreenButtonId(greenButtonIds.serviceCategoryId, emileDB);
+function getEnergyDataTypeRelatedIds(namesOrGreenButtonIds, emileDB) {
+    const serviceCategory = namesOrGreenButtonIds.type === 'greenButtonIds'
+        ? getEnergyServiceCategoryByGreenButtonId(namesOrGreenButtonIds.serviceCategoryId, emileDB)
+        : getEnergyServiceCategoryByName(namesOrGreenButtonIds.serviceCategory, emileDB);
     if (serviceCategory === undefined) {
-        throw new Error(`EnergyServiceCategory unavailable by greenButtonId = ${greenButtonIds.serviceCategoryId}`);
+        throw new Error('EnergyServiceCategory unavailable');
     }
-    const unit = getEnergyUnitByGreenButtonId(greenButtonIds.unitId, emileDB);
+    const unit = namesOrGreenButtonIds.type === 'greenButtonIds'
+        ? getEnergyUnitByGreenButtonId(namesOrGreenButtonIds.unitId, emileDB)
+        : getEnergyUnitByName(namesOrGreenButtonIds.unit, emileDB);
     if (unit === undefined) {
-        throw new Error(`EnergyUnit unavailable by greenButtonId = ${greenButtonIds.unitId}`);
+        throw new Error('EnergyUnit unavailable');
     }
     const returnObject = {
         serviceCategoryId: serviceCategory.serviceCategoryId,
         unitId: unit.unitId
     };
-    if (greenButtonIds.readingTypeId !== undefined) {
-        const readingType = getEnergyReadingTypeByGreenButtonId(greenButtonIds.readingTypeId, emileDB);
+    if ((namesOrGreenButtonIds.type === 'greenButtonIds' &&
+        namesOrGreenButtonIds.readingTypeId !== undefined) ||
+        (namesOrGreenButtonIds.type === 'names' &&
+            namesOrGreenButtonIds.readingType !== '')) {
+        const readingType = namesOrGreenButtonIds.type === 'greenButtonIds'
+            ? getEnergyReadingTypeByGreenButtonId(namesOrGreenButtonIds.readingTypeId ?? '', emileDB)
+            : getEnergyReadingTypeByName(namesOrGreenButtonIds.readingType, emileDB);
         if (readingType === undefined) {
-            throw new Error(`EnergyReadingType unavailable by greenButtonId = ${greenButtonIds.readingTypeId}`);
+            throw new Error('EnergyReadingType unavailable');
         }
         returnObject.readingTypeId = readingType.readingTypeId;
     }
-    if (greenButtonIds.commodityId !== undefined) {
-        const commodity = getEnergyCommodityByGreenButtonId(greenButtonIds.commodityId, emileDB);
+    if ((namesOrGreenButtonIds.type === 'greenButtonIds' &&
+        namesOrGreenButtonIds.commodityId !== undefined) ||
+        (namesOrGreenButtonIds.type === 'names' &&
+            namesOrGreenButtonIds.commodity !== '')) {
+        const commodity = namesOrGreenButtonIds.type === 'greenButtonIds'
+            ? getEnergyCommodityByGreenButtonId(namesOrGreenButtonIds.commodityId ?? '', emileDB)
+            : getEnergyCommodityByName(namesOrGreenButtonIds.commodity, emileDB);
         if (commodity === undefined) {
-            throw new Error(`EnergyCommodity unavailable by greenButtonId = ${greenButtonIds.commodityId}`);
+            throw new Error('EnergyCommodity unavailable');
         }
         returnObject.commodityId = commodity.commodityId;
     }
-    if (greenButtonIds.accumulationBehaviourId !== undefined) {
-        const accumulationBehaviour = getEnergyAccumulationBehaviourByGreenButtonId(greenButtonIds.accumulationBehaviourId);
+    if ((namesOrGreenButtonIds.type === 'greenButtonIds' &&
+        namesOrGreenButtonIds.accumulationBehaviourId !== undefined) ||
+        (namesOrGreenButtonIds.type === 'names' &&
+            namesOrGreenButtonIds.accumulationBehaviour !== '')) {
+        const accumulationBehaviour = namesOrGreenButtonIds.type === 'greenButtonIds'
+            ? getEnergyAccumulationBehaviourByGreenButtonId(namesOrGreenButtonIds.accumulationBehaviourId ?? '')
+            : getEnergyAccumulationBehaviourByName(namesOrGreenButtonIds.accumulationBehaviour);
         if (accumulationBehaviour === undefined) {
-            throw new Error(`EnergyAccumulationBehaviour unavailable by greenButtonId = ${greenButtonIds.accumulationBehaviourId}`);
+            throw new Error('EnergyAccumulationBehaviour unavailable');
         }
         returnObject.accumulationBehaviourId =
             accumulationBehaviour.accumulationBehaviourId;
@@ -139,7 +158,7 @@ export async function getEnergyDataTypeByGreenButtonIds(greenButtonIds, sessionU
     energyDataType = emileDB.prepare(sql).get(sqlParameters);
     if (energyDataType === undefined && createIfUnavailable) {
         try {
-            const relatedIds = getEnergyDataTypeRelatedIdsByGreenButtonIds(greenButtonIds, emileDB);
+            const relatedIds = getEnergyDataTypeRelatedIds(Object.assign({ type: 'greenButtonIds' }, greenButtonIds), emileDB);
             const dataTypeId = addEnergyDataType({
                 serviceCategoryId: relatedIds.serviceCategoryId,
                 unitId: relatedIds.unitId,
@@ -161,43 +180,6 @@ export async function getEnergyDataTypeByGreenButtonIds(greenButtonIds, sessionU
     }
     energyDataTypeByGreenButtonCache.set(energyDataTypeByGreenButtonCacheKey, energyDataType);
     return energyDataType;
-}
-function getEnergyDataRelatedIdsByNames(names, emileDB) {
-    const serviceCategory = getEnergyServiceCategoryByName(names.serviceCategory, emileDB);
-    if (serviceCategory === undefined) {
-        throw new Error(`EnergyServiceCategory unavailable by name = ${names.serviceCategory}`);
-    }
-    const unit = getEnergyUnitByName(names.unit, emileDB);
-    if (unit === undefined) {
-        throw new Error(`EnergyUnit unavailable by name = ${names.unit}`);
-    }
-    const returnObject = {
-        serviceCategoryId: serviceCategory.serviceCategoryId,
-        unitId: unit.unitId
-    };
-    if (names.readingType !== '') {
-        const readingType = getEnergyReadingTypeByName(names.readingType, emileDB);
-        if (readingType === undefined) {
-            throw new Error(`EnergyReadingType unavailable by name = ${names.readingType}`);
-        }
-        returnObject.readingTypeId = readingType.readingTypeId;
-    }
-    if (names.commodity !== '') {
-        const commodity = getEnergyCommodityByName(names.commodity, emileDB);
-        if (commodity === undefined) {
-            throw new Error(`EnergyCommodity unavailable by name = ${names.commodity}`);
-        }
-        returnObject.commodityId = commodity.commodityId;
-    }
-    if (names.accumulationBehaviour !== '') {
-        const accumulationBehaviour = getEnergyAccumulationBehaviourByName(names.accumulationBehaviour);
-        if (accumulationBehaviour === undefined) {
-            throw new Error(`EnergyAccumulationBehaviour unavailable by greenButtonId = ${names.accumulationBehaviour}`);
-        }
-        returnObject.accumulationBehaviourId =
-            accumulationBehaviour.accumulationBehaviourId;
-    }
-    return returnObject;
 }
 export function getEnergyDataTypeByNames(names, sessionUser, createIfUnavailable = true, connectedEmileDB) {
     const emileDB = connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB;
@@ -251,7 +233,7 @@ export function getEnergyDataTypeByNames(names, sessionUser, createIfUnavailable
     let energyDataType = emileDB.prepare(sql).get(sqlParameters);
     if (energyDataType === undefined && createIfUnavailable) {
         try {
-            const relatedIds = getEnergyDataRelatedIdsByNames(names, emileDB);
+            const relatedIds = getEnergyDataTypeRelatedIds(Object.assign({ type: 'names' }, names), emileDB);
             const dataTypeId = addEnergyDataType({
                 serviceCategoryId: relatedIds.serviceCategoryId,
                 unitId: relatedIds.unitId,
