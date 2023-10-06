@@ -10,7 +10,7 @@ const updateUser = {
     canUpdate: true,
     isAdmin: false
 };
-async function updateSsmPucAssetNames() {
+function updateSsmPucAssetNames() {
     const workbook = XLSX.readFile('./temp/assetNames.xlsx', {});
     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
     const assetRows = XLSX.utils.sheet_to_json(worksheet, {
@@ -27,7 +27,7 @@ async function updateSsmPucAssetNames() {
             return possibleCategory.category === assetRow.category.trim();
         });
         if ((assetRow.utilityApiAuthorizationNumber ?? '') !== '') {
-            const utilityApiUrlLike = `https://utilityapi.com/DataCustodian/espi/1_1/resource/Subscription/${assetRow.utilityApiAuthorizationNumber}/%`;
+            const utilityApiUrlLike = `https://utilityapi.com/DataCustodian/espi/1_1/resource/Subscription/${assetRow.utilityApiAuthorizationNumber ?? ''}/%`;
             const result = emileDB
                 .prepare(`update Assets
             set categoryId = ?,
@@ -68,4 +68,4 @@ async function updateSsmPucAssetNames() {
     }
     emileDB.close();
 }
-await updateSsmPucAssetNames();
+updateSsmPucAssetNames();

@@ -1,9 +1,9 @@
 import sqlite from 'better-sqlite3'
 import XLSX from 'xlsx'
 
-import { addAsset } from '../database/addAsset.js'
+// import { addAsset } from '../database/addAsset.js'
 import { addAssetAlias } from '../database/addAssetAlias.js'
-import { getAssetByAssetAlias } from '../database/getAsset.js'
+// import { getAssetByAssetAlias } from '../database/getAsset.js'
 import { getAssetAliasTypeByAliasTypeKey } from '../database/getAssetAliasType.js'
 import { getAssetCategories } from '../database/getAssetCategories.js'
 import { databasePath } from '../helpers/functions.database.js'
@@ -25,7 +25,7 @@ const updateUser = {
   isAdmin: false
 }
 
-async function updateSsmPucAssetNames(): Promise<void> {
+function updateSsmPucAssetNames(): void {
   const workbook = XLSX.readFile('./temp/assetNames.xlsx', {})
 
   const worksheet = workbook.Sheets[workbook.SheetNames[0]]
@@ -55,7 +55,7 @@ async function updateSsmPucAssetNames(): Promise<void> {
     })
 
     if ((assetRow.utilityApiAuthorizationNumber ?? '') !== '') {
-      const utilityApiUrlLike = `https://utilityapi.com/DataCustodian/espi/1_1/resource/Subscription/${assetRow.utilityApiAuthorizationNumber}/%`
+      const utilityApiUrlLike = `https://utilityapi.com/DataCustodian/espi/1_1/resource/Subscription/${assetRow.utilityApiAuthorizationNumber ?? ''}/%`
 
       const result = emileDB
         .prepare(
@@ -168,4 +168,4 @@ async function updateSsmPucAssetNames(): Promise<void> {
   emileDB.close()
 }
 
-await updateSsmPucAssetNames()
+updateSsmPucAssetNames()

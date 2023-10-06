@@ -57,7 +57,7 @@ async function postHandler(request, response) {
     }
     if (isAuthenticated && (userObject?.canLogin ?? false)) {
         request.session.user = userObject;
-        addUserAccessLog(userObject, request.ip);
+        await addUserAccessLog(userObject, request.ip);
         response.redirect(redirectURL);
     }
     else {

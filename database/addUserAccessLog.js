@@ -8,8 +8,8 @@ export async function addUserAccessLog(sessionUser, requestIp) {
         emileDB = await getConnectionWhenAvailable();
         const result = emileDB
             .prepare(`insert into UserAccessLog
-        (userName, ipAddress, accessTimeMillis)
-        values (?, ?, ?)`)
+          (userName, ipAddress, accessTimeMillis)
+          values (?, ?, ?)`)
             .run(sessionUser.userName, ipAddress, rightNowMillis);
         return result.changes > 0;
     }

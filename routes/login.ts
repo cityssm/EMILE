@@ -98,7 +98,7 @@ async function postHandler(
   if (isAuthenticated && (userObject?.canLogin ?? false)) {
     request.session.user = userObject
 
-    addUserAccessLog(userObject as EmileUser, request.ip)
+    await addUserAccessLog(userObject as EmileUser, request.ip)
 
     response.redirect(redirectURL)
   } else {

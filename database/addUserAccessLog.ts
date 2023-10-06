@@ -18,8 +18,8 @@ export async function addUserAccessLog(
     const result = emileDB
       .prepare(
         `insert into UserAccessLog
-        (userName, ipAddress, accessTimeMillis)
-        values (?, ?, ?)`
+          (userName, ipAddress, accessTimeMillis)
+          values (?, ?, ?)`
       )
       .run(sessionUser.userName, ipAddress, rightNowMillis)
 
