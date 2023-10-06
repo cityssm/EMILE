@@ -9,11 +9,12 @@ interface EnergyDataTypeGreenButtonIds {
     accumulationBehaviourId?: string;
 }
 export declare function getEnergyDataTypeByGreenButtonIds(greenButtonIds: EnergyDataTypeGreenButtonIds, sessionUser: EmileUser, createIfUnavailable?: boolean, connectedEmileDB?: sqlite.Database): Promise<EnergyDataType | undefined>;
-export declare function getEnergyDataTypeByNames(names: {
+interface EnergyDataTypeNames {
     serviceCategory: string;
     unit: string;
     readingType: string | '';
     commodity: string | '';
     accumulationBehaviour: string | '';
-}, sessionUser: EmileUser, createIfUnavailable?: boolean, connectedEmileDB?: sqlite.Database): EnergyDataType | undefined;
+}
+export declare function getEnergyDataTypeByNames(names: EnergyDataTypeNames, sessionUser: EmileUser, createIfUnavailable?: boolean, connectedEmileDB?: sqlite.Database): EnergyDataType | undefined;
 export {};
