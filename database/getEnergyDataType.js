@@ -1,7 +1,9 @@
+import { lookups as greenButtonLookups } from '@cityssm/green-button-parser';
 import sqlite from 'better-sqlite3';
 import NodeCache from 'node-cache';
 import { databasePath, getConnectionWhenAvailable } from '../helpers/functions.database.js';
 import { addEnergyDataType } from './addEnergyDataType.js';
+import { addEnergyUnit } from './addEnergyUnit.js';
 import { getEnergyAccumulationBehaviourByGreenButtonId, getEnergyAccumulationBehaviourByName } from './getEnergyAccumulationBehaviour.js';
 import { getEnergyCommodityByGreenButtonId, getEnergyCommodityByName } from './getEnergyCommodity.js';
 import { getEnergyReadingTypeByGreenButtonId, getEnergyReadingTypeByName } from './getEnergyReadingType.js';
@@ -45,22 +47,38 @@ const energyDataTypeByGreenButtonCache = new NodeCache({
 function getEnergyDataTypeByGreenButtonCacheKey(greenButtonIds) {
     return `${greenButtonIds.serviceCategoryId}:${greenButtonIds.unitId}:${greenButtonIds.readingTypeId ?? ''}:${greenButtonIds.commodityId ?? ''}:${greenButtonIds.accumulationBehaviourId ?? ''}`;
 }
-function getEnergyDataTypeRelatedIds(namesOrGreenButtonIds, emileDB) {
+function getEnergyDataTypeRelatedIds(namesOrGreenButtonIds, sessionUser, emileDB) {
     const serviceCategory = namesOrGreenButtonIds.type === 'greenButtonIds'
         ? getEnergyServiceCategoryByGreenButtonId(namesOrGreenButtonIds.serviceCategoryId, emileDB)
         : getEnergyServiceCategoryByName(namesOrGreenButtonIds.serviceCategory, emileDB);
     if (serviceCategory === undefined) {
         throw new Error('EnergyServiceCategory unavailable');
     }
+    let unitId;
     const unit = namesOrGreenButtonIds.type === 'greenButtonIds'
         ? getEnergyUnitByGreenButtonId(namesOrGreenButtonIds.unitId, emileDB)
         : getEnergyUnitByName(namesOrGreenButtonIds.unit, emileDB);
-    if (unit === undefined) {
+    if (unit === undefined &&
+        namesOrGreenButtonIds.type === 'greenButtonIds' &&
+        namesOrGreenButtonIds.unitId.startsWith('currency:')) {
+        const currencyGreenButtonId = namesOrGreenButtonIds.unitId.split(':')[1];
+        const currencyName = greenButtonLookups.currencies[currencyGreenButtonId];
+        unitId = addEnergyUnit({
+            unit: currencyName,
+            unitLong: currencyName,
+            preferredPowerOfTenMultiplier: 0,
+            greenButtonId: namesOrGreenButtonIds.unitId
+        }, sessionUser, emileDB);
+    }
+    else if (unit === undefined) {
         throw new Error('EnergyUnit unavailable');
+    }
+    else {
+        unitId = unit.unitId;
     }
     const returnObject = {
         serviceCategoryId: serviceCategory.serviceCategoryId,
-        unitId: unit.unitId
+        unitId
     };
     if ((namesOrGreenButtonIds.type === 'greenButtonIds' &&
         namesOrGreenButtonIds.readingTypeId !== undefined) ||
@@ -158,7 +176,7 @@ export async function getEnergyDataTypeByGreenButtonIds(greenButtonIds, sessionU
     energyDataType = emileDB.prepare(sql).get(sqlParameters);
     if (energyDataType === undefined && createIfUnavailable) {
         try {
-            const relatedIds = getEnergyDataTypeRelatedIds(Object.assign({ type: 'greenButtonIds' }, greenButtonIds), emileDB);
+            const relatedIds = getEnergyDataTypeRelatedIds(Object.assign({ type: 'greenButtonIds' }, greenButtonIds), sessionUser, emileDB);
             const dataTypeId = addEnergyDataType({
                 serviceCategoryId: relatedIds.serviceCategoryId,
                 unitId: relatedIds.unitId,
@@ -233,7 +251,7 @@ export function getEnergyDataTypeByNames(names, sessionUser, createIfUnavailable
     let energyDataType = emileDB.prepare(sql).get(sqlParameters);
     if (energyDataType === undefined && createIfUnavailable) {
         try {
-            const relatedIds = getEnergyDataTypeRelatedIds(Object.assign({ type: 'names' }, names), emileDB);
+            const relatedIds = getEnergyDataTypeRelatedIds(Object.assign({ type: 'names' }, names), sessionUser, emileDB);
             const dataTypeId = addEnergyDataType({
                 serviceCategoryId: relatedIds.serviceCategoryId,
                 unitId: relatedIds.unitId,

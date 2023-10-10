@@ -36,24 +36,11 @@ const greenButtonUser: EmileUser = {
   isAdmin: false
 }
 
-async function getAssetIdFromIntervalBlock(
-  intervalBlockEntry: GreenButtonTypes.GreenButtonEntryWithIntervalBlockContent,
+async function getAssetIdFromAssetAlias(
+  assetAlias: string,
   connectedEmileDB: sqlite.Database
 ): Promise<number> {
   let assetId: number
-
-  let assetAlias = intervalBlockEntry.links.self ?? ''
-
-  if (assetAlias === undefined) {
-    throw new Error('No asset alias available on IntervalBlock entry.')
-  }
-
-  if (assetAlias.includes('/MeterReading/')) {
-    assetAlias = assetAlias.slice(
-      0,
-      Math.max(0, assetAlias.indexOf('/MeterReading/'))
-    )
-  }
 
   debug(`assetAlias: ${assetAlias}`)
 
@@ -98,6 +85,46 @@ async function getAssetIdFromIntervalBlock(
   return assetId
 }
 
+async function getAssetIdFromIntervalBlock(
+  intervalBlockEntry: GreenButtonTypes.GreenButtonEntryWithIntervalBlockContent,
+  connectedEmileDB: sqlite.Database
+): Promise<number> {
+  let assetAlias = intervalBlockEntry.links.self ?? ''
+
+  if (assetAlias === undefined) {
+    throw new Error('No asset alias available on IntervalBlock entry.')
+  }
+
+  if (assetAlias.includes('/MeterReading/')) {
+    assetAlias = assetAlias.slice(
+      0,
+      Math.max(0, assetAlias.indexOf('/MeterReading/'))
+    )
+  }
+
+  return await getAssetIdFromAssetAlias(assetAlias, connectedEmileDB)
+}
+
+async function getAssetIdFromUsageSummary(
+  usageSummaryEntry: GreenButtonTypes.GreenButtonEntryWithUsageSummaryContent,
+  connectedEmileDB: sqlite.Database
+): Promise<number> {
+  let assetAlias = usageSummaryEntry.links.self ?? ''
+
+  if (assetAlias === undefined) {
+    throw new Error('No asset alias available on UsageSummary entry.')
+  }
+
+  if (assetAlias.includes('/UsageSummary/')) {
+    assetAlias = assetAlias.slice(
+      0,
+      Math.max(0, assetAlias.indexOf('/UsageSummary/'))
+    )
+  }
+
+  return await getAssetIdFromAssetAlias(assetAlias, connectedEmileDB)
+}
+
 async function getEnergyDataTypeAndPowerOfTenMultiplier(
   greenButtonJson: GreenButtonTypes.GreenButtonJson,
   intervalBlockEntry: GreenButtonTypes.GreenButtonEntryWithIntervalBlockContent,
@@ -129,7 +156,7 @@ async function getEnergyDataTypeAndPowerOfTenMultiplier(
     throw new Error('Unable to find related ReadingType entry.')
   }
 
-  const usagePoint = greenButtonHelpers.getUsagePointEntryFromMeterReadingEntry(
+  const usagePoint = greenButtonHelpers.getUsagePointEntryFromEntry(
     greenButtonJson,
     meterReadingEntry
   )
@@ -163,6 +190,35 @@ async function getEnergyDataTypeAndPowerOfTenMultiplier(
   }
 }
 
+async function getEnergyDataType(
+  greenButtonJson: GreenButtonTypes.GreenButtonJson,
+  usageSummaryEntry: GreenButtonTypes.GreenButtonEntryWithUsageSummaryContent,
+  connectedEmileDB: sqlite.Database
+): Promise<undefined | EnergyDataType> {
+  const usagePoint = greenButtonHelpers.getUsagePointEntryFromEntry(
+    greenButtonJson,
+    usageSummaryEntry
+  )
+
+  if (usagePoint === undefined) {
+    throw new Error('Unable to find related UsagePoint entry.')
+  }
+
+  return await getEnergyDataTypeByGreenButtonIds(
+    {
+      serviceCategoryId:
+        usagePoint.content.UsagePoint.ServiceCategory?.kind.toString() ?? '',
+      unitId: `currency:${
+        usageSummaryEntry.content.UsageSummary.currency?.toString() ?? ''
+      }`,
+      commodityId: usageSummaryEntry.content.UsageSummary.commodity?.toString()
+    },
+    greenButtonUser,
+    true,
+    connectedEmileDB
+  )
+}
+
 export async function recordGreenButtonData(
   greenButtonJson: GreenButtonTypes.GreenButtonJson,
   options: {
@@ -177,8 +233,13 @@ export async function recordGreenButtonData(
     'IntervalBlock'
   )
 
-  if (intervalBlockEntries.length === 0) {
-    throw new Error('File contains no IntervalBlock entries.')
+  const usageSummaryEntries = greenButtonHelpers.getEntriesByContentType(
+    greenButtonJson,
+    'UsageSummary'
+  )
+
+  if (intervalBlockEntries.length === 0 && usageSummaryEntries.length === 0) {
+    throw new Error('File contains no IntervalBlock or UsageSummary entries.')
   }
 
   let emileDB: sqlite.Database | undefined
@@ -274,6 +335,84 @@ export async function recordGreenButtonData(
             }
           }
         }
+      }
+    }
+
+    for (const usageSummaryEntry of usageSummaryEntries) {
+      /*
+       * Ensure an assetId is available
+       */
+
+      let assetId = options.assetId
+
+      if ((assetId ?? '') === '') {
+        assetId = await getAssetIdFromUsageSummary(usageSummaryEntry, emileDB)
+      }
+
+      /*
+       * Ensure a dataTypeId is available
+       */
+
+      const energyDataType = await getEnergyDataType(
+        greenButtonJson,
+        usageSummaryEntry,
+        emileDB
+      )
+
+      if (energyDataType === undefined) {
+        throw new Error('Unable to retrieve EnergyDataType.')
+      }
+
+      const currentDataPoint = await getEnergyDataPoint(
+        {
+          assetId: assetId as number,
+          dataTypeId: energyDataType.dataTypeId as number,
+          timeSeconds:
+            usageSummaryEntry.content.UsageSummary.billingPeriod.start,
+          durationSeconds:
+            usageSummaryEntry.content.UsageSummary.billingPeriod.duration
+        },
+        emileDB
+      )
+
+      const dataValue =
+        (usageSummaryEntry.content.UsageSummary.billToDate ?? 0) / 100_000
+      const powerOfTenMultiplier = 0
+
+      if (currentDataPoint === undefined) {
+        await addEnergyData(
+          {
+            assetId,
+            dataTypeId: energyDataType.dataTypeId,
+            fileId: options.fileId,
+            timeSeconds:
+              usageSummaryEntry.content.UsageSummary.billingPeriod.start,
+            durationSeconds:
+              usageSummaryEntry.content.UsageSummary.billingPeriod.duration,
+            dataValue,
+            powerOfTenMultiplier
+          },
+          greenButtonUser,
+          emileDB
+        )
+
+        recordCount += 1
+      } else if (
+        currentDataPoint.dataValue !== dataValue ||
+        currentDataPoint.powerOfTenMultiplier !== powerOfTenMultiplier
+      ) {
+        updateEnergyDataValue(
+          {
+            dataId: currentDataPoint.dataId,
+            fileId: options.fileId,
+            dataValue,
+            powerOfTenMultiplier
+          },
+          greenButtonUser,
+          emileDB
+        )
+
+        recordCount += 1
       }
     }
   } finally {

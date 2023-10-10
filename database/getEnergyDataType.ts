@@ -1,6 +1,7 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable @typescript-eslint/indent */
 
+import { lookups as greenButtonLookups } from '@cityssm/green-button-parser'
 import sqlite from 'better-sqlite3'
 import NodeCache from 'node-cache'
 
@@ -11,6 +12,7 @@ import {
 import type { EnergyDataType } from '../types/recordTypes.js'
 
 import { addEnergyDataType } from './addEnergyDataType.js'
+import { addEnergyUnit } from './addEnergyUnit.js'
 import {
   getEnergyAccumulationBehaviourByGreenButtonId,
   getEnergyAccumulationBehaviourByName
@@ -125,6 +127,7 @@ function getEnergyDataTypeRelatedIds(
   namesOrGreenButtonIds:
     | EnergyDataTypeGreenButtonIdsWithType
     | EnergyDataTypeNamesWithType,
+  sessionUser: EmileUser,
   emileDB: sqlite.Database
 ): GetEnergyDataTypeRelatedIdsReturn {
   /*
@@ -150,6 +153,8 @@ function getEnergyDataTypeRelatedIds(
    * Unit - required
    */
 
+  let unitId: number
+
   const unit =
     namesOrGreenButtonIds.type === 'greenButtonIds'
       ? getEnergyUnitByGreenButtonId(
@@ -161,13 +166,34 @@ function getEnergyDataTypeRelatedIds(
           emileDB
         )
 
-  if (unit === undefined) {
+  if (
+    unit === undefined &&
+    namesOrGreenButtonIds.type === 'greenButtonIds' &&
+    namesOrGreenButtonIds.unitId.startsWith('currency:')
+  ) {
+    const currencyGreenButtonId = namesOrGreenButtonIds.unitId.split(':')[1]
+    const currencyName =
+      greenButtonLookups.currencies[currencyGreenButtonId]
+
+    unitId = addEnergyUnit(
+      {
+        unit: currencyName,
+        unitLong: currencyName,
+        preferredPowerOfTenMultiplier: 0,
+        greenButtonId: namesOrGreenButtonIds.unitId
+      },
+      sessionUser,
+      emileDB
+    )
+  } else if (unit === undefined) {
     throw new Error('EnergyUnit unavailable')
+  } else {
+    unitId = unit.unitId
   }
 
   const returnObject: GetEnergyDataTypeRelatedIdsReturn = {
     serviceCategoryId: serviceCategory.serviceCategoryId,
-    unitId: unit.unitId
+    unitId
   }
 
   /*
@@ -330,6 +356,7 @@ export async function getEnergyDataTypeByGreenButtonIds(
           { type: 'greenButtonIds' },
           greenButtonIds
         ) as EnergyDataTypeGreenButtonIdsWithType,
+        sessionUser,
         emileDB
       )
 
@@ -431,6 +458,7 @@ export function getEnergyDataTypeByNames(
     try {
       const relatedIds = getEnergyDataTypeRelatedIds(
         Object.assign({ type: 'names' }, names) as EnergyDataTypeNamesWithType,
+        sessionUser,
         emileDB
       )
 
