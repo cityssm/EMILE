@@ -1,8 +1,9 @@
 import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
 import { recordColumns } from './initializeDatabase.js';
 let energyDataTableNames = new Set();
+export const energyDataTablePrefix = 'EnergyData_AssetId_';
 function getEnergyDataTableName(assetId) {
-    return `EnergyData_AssetId_${assetId}`;
+    return `${energyDataTablePrefix}${assetId}`;
 }
 export async function reloadEnergyDataTableNames(connectedEmileDB) {
     const emileDB = connectedEmileDB === undefined
@@ -11,7 +12,7 @@ export async function reloadEnergyDataTableNames(connectedEmileDB) {
     const result = emileDB
         .prepare(`select name from sqlite_master
         where type = 'table'
-        and name like 'EnergyData_AssetId_%'`)
+        and name like '${energyDataTablePrefix}%'`)
         .all();
     if (connectedEmileDB === undefined) {
         emileDB.close();

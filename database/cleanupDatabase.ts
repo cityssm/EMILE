@@ -1,5 +1,11 @@
 import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 
+import {
+  energyDataTablePrefix,
+  refreshEnergyDataTableView,
+  reloadEnergyDataTableNames
+} from './manageEnergyDataTables.js'
+
 const deleteAgeDays = 14
 
 const deleteSql = [
@@ -27,26 +33,14 @@ const deleteSql = [
     where recordDelete_timeMillis <= ?
     and groupId not in (select groupId from AssetGroupMembers)`,
 
-  // Energy Data
-
-  `delete from EnergyData
-    where recordDelete_timeMillis <= ?`,
-
-  `delete from EnergyDataTypes
-    where recordDelete_timeMillis <= ?
-    and dataTypeId not in (select dataTypeId from EnergyData)`,
-
-  `delete from EnergyDataFiles
-    where recordDelete_timeMillis <= ?
-    and fileId not in (select fileId from EnergyData)`,
-
   // Assets
 
   `delete from Assets
     where recordDelete_timeMillis <= ?
     and assetId not in (select assetId from AssetGroupMembers)
     and assetId not in (select assetId from AssetAliases)
-    and assetId not in (select assetId from EnergyDataFiles)`,
+    and assetId not in (select assetId from EnergyDataFiles)
+    and assetId not in (select assetId from EnergyData)`,
 
   `delete from AssetCategories
     where recordDelete_timeMillis <= ?
@@ -58,25 +52,89 @@ const deleteSql = [
     where recordDelete_timeMillis <= ?`
 ]
 
+const postEnergyDataDeleteSql = [
+  `delete from EnergyDataTypes
+    where recordDelete_timeMillis <= ?
+    and dataTypeId not in (select dataTypeId from EnergyData)`,
+
+  `delete from EnergyDataFiles
+    where recordDelete_timeMillis <= ?
+    and fileId not in (select fileId from EnergyData)`
+]
+
 export async function cleanupDatabase(
   _sessionUser: EmileUser
 ): Promise<number> {
-  const emileDB = await getConnectionWhenAvailable()
-
+  let deleteCount = 0
+  let dropCount = 0
   const recordDeleteTimeMillis = Date.now() - deleteAgeDays * 86_400 * 1000
 
-  let deleteCount = 0
+  const emileDB = await getConnectionWhenAvailable()
 
-  for (const sql of deleteSql) {
-    const result = emileDB.prepare(sql).run(recordDeleteTimeMillis)
-    deleteCount += result.changes
+  try {
+    /*
+     * Initial deletes
+     */
+
+    for (const sql of deleteSql) {
+      const result = emileDB.prepare(sql).run(recordDeleteTimeMillis)
+      deleteCount += result.changes
+    }
+
+    /*
+     * EnergyData tables
+     */
+
+    const assets = emileDB
+      .prepare('select assetId from Assets')
+      .all() as Array<{
+      assetId: number
+    }>
+
+    const energyDataTableNames = await reloadEnergyDataTableNames(emileDB)
+
+    for (const tableName of energyDataTableNames) {
+      const assetExists = assets.some((possibleAsset) => {
+        return `${energyDataTablePrefix}${possibleAsset.assetId}` === tableName
+      })
+
+      if (assetExists) {
+        const result = emileDB
+          .prepare(
+            `delete from ${tableName} where recordDelete_timeMillis <= ?`
+          )
+          .run(recordDeleteTimeMillis)
+
+        deleteCount += result.changes
+      } else {
+        emileDB.prepare(`drop table ${tableName}`).run()
+        dropCount += 1
+
+        await refreshEnergyDataTableView(emileDB)
+      }
+    }
+
+    /*
+     * Post EnergyData deletes
+     */
+
+    for (const sql of postEnergyDataDeleteSql) {
+      const result = emileDB.prepare(sql).run(recordDeleteTimeMillis)
+      deleteCount += result.changes
+    }
+
+    /*
+     * vacuum if records deleted
+     */
+
+    if (deleteCount > 0 || dropCount > 0) {
+      emileDB.prepare('vacuum').run()
+    }
+  } catch {
+    // ignore
+  } finally {
+    emileDB.close()
   }
-
-  if (deleteCount > 0) {
-    emileDB.prepare('vacuum').run()
-  }
-
-  emileDB.close()
 
   return deleteCount
 }

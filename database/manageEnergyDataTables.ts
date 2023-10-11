@@ -6,8 +6,10 @@ import { recordColumns } from './initializeDatabase.js'
 
 let energyDataTableNames = new Set<string>()
 
+export const energyDataTablePrefix = 'EnergyData_AssetId_'
+
 function getEnergyDataTableName(assetId: number | string): string {
-  return `EnergyData_AssetId_${assetId}`
+  return `${energyDataTablePrefix}${assetId}`
 }
 
 export async function reloadEnergyDataTableNames(
@@ -22,7 +24,7 @@ export async function reloadEnergyDataTableNames(
     .prepare(
       `select name from sqlite_master
         where type = 'table'
-        and name like 'EnergyData_AssetId_%'`
+        and name like '${energyDataTablePrefix}%'`
     )
     .all() as Array<{ name: string }>
 
