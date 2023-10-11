@@ -5,6 +5,7 @@ export async function getReportData(reportName, reportParameters = {}) {
     let header;
     let useTempTable = false;
     let useRaw = false;
+    let runOptimizer = false;
     switch (reportName) {
         case 'assets-all': {
             sql = 'select * from Assets';
@@ -65,6 +66,7 @@ export async function getReportData(reportName, reportParameters = {}) {
         case 'energyData-fullyJoined': {
             useTempTable = true;
             useRaw = true;
+            runOptimizer = true;
             header = [
                 'dataId',
                 'category',
@@ -186,6 +188,9 @@ export async function getReportData(reportName, reportParameters = {}) {
     }
     else {
         resultRows = emileDB.prepare(sql).all();
+    }
+    if (runOptimizer) {
+        emileDB.pragma('optimize');
     }
     emileDB.close();
     return {

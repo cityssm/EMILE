@@ -69,6 +69,7 @@ export async function mergeAssets(assetForm, sessionUser) {
         clearCacheByTableName('EnergyData');
         deleteAsset(mergeAssetId, sessionUser, emileDB);
     }
+    emileDB.pragma('optimize');
     emileDB.close();
     return newAssetId;
 }

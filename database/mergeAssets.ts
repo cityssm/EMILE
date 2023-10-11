@@ -123,6 +123,8 @@ export async function mergeAssets(
     deleteAsset(mergeAssetId, sessionUser, emileDB)
   }
 
+  emileDB.pragma('optimize')
+
   emileDB.close()
 
   return newAssetId

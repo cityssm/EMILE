@@ -540,6 +540,8 @@ export async function initializeDatabase(): Promise<void> {
    * Close Database
    */
 
+  emileDB.pragma('optimize')
+
   emileDB.close()
 
   debug('Database created successfully.')

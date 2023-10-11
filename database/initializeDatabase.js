@@ -333,6 +333,7 @@ export async function initializeDatabase() {
     emileDB
         .prepare('create index idx_UserAccessLog on UserAccessLog (accessTimeMillis, ipAddress, userName)')
         .run();
+    emileDB.pragma('optimize');
     emileDB.close();
     debug('Database created successfully.');
 }

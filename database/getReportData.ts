@@ -18,8 +18,10 @@ export async function getReportData(
 ): Promise<GetReportDataReturn | undefined> {
   let sql = ''
   let header: string[] | undefined
+
   let useTempTable = false
   let useRaw = false
+  let runOptimizer = false
 
   switch (reportName) {
     /*
@@ -118,6 +120,7 @@ export async function getReportData(
     case 'energyData-fullyJoined': {
       useTempTable = true
       useRaw = true
+      runOptimizer = true
 
       header = [
         'dataId',
@@ -265,6 +268,10 @@ export async function getReportData(
     resultRows = statement.all()
   } else {
     resultRows = emileDB.prepare(sql).all()
+  }
+
+  if (runOptimizer) {
+    emileDB.pragma('optimize')
   }
 
   emileDB.close()
