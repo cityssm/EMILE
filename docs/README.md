@@ -27,3 +27,12 @@ Get starting with installing your own instance of EMILE.
 
 [**config.js File**](admin-configJS.md)<br />
 How to use the configuration file to customize EMILE.
+
+[**Settings - User Maintenance**](settings-users.md)<br />
+Add users. Remove users. Manage user permissions.
+
+[**Settings - Database Maintenance**](settings-database.md)<br />
+Backup the database. Export the database. Clean up deleted records.
+
+[**Settings - Table Maintenance**](settings-tables.md)<br />
+Manage tables used to populate drop lists.
