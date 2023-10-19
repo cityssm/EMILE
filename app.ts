@@ -6,8 +6,6 @@ import './helpers/polyfills.js'
 import path from 'node:path'
 
 import { abuseCheck } from '@cityssm/express-abuse-points'
-import * as htmlFns from '@cityssm/expressjs-server-js/htmlFns.js'
-import * as stringFns from '@cityssm/expressjs-server-js/stringFns.js'
 import * as dateTimeFns from '@cityssm/utils-datetime'
 import compression from 'compression'
 import cookieParser from 'cookie-parser'
@@ -198,8 +196,6 @@ app.use((request, response, next) => {
 
   response.locals.configFunctions = configFunctions
   response.locals.dateTimeFunctions = dateTimeFns
-  response.locals.stringFunctions = stringFns
-  response.locals.htmlFunctions = htmlFns
 
   response.locals.urlPrefix = getConfigProperty('reverseProxy.urlPrefix')
 

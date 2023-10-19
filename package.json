@@ -51,7 +51,6 @@
     "@cityssm/bulma-js": "^0.4.0",
     "@cityssm/bulma-webapp-js": "^1.5.0",
     "@cityssm/express-abuse-points": "^2.0.0",
-    "@cityssm/expressjs-server-js": "^2.3.3",
     "@cityssm/font-awesome-v5-iconclasses": "^0.1.0",
     "@cityssm/green-button-parser": "^0.8.0",
     "@cityssm/green-button-subscriber": "^0.5.0",
