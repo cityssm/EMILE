@@ -1,6 +1,6 @@
 "use strict";
 // eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable @typescript-eslint/indent */
+/* eslint-disable no-extra-semi */
 Object.defineProperty(exports, "__esModule", { value: true });
 ;
 (() => {
@@ -247,7 +247,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
             .toLowerCase()
             .split(' ');
         const tableElement = document.createElement('table');
-        tableElement.className = 'table is-fullwidth is-striped has-sticky-header is-fade-hoverable';
+        tableElement.className =
+            'table is-fullwidth is-striped has-sticky-header is-fade-hoverable';
         tableElement.innerHTML = `<thead><tr>
       <th>Group</th>
       <th class="has-text-right">Members</th>

@@ -1,4 +1,7 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable no-extra-semi */
+
+// eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable @typescript-eslint/indent */
 
 // eslint-disable-next-line eslint-comments/disable-enable-pair
@@ -37,6 +40,9 @@ declare const cityssm: cityssmGlobal
 
   let pendingFiles = exports.pendingFiles as EnergyDataFile[]
   delete exports.pendingFiles
+
+  let processedFiles = exports.processedFiles as EnergyDataFile[]
+  delete exports.processedFiles
 
   function updatePendingEnergyDataFile(formEvent: Event): void {
     formEvent.preventDefault()
@@ -419,9 +425,6 @@ declare const cityssm: cityssmGlobal
         success: false
         errorMessage: string
       }
-
-  let processedFiles = exports.processedFiles as EnergyDataFile[]
-  delete exports.processedFiles
 
   function confirmReprocessProcessedDataFile(clickEvent: Event): void {
     const fileId = Number.parseInt(

@@ -8,7 +8,7 @@
 import type { BulmaJS } from '@cityssm/bulma-js/types.js'
 import type { cityssmGlobal } from '@cityssm/bulma-webapp-js/src/types.js'
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-import type { Chart } from 'chart.js'
+import type { Chart as ChartJS } from 'chart.js'
 
 import type { EnergyData } from '../types/recordTypes.js'
 
@@ -16,6 +16,7 @@ import type { Emile as EmileGlobal } from './globalTypes.js'
 
 declare const bulmaJS: BulmaJS
 declare const cityssm: cityssmGlobal
+declare const Chart: ChartJS
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ;(() => {
@@ -66,7 +67,7 @@ declare const cityssm: cityssmGlobal
   let charts: Record<
     string,
     {
-      chart: Chart
+      chart: ChartJS
       table: HTMLTableElement
       exportLink: HTMLAnchorElement
       assetId: number
@@ -113,7 +114,7 @@ declare const cityssm: cityssmGlobal
     return `${currentDuration} ${currentUnit}`
   }
 
-  function addDataToChart(chart: Chart, label: unknown, newData: number): void {
+  function addDataToChart(chart: ChartJS, label: unknown, newData: number): void {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     chart.data.labels!.push(label)
 
