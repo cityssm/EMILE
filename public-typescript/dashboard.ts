@@ -7,7 +7,6 @@
 // eslint-disable-next-line n/no-missing-import
 import type { BulmaJS } from '@cityssm/bulma-js/types.js'
 import type { cityssmGlobal } from '@cityssm/bulma-webapp-js/src/types.js'
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import type { Chart as ChartJS } from 'chart.js'
 
 import type { EnergyData } from '../types/recordTypes.js'
@@ -114,7 +113,11 @@ declare const Chart: ChartJS
     return `${currentDuration} ${currentUnit}`
   }
 
-  function addDataToChart(chart: ChartJS, label: unknown, newData: number): void {
+  function addDataToChart(
+    chart: ChartJS,
+    label: unknown,
+    newData: number
+  ): void {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     chart.data.labels!.push(label)
 

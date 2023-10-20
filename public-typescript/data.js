@@ -49,7 +49,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         });
         cityssm.openHtmlModal('data-parserSettings', {
             onshow(modalElement) {
-                var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+                var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
                 ;
                 modalElement.querySelector('#energyDataFileEdit--fileId').value = (_b = (_a = pendingFile.fileId) === null || _a === void 0 ? void 0 : _a.toString()) !== null && _b !== void 0 ? _b : '';
                 modalElement.querySelector('[data-field="originalFileName"]').textContent = pendingFile.originalFileName;
@@ -80,8 +80,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
                     parserClassSelectElement.append(optionElement);
                 }
                 if (!parserClassFound &&
-                    pendingFile.parserProperties !== undefined &&
-                    pendingFile.parserProperties.parserClass !== undefined) {
+                    ((_k = pendingFile.parserProperties) === null || _k === void 0 ? void 0 : _k.parserClass) !== undefined) {
                     const optionElement = document.createElement('option');
                     optionElement.value = pendingFileParserClassAndConfiguration;
                     optionElement.textContent = `${pendingFileParserClassAndConfiguration} (Unavailable)`;

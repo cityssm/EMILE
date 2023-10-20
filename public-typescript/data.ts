@@ -150,8 +150,7 @@ declare const cityssm: cityssmGlobal
 
         if (
           !parserClassFound &&
-          pendingFile.parserProperties !== undefined &&
-          pendingFile.parserProperties.parserClass !== undefined
+          pendingFile.parserProperties?.parserClass !== undefined
         ) {
           const optionElement = document.createElement('option')
           optionElement.value = pendingFileParserClassAndConfiguration

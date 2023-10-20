@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
-import * as greenButtonParser from '@cityssm/green-button-parser'
+import { atomToGreenButtonJson } from '@cityssm/green-button-parser'
 
 import { updateEnergyDataFileAsProcessed } from '../database/updateEnergyDataFile.js'
 import { recordGreenButtonData } from '../helpers/functions.greenButton.js'
@@ -25,9 +25,7 @@ export class GreenButtonParser extends BaseParser {
         )
       )) as unknown as string
 
-      const greenButtonJson = await greenButtonParser.atomToGreenButtonJson(
-        atomXml
-      )
+      const greenButtonJson = await atomToGreenButtonJson(atomXml)
 
       await recordGreenButtonData(greenButtonJson, {
         assetId: this.energyDataFile.assetId ?? undefined,
