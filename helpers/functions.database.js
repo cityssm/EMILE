@@ -62,7 +62,9 @@ export async function getBackedUpDatabaseFiles() {
 }
 export async function getConnectionWhenAvailable(readOnly = false) {
     try {
-        return sqlite(databasePath);
+        return sqlite(databasePath, {
+            readonly: readOnly
+        });
     }
     catch {
         debug('Waiting 1s for database connection...');

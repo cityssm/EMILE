@@ -105,7 +105,9 @@ export async function getConnectionWhenAvailable(
   readOnly = false
 ): Promise<sqlite.Database> {
   try {
-    return sqlite(databasePath)
+    return sqlite(databasePath, {
+      readonly: readOnly
+    })
   } catch {
     debug('Waiting 1s for database connection...')
     await delay(1000)
