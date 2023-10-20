@@ -3,11 +3,10 @@ import NodeCache from 'node-cache';
 import { databasePath, getConnectionWhenAvailable } from '../helpers/functions.database.js';
 import { getAssetAliases } from './getAssetAliases.js';
 export function getAsset(assetId, connectedEmileDB) {
-    const emileDB = connectedEmileDB === undefined
-        ? sqlite(databasePath, {
+    const emileDB = connectedEmileDB ??
+        sqlite(databasePath, {
             readonly: true
-        })
-        : connectedEmileDB;
+        });
     const asset = emileDB
         .prepare(`select a.assetId, a.assetName, a.latitude, a.longitude,
         a.categoryId, c.category, c.fontAwesomeIconClasses
@@ -38,9 +37,7 @@ export async function getAssetByAssetAlias(assetAlias, aliasTypeId, connectedEmi
     if (asset !== undefined) {
         return asset;
     }
-    const emileDB = connectedEmileDB === undefined
-        ? await getConnectionWhenAvailable()
-        : connectedEmileDB;
+    const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable());
     let sql = `select assetId from AssetAliases
     where recordDelete_timeMillis is null
     and assetId in (select assetId from Assets where recordDelete_timeMillis is null)

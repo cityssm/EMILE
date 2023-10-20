@@ -14,7 +14,7 @@ export function deleteAssetGroupMember(groupId, assetId, sessionUser) {
     return result.changes > 0;
 }
 export function deleteAssetGroupMembersByAssetId(assetId, sessionUser, connectedEmileDB) {
-    const emileDB = connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB;
+    const emileDB = connectedEmileDB ?? sqlite(databasePath);
     const result = emileDB
         .prepare(`update AssetGroupMembers
         set recordDelete_userName = ?,
@@ -28,7 +28,7 @@ export function deleteAssetGroupMembersByAssetId(assetId, sessionUser, connected
     return result.changes > 0;
 }
 export function deleteAssetGroupMembersByGroupId(groupId, sessionUser, connectedEmileDB) {
-    const emileDB = connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB;
+    const emileDB = connectedEmileDB ?? sqlite(databasePath);
     const result = emileDB
         .prepare(`update AssetGroupMembers
         set recordDelete_userName = ?,

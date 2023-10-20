@@ -10,11 +10,10 @@ import { getEnergyReadingTypeByGreenButtonId, getEnergyReadingTypeByName } from 
 import { getEnergyServiceCategoryByGreenButtonId, getEnergyServiceCategoryByName } from './getEnergyServiceCategory.js';
 import { getEnergyUnitByGreenButtonId, getEnergyUnitByName } from './getEnergyUnit.js';
 export function getEnergyDataType(dataTypeId, connectedEmileDB) {
-    const emileDB = connectedEmileDB === undefined
-        ? sqlite(databasePath, {
+    const emileDB = connectedEmileDB ??
+        sqlite(databasePath, {
             readonly: true
-        })
-        : connectedEmileDB;
+        });
     const energyDataType = emileDB
         .prepare(`select t.dataTypeId,
           t.serviceCategoryId, s.serviceCategory,
@@ -119,15 +118,13 @@ function getEnergyDataTypeRelatedIds(namesOrGreenButtonIds, sessionUser, emileDB
     }
     return returnObject;
 }
-export async function getEnergyDataTypeByGreenButtonIds(greenButtonIds, sessionUser, createIfUnavailable = true, connectedEmileDB) {
+export async function getEnergyDataTypeByGreenButtonIds(greenButtonIds, sessionUser, createIfUnavailable, connectedEmileDB) {
     const energyDataTypeByGreenButtonCacheKey = getEnergyDataTypeByGreenButtonCacheKey(greenButtonIds);
     let energyDataType = energyDataTypeByGreenButtonCache.get(energyDataTypeByGreenButtonCacheKey);
     if (energyDataType !== undefined) {
         return energyDataType;
     }
-    const emileDB = connectedEmileDB === undefined
-        ? await getConnectionWhenAvailable()
-        : connectedEmileDB;
+    const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable());
     let sql = `select t.dataTypeId,
       t.serviceCategoryId, s.serviceCategory,
       t.unitId, u.unit, u.unitLong,
@@ -199,8 +196,8 @@ export async function getEnergyDataTypeByGreenButtonIds(greenButtonIds, sessionU
     energyDataTypeByGreenButtonCache.set(energyDataTypeByGreenButtonCacheKey, energyDataType);
     return energyDataType;
 }
-export function getEnergyDataTypeByNames(names, sessionUser, createIfUnavailable = true, connectedEmileDB) {
-    const emileDB = connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB;
+export function getEnergyDataTypeByNames(names, sessionUser, createIfUnavailable, connectedEmileDB) {
+    const emileDB = connectedEmileDB ?? sqlite(databasePath);
     let sql = `select t.dataTypeId,
       t.serviceCategoryId, s.serviceCategory,
       t.unitId, u.unit, u.unitLong,

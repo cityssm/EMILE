@@ -11,11 +11,10 @@ export function getEnergyAccumulationBehaviourByGreenButtonId(
   connectedEmileDB?: sqlite.Database
 ): EnergyAccumulationBehaviour | undefined {
   const emileDB =
-    connectedEmileDB === undefined
-      ? sqlite(databasePath, {
-          readonly: true
-        })
-      : connectedEmileDB
+    connectedEmileDB ??
+    sqlite(databasePath, {
+      readonly: true
+    })
 
   const accumulationBehaviour = emileDB
     .prepare(
@@ -38,11 +37,10 @@ export function getEnergyAccumulationBehaviourByName(
   connectedEmileDB?: sqlite.Database
 ): EnergyAccumulationBehaviour | undefined {
   const emileDB =
-    connectedEmileDB === undefined
-      ? sqlite(databasePath, {
-          readonly: true
-        })
-      : connectedEmileDB
+    connectedEmileDB ??
+    sqlite(databasePath, {
+      readonly: true
+    })
 
   const accumulationBehaviour = emileDB
     .prepare(

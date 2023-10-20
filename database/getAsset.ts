@@ -4,7 +4,10 @@
 import sqlite from 'better-sqlite3'
 import NodeCache from 'node-cache'
 
-import { databasePath, getConnectionWhenAvailable } from '../helpers/functions.database.js'
+import {
+  databasePath,
+  getConnectionWhenAvailable
+} from '../helpers/functions.database.js'
 import type { Asset } from '../types/recordTypes.js'
 
 import { getAssetAliases } from './getAssetAliases.js'
@@ -14,11 +17,10 @@ export function getAsset(
   connectedEmileDB?: sqlite.Database
 ): Asset | undefined {
   const emileDB =
-    connectedEmileDB === undefined
-      ? sqlite(databasePath, {
-          readonly: true
-        })
-      : connectedEmileDB
+    connectedEmileDB ??
+    sqlite(databasePath, {
+      readonly: true
+    })
 
   const asset = emileDB
     .prepare(
@@ -51,7 +53,10 @@ const assetAliasCache = new NodeCache({
   stdTTL: 30
 })
 
-function getAssetAliasCacheKey(assetAlias: string, aliasTypeId?: number | string): string {
+function getAssetAliasCacheKey(
+  assetAlias: string,
+  aliasTypeId?: number | string
+): string {
   return `${aliasTypeId ?? ''}::::${assetAlias}`
 }
 
@@ -68,10 +73,7 @@ export async function getAssetByAssetAlias(
     return asset
   }
 
-  const emileDB =
-    connectedEmileDB === undefined
-      ? await getConnectionWhenAvailable()
-      : connectedEmileDB
+  const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable())
 
   let sql = `select assetId from AssetAliases
     where recordDelete_timeMillis is null

@@ -28,8 +28,7 @@ export function deleteAssetAliasesByAssetId(
   sessionUser: EmileUser,
   connectedEmileDB?: sqlite.Database
 ): boolean {
-  const emileDB =
-    connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB
+  const emileDB = connectedEmileDB ?? sqlite(databasePath)
 
   const result = emileDB
     .prepare(

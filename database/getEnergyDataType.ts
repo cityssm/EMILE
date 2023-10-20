@@ -39,11 +39,10 @@ export function getEnergyDataType(
   connectedEmileDB?: sqlite.Database
 ): EnergyDataType | undefined {
   const emileDB =
-    connectedEmileDB === undefined
-      ? sqlite(databasePath, {
-          readonly: true
-        })
-      : connectedEmileDB
+    connectedEmileDB ??
+    sqlite(databasePath, {
+      readonly: true
+    })
 
   const energyDataType = emileDB
     .prepare(
@@ -172,8 +171,7 @@ function getEnergyDataTypeRelatedIds(
     namesOrGreenButtonIds.unitId.startsWith('currency:')
   ) {
     const currencyGreenButtonId = namesOrGreenButtonIds.unitId.split(':')[1]
-    const currencyName =
-      greenButtonLookups.currencies[currencyGreenButtonId]
+    const currencyName = greenButtonLookups.currencies[currencyGreenButtonId]
 
     unitId = addEnergyUnit(
       {
@@ -279,7 +277,7 @@ function getEnergyDataTypeRelatedIds(
 export async function getEnergyDataTypeByGreenButtonIds(
   greenButtonIds: EnergyDataTypeGreenButtonIds,
   sessionUser: EmileUser,
-  createIfUnavailable = true,
+  createIfUnavailable: boolean,
   connectedEmileDB?: sqlite.Database
 ): Promise<EnergyDataType | undefined> {
   const energyDataTypeByGreenButtonCacheKey =
@@ -293,10 +291,7 @@ export async function getEnergyDataTypeByGreenButtonIds(
     return energyDataType
   }
 
-  const emileDB =
-    connectedEmileDB === undefined
-      ? await getConnectionWhenAvailable()
-      : connectedEmileDB
+  const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable())
 
   let sql = `select t.dataTypeId,
       t.serviceCategoryId, s.serviceCategory,
@@ -395,11 +390,10 @@ export async function getEnergyDataTypeByGreenButtonIds(
 export function getEnergyDataTypeByNames(
   names: EnergyDataTypeNames,
   sessionUser: EmileUser,
-  createIfUnavailable = true,
+  createIfUnavailable: boolean,
   connectedEmileDB?: sqlite.Database
 ): EnergyDataType | undefined {
-  const emileDB =
-    connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB
+  const emileDB = connectedEmileDB ?? sqlite(databasePath)
 
   let sql = `select t.dataTypeId,
       t.serviceCategoryId, s.serviceCategory,

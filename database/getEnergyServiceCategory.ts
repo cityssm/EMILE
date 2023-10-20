@@ -11,11 +11,10 @@ export function getEnergyServiceCategoryByGreenButtonId(
   connectedEmileDB?: sqlite.Database
 ): EnergyServiceCategory | undefined {
   const emileDB =
-    connectedEmileDB === undefined
-      ? sqlite(databasePath, {
-          readonly: true
-        })
-      : connectedEmileDB
+    connectedEmileDB ??
+    sqlite(databasePath, {
+      readonly: true
+    })
 
   const serviceCategory = emileDB
     .prepare(
@@ -38,11 +37,10 @@ export function getEnergyServiceCategoryByName(
   connectedEmileDB?: sqlite.Database
 ): EnergyServiceCategory | undefined {
   const emileDB =
-    connectedEmileDB === undefined
-      ? sqlite(databasePath, {
-          readonly: true
-        })
-      : connectedEmileDB
+    connectedEmileDB ??
+    sqlite(databasePath, {
+      readonly: true
+    })
 
   const serviceCategory = emileDB
     .prepare(

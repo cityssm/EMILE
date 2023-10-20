@@ -16,9 +16,7 @@ export async function getAssets(filters, connectedEmileDB) {
         sqlParameters.push(filters.groupId);
     }
     const orderBy = ' order by orderNumber, category, assetName';
-    const emileDB = connectedEmileDB === undefined
-        ? await getConnectionWhenAvailable(true)
-        : connectedEmileDB;
+    const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable(true));
     const tempTableName = getTempTableName();
     emileDB
         .prepare(`create temp table ${tempTableName} as ${sql}`)

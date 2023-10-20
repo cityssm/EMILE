@@ -53,10 +53,7 @@ export async function updateAssetTimeSeconds(
 
   const tableName = await ensureEnergyDataTableExists(assetId)
 
-  const emileDB =
-    connectedEmileDB === undefined
-      ? await getConnectionWhenAvailable()
-      : connectedEmileDB
+  const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable())
 
   emileDB
     .prepare(

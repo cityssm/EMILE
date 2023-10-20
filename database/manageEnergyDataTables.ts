@@ -15,10 +15,7 @@ function getEnergyDataTableName(assetId: number | string): string {
 export async function reloadEnergyDataTableNames(
   connectedEmileDB?: sqlite.Database
 ): Promise<Set<string>> {
-  const emileDB =
-    connectedEmileDB === undefined
-      ? await getConnectionWhenAvailable()
-      : connectedEmileDB
+  const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable())
 
   const result = emileDB
     .prepare(
@@ -46,10 +43,7 @@ export async function reloadEnergyDataTableNames(
 export async function refreshEnergyDataTableView(
   connectedEmileDB: sqlite.Database
 ): Promise<void> {
-  const emileDB =
-    connectedEmileDB === undefined
-      ? await getConnectionWhenAvailable()
-      : connectedEmileDB
+  const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable())
 
   await reloadEnergyDataTableNames(emileDB)
 
@@ -114,10 +108,7 @@ export async function ensureEnergyDataTableExists(
     return tableName
   }
 
-  const emileDB =
-    connectedEmileDB === undefined
-      ? await getConnectionWhenAvailable()
-      : connectedEmileDB
+  const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable())
 
   emileDB
     .prepare(

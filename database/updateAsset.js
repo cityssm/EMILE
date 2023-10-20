@@ -22,9 +22,7 @@ export function updateAsset(asset, sessionUser) {
 export async function updateAssetTimeSeconds(assetId, connectedEmileDB) {
     const tempTableName = getTempTableName();
     const tableName = await ensureEnergyDataTableExists(assetId);
-    const emileDB = connectedEmileDB === undefined
-        ? await getConnectionWhenAvailable()
-        : connectedEmileDB;
+    const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable());
     emileDB
         .prepare(`create temp table ${tempTableName} as 
         select min(timeSeconds) as timeSecondsMin,

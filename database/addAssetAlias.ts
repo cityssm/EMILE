@@ -8,8 +8,7 @@ export function addAssetAlias(
   sessionUser: EmileUser,
   connectedEmileDB?: sqlite.Database
 ): number {
-  const emileDB =
-    connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB
+  const emileDB = connectedEmileDB ?? sqlite(databasePath)
 
   const rightNowMillis = Date.now()
 

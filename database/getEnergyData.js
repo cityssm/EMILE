@@ -151,11 +151,10 @@ export async function getEnergyData(filters, options) {
     return data;
 }
 export async function getEnergyDataPoint(filters, connectedEmileDB) {
-    const emileDB = connectedEmileDB === undefined
-        ? sqlite(databasePath, {
+    const emileDB = connectedEmileDB ??
+        sqlite(databasePath, {
             readonly: true
-        })
-        : connectedEmileDB;
+        });
     const tableName = await ensureEnergyDataTableExists(filters.assetId, emileDB);
     const dataPoint = emileDB
         .prepare(`select dataId, assetId, dataTypeId, fileId,

@@ -1,11 +1,10 @@
 import sqlite from 'better-sqlite3';
 import { databasePath } from '../helpers/functions.database.js';
 export function getEnergyAccumulationBehaviourByGreenButtonId(accumulationBehaviourGreenButtonId, connectedEmileDB) {
-    const emileDB = connectedEmileDB === undefined
-        ? sqlite(databasePath, {
+    const emileDB = connectedEmileDB ??
+        sqlite(databasePath, {
             readonly: true
-        })
-        : connectedEmileDB;
+        });
     const accumulationBehaviour = emileDB
         .prepare(`select accumulationBehaviourId, accumulationBehaviour, greenButtonId
         from EnergyAccumulationBehaviours
@@ -18,11 +17,10 @@ export function getEnergyAccumulationBehaviourByGreenButtonId(accumulationBehavi
     return accumulationBehaviour;
 }
 export function getEnergyAccumulationBehaviourByName(accumulationBehaviourName, connectedEmileDB) {
-    const emileDB = connectedEmileDB === undefined
-        ? sqlite(databasePath, {
+    const emileDB = connectedEmileDB ??
+        sqlite(databasePath, {
             readonly: true
-        })
-        : connectedEmileDB;
+        });
     const accumulationBehaviour = emileDB
         .prepare(`select accumulationBehaviourId, accumulationBehaviour, greenButtonId
         from EnergyAccumulationBehaviours

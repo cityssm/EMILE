@@ -11,11 +11,10 @@ export function getEnergyUnitByGreenButtonId(
   connectedEmileDB?: sqlite.Database
 ): EnergyUnit | undefined {
   const emileDB =
-    connectedEmileDB === undefined
-      ? sqlite(databasePath, {
-          readonly: true
-        })
-      : connectedEmileDB
+    connectedEmileDB ??
+    sqlite(databasePath, {
+      readonly: true
+    })
 
   const unit = emileDB
     .prepare(
@@ -38,11 +37,10 @@ export function getEnergyUnitByName(
   connectedEmileDB?: sqlite.Database
 ): EnergyUnit | undefined {
   const emileDB =
-    connectedEmileDB === undefined
-      ? sqlite(databasePath, {
-          readonly: true
-        })
-      : connectedEmileDB
+    connectedEmileDB ??
+    sqlite(databasePath, {
+      readonly: true
+    })
 
   const unit = emileDB
     .prepare(

@@ -1,11 +1,10 @@
 import sqlite from 'better-sqlite3';
 import { databasePath } from '../helpers/functions.database.js';
 export function getEnergyServiceCategoryByGreenButtonId(serviceCategoryGreenButtonId, connectedEmileDB) {
-    const emileDB = connectedEmileDB === undefined
-        ? sqlite(databasePath, {
+    const emileDB = connectedEmileDB ??
+        sqlite(databasePath, {
             readonly: true
-        })
-        : connectedEmileDB;
+        });
     const serviceCategory = emileDB
         .prepare(`select serviceCategoryId, serviceCategory, greenButtonId
         from EnergyServiceCategories
@@ -18,11 +17,10 @@ export function getEnergyServiceCategoryByGreenButtonId(serviceCategoryGreenButt
     return serviceCategory;
 }
 export function getEnergyServiceCategoryByName(serviceCategoryName, connectedEmileDB) {
-    const emileDB = connectedEmileDB === undefined
-        ? sqlite(databasePath, {
+    const emileDB = connectedEmileDB ??
+        sqlite(databasePath, {
             readonly: true
-        })
-        : connectedEmileDB;
+        });
     const serviceCategory = emileDB
         .prepare(`select serviceCategoryId, serviceCategory, greenButtonId
         from EnergyServiceCategories

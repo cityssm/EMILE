@@ -245,11 +245,10 @@ export async function getEnergyDataPoint(
   connectedEmileDB?: sqlite.Database
 ): Promise<EnergyData | undefined> {
   const emileDB =
-    connectedEmileDB === undefined
-      ? sqlite(databasePath, {
-          readonly: true
-        })
-      : connectedEmileDB
+    connectedEmileDB ??
+    sqlite(databasePath, {
+      readonly: true
+    })
 
   const tableName = await ensureEnergyDataTableExists(filters.assetId, emileDB)
 
@@ -263,11 +262,9 @@ export async function getEnergyDataPoint(
         and timeSeconds = ?
         and durationSeconds = ?`
     )
-    .get(
-      filters.dataTypeId,
-      filters.timeSeconds,
-      filters.durationSeconds
-    ) as EnergyData | undefined
+    .get(filters.dataTypeId, filters.timeSeconds, filters.durationSeconds) as
+    | EnergyData
+    | undefined
 
   if (connectedEmileDB === undefined) {
     emileDB.close()

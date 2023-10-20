@@ -16,10 +16,7 @@ export async function addEnergyData(
   sessionUser: EmileUser,
   connectedEmileDB?: sqlite.Database
 ): Promise<number | undefined> {
-  const emileDB =
-    connectedEmileDB === undefined
-      ? await getConnectionWhenAvailable()
-      : connectedEmileDB
+  const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable())
 
   let result: sqlite.RunResult | undefined
 

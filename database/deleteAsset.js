@@ -3,7 +3,7 @@ import { databasePath } from '../helpers/functions.database.js';
 import { deleteAssetAliasesByAssetId } from './deleteAssetAlias.js';
 import { deleteAssetGroupMembersByAssetId } from './deleteAssetGroupMember.js';
 export function deleteAsset(assetId, sessionUser, connectedEmileDB) {
-    const emileDB = connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB;
+    const emileDB = connectedEmileDB ?? sqlite(databasePath);
     const result = emileDB
         .prepare(`update Assets
         set recordDelete_userName = ?,

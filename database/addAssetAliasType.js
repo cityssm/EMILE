@@ -1,7 +1,7 @@
 import sqlite from 'better-sqlite3';
 import { databasePath } from '../helpers/functions.database.js';
 export function addAssetAliasType(aliasType, sessionUser, connectedEmileDB) {
-    const emileDB = connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB;
+    const emileDB = connectedEmileDB ?? sqlite(databasePath);
     const rightNowMillis = Date.now();
     const result = emileDB
         .prepare(`insert into AssetAliasTypes (

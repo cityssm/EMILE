@@ -9,8 +9,8 @@ import { getAssetAliasTypeByAliasTypeKey } from '../database/getAssetAliasType.j
 import { getEnergyDataPoint } from '../database/getEnergyData.js';
 import { getEnergyDataTypeByGreenButtonIds } from '../database/getEnergyDataType.js';
 import { updateEnergyDataValue } from '../database/updateEnergyData.js';
-import { databasePath } from '../helpers/functions.database.js';
 import { getAssetCategories } from './functions.cache.js';
+import { databasePath } from './functions.database.js';
 const debug = Debug('emile:functions.greenButton');
 const greenButtonAliasTypeKey = 'GreenButtonParser.IntervalBlock.link';
 export const greenButtonAssetAliasType = getAssetAliasTypeByAliasTypeKey(greenButtonAliasTypeKey);
@@ -118,8 +118,7 @@ export async function recordGreenButtonData(greenButtonJson, options) {
                 assetId = await getAssetIdFromIntervalBlock(intervalBlockEntry, emileDB);
             }
             const energyDataTypeAndPower = await getEnergyDataTypeAndPowerOfTenMultiplier(greenButtonJson, intervalBlockEntry, emileDB);
-            if (energyDataTypeAndPower === undefined ||
-                energyDataTypeAndPower.energyDataType === undefined) {
+            if (energyDataTypeAndPower?.energyDataType === undefined) {
                 throw new Error('Unable to retrieve EnergyDataType.');
             }
             for (const intervalBlock of intervalBlockEntry.content.IntervalBlock) {

@@ -11,11 +11,10 @@ export function getEnergyReadingTypeByGreenButtonId(
   connectedEmileDB?: sqlite.Database
 ): EnergyReadingType | undefined {
   const emileDB =
-    connectedEmileDB === undefined
-      ? sqlite(databasePath, {
-          readonly: true
-        })
-      : connectedEmileDB
+    connectedEmileDB ??
+    sqlite(databasePath, {
+      readonly: true
+    })
 
   const readingType = emileDB
     .prepare(
@@ -38,11 +37,10 @@ export function getEnergyReadingTypeByName(
   connectedEmileDB?: sqlite.Database
 ): EnergyReadingType | undefined {
   const emileDB =
-    connectedEmileDB === undefined
-      ? sqlite(databasePath, {
-          readonly: true
-        })
-      : connectedEmileDB
+    connectedEmileDB ??
+    sqlite(databasePath, {
+      readonly: true
+    })
 
   const readingType = emileDB
     .prepare(

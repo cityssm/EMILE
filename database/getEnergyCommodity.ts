@@ -11,11 +11,10 @@ export function getEnergyCommodityByGreenButtonId(
   connectedEmileDB?: sqlite.Database
 ): EnergyCommodity | undefined {
   const emileDB =
-    connectedEmileDB === undefined
-      ? sqlite(databasePath, {
-          readonly: true
-        })
-      : connectedEmileDB
+    connectedEmileDB ??
+    sqlite(databasePath, {
+      readonly: true
+    })
 
   const commodity = emileDB
     .prepare(
@@ -38,11 +37,10 @@ export function getEnergyCommodityByName(
   connectedEmileDB?: sqlite.Database
 ): EnergyCommodity | undefined {
   const emileDB =
-    connectedEmileDB === undefined
-      ? sqlite(databasePath, {
-          readonly: true
-        })
-      : connectedEmileDB
+    connectedEmileDB ??
+    sqlite(databasePath, {
+      readonly: true
+    })
 
   const commodity = emileDB
     .prepare(

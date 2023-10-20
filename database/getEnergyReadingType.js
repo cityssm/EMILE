@@ -1,11 +1,10 @@
 import sqlite from 'better-sqlite3';
 import { databasePath } from '../helpers/functions.database.js';
 export function getEnergyReadingTypeByGreenButtonId(readingTypeGreenButtonId, connectedEmileDB) {
-    const emileDB = connectedEmileDB === undefined
-        ? sqlite(databasePath, {
+    const emileDB = connectedEmileDB ??
+        sqlite(databasePath, {
             readonly: true
-        })
-        : connectedEmileDB;
+        });
     const readingType = emileDB
         .prepare(`select readingTypeId, readingType, greenButtonId
         from EnergyReadingTypes
@@ -18,11 +17,10 @@ export function getEnergyReadingTypeByGreenButtonId(readingTypeGreenButtonId, co
     return readingType;
 }
 export function getEnergyReadingTypeByName(readingTypeName, connectedEmileDB) {
-    const emileDB = connectedEmileDB === undefined
-        ? sqlite(databasePath, {
+    const emileDB = connectedEmileDB ??
+        sqlite(databasePath, {
             readonly: true
-        })
-        : connectedEmileDB;
+        });
     const readingType = emileDB
         .prepare(`select readingTypeId, readingType, greenButtonId
         from EnergyReadingTypes

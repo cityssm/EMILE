@@ -10,8 +10,7 @@ export async function addAsset(
   sessionUser: EmileUser,
   connectedEmileDB?: sqlite.Database
 ): Promise<number> {
-  const emileDB =
-    connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB
+  const emileDB = connectedEmileDB ?? sqlite(databasePath)
 
   const rightNowMillis = Date.now()
 

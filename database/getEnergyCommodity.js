@@ -1,11 +1,10 @@
 import sqlite from 'better-sqlite3';
 import { databasePath } from '../helpers/functions.database.js';
 export function getEnergyCommodityByGreenButtonId(commodityGreenButtonId, connectedEmileDB) {
-    const emileDB = connectedEmileDB === undefined
-        ? sqlite(databasePath, {
+    const emileDB = connectedEmileDB ??
+        sqlite(databasePath, {
             readonly: true
-        })
-        : connectedEmileDB;
+        });
     const commodity = emileDB
         .prepare(`select commodityId, commodity, greenButtonId
         from EnergyCommodities
@@ -18,11 +17,10 @@ export function getEnergyCommodityByGreenButtonId(commodityGreenButtonId, connec
     return commodity;
 }
 export function getEnergyCommodityByName(commodityName, connectedEmileDB) {
-    const emileDB = connectedEmileDB === undefined
-        ? sqlite(databasePath, {
+    const emileDB = connectedEmileDB ??
+        sqlite(databasePath, {
             readonly: true
-        })
-        : connectedEmileDB;
+        });
     const commodity = emileDB
         .prepare(`select commodityId, commodity, greenButtonId
         from EnergyCommodities

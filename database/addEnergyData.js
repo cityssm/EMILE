@@ -4,9 +4,7 @@ import { delay } from '../helpers/functions.utilities.js';
 import { ensureEnergyDataTableExists } from './manageEnergyDataTables.js';
 import { updateAssetTimeSeconds } from './updateAsset.js';
 export async function addEnergyData(data, sessionUser, connectedEmileDB) {
-    const emileDB = connectedEmileDB === undefined
-        ? await getConnectionWhenAvailable()
-        : connectedEmileDB;
+    const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable());
     let result;
     for (let count = 0; count <= queryMaxRetryCount; count += 1) {
         try {

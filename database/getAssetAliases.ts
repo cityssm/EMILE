@@ -33,11 +33,10 @@ export function getAssetAliases(
   sql += ' order by t.orderNumber, t.aliasType, a.assetId, a.assetAlias'
 
   const emileDB =
-    connectedEmileDB === undefined
-      ? sqlite(databasePath, {
-          readonly: true
-        })
-      : connectedEmileDB
+    connectedEmileDB ??
+    sqlite(databasePath, {
+      readonly: true
+    })
 
   const assetAliases = emileDB.prepare(sql).all(sqlParameters) as AssetAlias[]
 

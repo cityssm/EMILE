@@ -11,7 +11,7 @@ export function deleteAsset(
   connectedEmileDB?: sqlite.Database
 ): boolean {
   const emileDB =
-    connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB
+    connectedEmileDB ?? sqlite(databasePath)
 
   const result = emileDB
     .prepare(

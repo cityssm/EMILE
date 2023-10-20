@@ -13,7 +13,7 @@ export function deleteAssetAlias(aliasId, sessionUser) {
     return result.changes > 0;
 }
 export function deleteAssetAliasesByAssetId(assetId, sessionUser, connectedEmileDB) {
-    const emileDB = connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB;
+    const emileDB = connectedEmileDB ?? sqlite(databasePath);
     const result = emileDB
         .prepare(`update AssetAliases
         set recordDelete_userName = ?,

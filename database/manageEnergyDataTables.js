@@ -6,9 +6,7 @@ function getEnergyDataTableName(assetId) {
     return `${energyDataTablePrefix}${assetId}`;
 }
 export async function reloadEnergyDataTableNames(connectedEmileDB) {
-    const emileDB = connectedEmileDB === undefined
-        ? await getConnectionWhenAvailable()
-        : connectedEmileDB;
+    const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable());
     const result = emileDB
         .prepare(`select name from sqlite_master
         where type = 'table'
@@ -25,9 +23,7 @@ export async function reloadEnergyDataTableNames(connectedEmileDB) {
     return energyDataTableNames;
 }
 export async function refreshEnergyDataTableView(connectedEmileDB) {
-    const emileDB = connectedEmileDB === undefined
-        ? await getConnectionWhenAvailable()
-        : connectedEmileDB;
+    const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable());
     await reloadEnergyDataTableNames(emileDB);
     emileDB.prepare('drop view if exists EnergyData').run();
     let createViewSql = '';
@@ -78,9 +74,7 @@ export async function ensureEnergyDataTableExists(assetId, connectedEmileDB) {
     if (energyDataTableNames.has(tableName)) {
         return tableName;
     }
-    const emileDB = connectedEmileDB === undefined
-        ? await getConnectionWhenAvailable()
-        : connectedEmileDB;
+    const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable());
     emileDB
         .prepare(`create table if not exists ${tableName} (
         dataId integer primary key autoincrement,

@@ -37,10 +37,7 @@ export async function getAssets(
 
   const orderBy = ' order by orderNumber, category, assetName'
 
-  const emileDB =
-    connectedEmileDB === undefined
-      ? await getConnectionWhenAvailable(true)
-      : connectedEmileDB
+  const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable(true))
 
   const tempTableName = getTempTableName()
 
