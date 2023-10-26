@@ -17,6 +17,8 @@ import session from 'express-session'
 import createError from 'http-errors'
 import FileStore from 'session-file-store'
 
+import handler_notify from './handlers/data-all/notify.js'
+import handler_redirect from './handlers/data-all/redirect.js'
 import { adminGetHandler, updateGetHandler } from './handlers/permissions.js'
 import configFunctions, {
   getConfigProperty
@@ -208,6 +210,8 @@ app.get(`${urlPrefix}/`, sessionHandler, (_request, response) => {
 
 app.use(`${urlPrefix}/dashboard`, sessionHandler, routerDashboard)
 app.use(`${urlPrefix}/assets`, sessionHandler, routerAssets)
+app.use(`${urlPrefix}/data/notify`, handler_notify)
+app.use(`${urlPrefix}/data/redirect`, handler_redirect)
 app.use(`${urlPrefix}/data`, sessionHandler, updateGetHandler, routerData)
 app.use(`${urlPrefix}/admin`, sessionHandler, adminGetHandler, routerAdmin)
 
