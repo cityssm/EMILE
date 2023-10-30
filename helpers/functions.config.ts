@@ -1,8 +1,6 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable @typescript-eslint/indent */
 
-import './polyfills.js'
-
 // eslint-disable-next-line n/no-missing-import
 import type { ADWebAuthConfig } from '@cityssm/ad-web-auth-connector/types.js'
 

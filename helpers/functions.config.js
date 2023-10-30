@@ -1,4 +1,3 @@
-import './polyfills.js';
 import { config } from '../data/config.js';
 const property_session_maxAgeMillis = 'session.maxAgeMillis';
 const configFallbackValues = new Map();

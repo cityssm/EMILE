@@ -1,4 +1,3 @@
-import './polyfills.js';
 import type { ADWebAuthConfig } from '@cityssm/ad-web-auth-connector/types.js';
 import type { ConfigActiveDirectory, ConfigGreenButtonSubscription, ConfigParserConfiguration, ConfigTemporaryUserCredentials } from '../types/configTypes.js';
 declare const property_session_maxAgeMillis = "session.maxAgeMillis";

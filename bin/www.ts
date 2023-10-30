@@ -1,5 +1,3 @@
-import '../helpers/polyfills.js'
-
 import { fork, type ChildProcess } from 'node:child_process'
 import type { Worker } from 'node:cluster'
 import cluster from 'node:cluster'

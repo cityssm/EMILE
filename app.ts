@@ -1,8 +1,6 @@
 /* eslint-disable eslint-comments/disable-enable-pair */
 /* eslint-disable import/no-named-as-default-member */
 
-import './helpers/polyfills.js'
-
 import path from 'node:path'
 
 import { abuseCheck } from '@cityssm/express-abuse-points'

@@ -1,5 +1,3 @@
-import './polyfills.js'
-
 import type { NextFunction, Request, Response } from 'express'
 
 import { getSafeRedirectURL } from './functions.authentication.js'

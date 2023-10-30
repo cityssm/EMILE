@@ -1,4 +1,3 @@
-import './polyfills.js';
 import { getSafeRedirectURL } from './functions.authentication.js';
 import { getConfigProperty } from './functions.config.js';
 const sessionCookieName = getConfigProperty('session.cookieName');

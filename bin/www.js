@@ -1,4 +1,3 @@
-import '../helpers/polyfills.js';
 import { fork } from 'node:child_process';
 import cluster from 'node:cluster';
 import os from 'node:os';

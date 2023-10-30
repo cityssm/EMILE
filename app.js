@@ -1,4 +1,3 @@
-import './helpers/polyfills.js';
 import path from 'node:path';
 import { abuseCheck } from '@cityssm/express-abuse-points';
 import * as dateTimeFns from '@cityssm/utils-datetime';
