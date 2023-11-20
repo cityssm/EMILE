@@ -34,7 +34,7 @@ interface GetEnergyDataOptions {
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-function userFunction_getPowerOfTenMultiplierName(
+export function userFunction_getPowerOfTenMultiplierName(
   powerOfTenMultiplier: number
 ): string {
   if (powerOfTenMultiplier === 0) {

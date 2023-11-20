@@ -14,6 +14,7 @@ interface GetEnergyDataFilters {
 interface GetEnergyDataOptions {
     formatForExport?: boolean;
 }
+export declare function userFunction_getPowerOfTenMultiplierName(powerOfTenMultiplier: number): string;
 export declare function getEnergyData(filters: GetEnergyDataFilters, options?: GetEnergyDataOptions): Promise<EnergyData[]>;
 export declare function getEnergyDataPoint(filters: {
     assetId: number;

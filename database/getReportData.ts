@@ -3,7 +3,10 @@ import {
   getTempTableName
 } from '../helpers/functions.database.js'
 
-import { getEnergyData } from './getEnergyData.js'
+import {
+  getEnergyData,
+  userFunction_getPowerOfTenMultiplierName
+} from './getEnergyData.js'
 
 export type ReportParameters = Record<string, string | number>
 
@@ -124,59 +127,49 @@ export async function getReportData(
 
       header = [
         'dataId',
+        'serviceCategory',
         'category',
         'assetName',
-        'latitude',
-        'longitude',
-        'serviceCategory',
-        'unit',
-        'unitLong',
-        'readingType',
-        'commodity',
-        'accumulationBehaviour',
+
         'startDateTime',
         'endDateTime',
+
         'dataValueEvaluated',
+        'preferredPowerOfTenMultiplierName',
+        'unit',
+        'unitLong',
 
-        'dataValue',
-        'powerOfTenMultiplier',
+        'accumulationBehaviour',
+        'commodity',
+        'readingType',
 
-        'recordCreate_userName',
+        'latitude',
+        'longitude',
+
         'recordCreate_timeMillis',
-        'recordUpdate_userName',
-        'recordUpdate_timeMillis',
-        'categoryId',
-        'assetId',
-        'dataTypeId',
-        'serviceCategoryId',
-        'unitId',
-        'readingTypeId',
-        'commodityId',
-        'accumulationBehaviourId',
-        'timeSeconds',
-        'durationSeconds'
+        'recordUpdate_timeMillis'
       ]
 
       sql = `select d.dataId,
-          c.category,
-          a.assetName, a.latitude, a.longitude,
-          ts.serviceCategory,
-          tu.unit, tu.unitLong,
-          tr.readingType,
-          tc.commodity,
-          ta.accumulationBehaviour,
-          datetime(d.timeSeconds, 'unixepoch', 'localtime') as startDateTime,
-          datetime(d.endTimeSeconds, 'unixepoch', 'localtime') as endDateTime,
+        ts.serviceCategory,
+        c.category,
+        a.assetName,
         
-          d.dataValue * power(10, d.powerOfTenMultiplier) as dataValueEvaluated,
-        
-          d.dataValue,
-          d.powerOfTenMultiplier,
-        
-          d.recordCreate_userName, d.recordCreate_timeMillis,
-          d.recordUpdate_userName, d.recordUpdate_timeMillis,
-          a.categoryId, a.assetId, d.dataTypeId, t.serviceCategoryId, t.unitId, t.readingTypeId, t.commodityId, t.accumulationBehaviourId,
-          d.timeSeconds, d.durationSeconds
+        datetime(d.timeSeconds, 'unixepoch', 'localtime') as startDateTime,
+        datetime(d.endTimeSeconds, 'unixepoch', 'localtime') as endDateTime,
+          
+        d.dataValue
+          * power(10, d.powerOfTenMultiplier)
+          / power(10, tu.preferredPowerOfTenMultiplier) as dataValueEvaluated,
+          
+        tu.preferredPowerOfTenMultiplierName,
+        tu.unit, tu.unitLong,
+          
+        ta.accumulationBehaviour, tc.commodity, tr.readingType,
+
+        a.latitude, a.longitude,
+          
+        d.recordCreate_timeMillis, d.recordUpdate_timeMillis
         
         from EnergyData d
         left join Assets a
@@ -187,16 +180,18 @@ export async function getReportData(
           on d.dataTypeId = t.dataTypeId
         left join EnergyServiceCategories ts
           on t.serviceCategoryId = ts.serviceCategoryId
-        left join EnergyUnits tu
-          on t.unitId = tu.unitId
+        left join (
+          select unitId, unit, unitLong, preferredPowerOfTenMultiplier,
+          userFunction_getPowerOfTenMultiplierName(preferredPowerOfTenMultiplier) as preferredPowerOfTenMultiplierName
+          from EnergyUnits
+        ) tu on t.unitId = tu.unitId
         left join EnergyReadingTypes tr
           on t.readingTypeId = tr.readingTypeId
         left join EnergyCommodities tc
           on t.commodityId = tc.commodityId
         left join EnergyAccumulationBehaviours ta
           on t.accumulationBehaviourId = ta.accumulationBehaviourId
-        left join EnergyDataFiles f
-          on d.fileId = f.fileId
+
         where d.recordDelete_timeMillis is null
           and a.recordDelete_timeMillis is null`
 
@@ -252,6 +247,11 @@ export async function getReportData(
   }
 
   const emileDB = await getConnectionWhenAvailable(true)
+
+  emileDB.function(
+    'userFunction_getPowerOfTenMultiplierName',
+    userFunction_getPowerOfTenMultiplierName
+  )
 
   let resultRows: unknown[] = []
 

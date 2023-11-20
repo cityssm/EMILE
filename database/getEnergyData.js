@@ -3,7 +3,7 @@ import { dateStringToDate } from '@cityssm/utils-datetime';
 import sqlite from 'better-sqlite3';
 import { databasePath, getConnectionWhenAvailable, getTempTableName } from '../helpers/functions.database.js';
 import { ensureEnergyDataTableExists } from './manageEnergyDataTables.js';
-function userFunction_getPowerOfTenMultiplierName(powerOfTenMultiplier) {
+export function userFunction_getPowerOfTenMultiplierName(powerOfTenMultiplier) {
     if (powerOfTenMultiplier === 0) {
         return '';
     }
