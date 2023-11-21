@@ -17,8 +17,8 @@ export async function deleteEnergyData(assetId, dataId, sessionUser) {
     clearCacheByTableName('EnergyData');
     return result.changes > 0;
 }
-export async function deleteEnergyDataByFileId(fileId, sessionUser) {
-    const emileDB = await getConnectionWhenAvailable();
+export async function deleteEnergyDataByFileId(fileId, sessionUser, connectedEmileDB) {
+    const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable());
     const tableNames = await reloadEnergyDataTableNames(emileDB);
     let count = 0;
     for (const tableName of tableNames) {
@@ -35,7 +35,9 @@ export async function deleteEnergyDataByFileId(fileId, sessionUser) {
             count += result.changes;
         }
     }
-    emileDB.close();
+    if (connectedEmileDB === undefined) {
+        emileDB.close();
+    }
     clearCacheByTableName('EnergyData');
     return count > 0;
 }

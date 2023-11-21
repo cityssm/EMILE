@@ -1,3 +1,4 @@
+import type sqlite from 'better-sqlite3';
 import { BaseParser } from './baseParser.js';
 export interface GreenButtonParserProperties {
     parserClass: 'GreenButtonParser';
@@ -5,5 +6,5 @@ export interface GreenButtonParserProperties {
 }
 export declare class GreenButtonParser extends BaseParser {
     static fileExtensions: string[];
-    parseFile(): Promise<boolean>;
+    parseFile(emileDB: sqlite.Database): Promise<boolean>;
 }

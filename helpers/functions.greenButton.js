@@ -1,5 +1,4 @@
 import { helpers as greenButtonHelpers } from '@cityssm/green-button-parser';
-import sqlite from 'better-sqlite3';
 import Debug from 'debug';
 import { addAsset } from '../database/addAsset.js';
 import { addAssetAlias } from '../database/addAssetAlias.js';
@@ -10,10 +9,10 @@ import { getEnergyDataPoint } from '../database/getEnergyData.js';
 import { getEnergyDataTypeByGreenButtonIds } from '../database/getEnergyDataType.js';
 import { updateEnergyDataValue } from '../database/updateEnergyData.js';
 import { getAssetCategories } from './functions.cache.js';
-import { databasePath } from './functions.database.js';
+import { getConnectionWhenAvailable } from './functions.database.js';
 const debug = Debug('emile:functions.greenButton');
 const greenButtonAliasTypeKey = 'GreenButtonParser.IntervalBlock.link';
-export const greenButtonAssetAliasType = getAssetAliasTypeByAliasTypeKey(greenButtonAliasTypeKey);
+export const greenButtonAssetAliasType = await getAssetAliasTypeByAliasTypeKey(greenButtonAliasTypeKey);
 const greenButtonUser = {
     userName: 'system.greenButton',
     canLogin: true,
@@ -33,7 +32,7 @@ async function getAssetIdFromAssetAlias(assetAlias, connectedEmileDB) {
             assetName: assetAlias,
             categoryId: assetCategory.categoryId
         }, greenButtonUser, connectedEmileDB);
-        addAssetAlias({
+        await addAssetAlias({
             assetId,
             aliasTypeId: greenButtonAssetAliasType?.aliasTypeId,
             assetAlias
@@ -102,16 +101,15 @@ async function getEnergyDataType(greenButtonJson, usageSummaryEntry, connectedEm
         commodityId: usageSummaryEntry.content.UsageSummary.commodity?.toString()
     }, greenButtonUser, true, connectedEmileDB);
 }
-export async function recordGreenButtonData(greenButtonJson, options) {
+export async function recordGreenButtonData(greenButtonJson, options, connectedEmileDB) {
     let recordCount = 0;
     const intervalBlockEntries = greenButtonHelpers.getEntriesByContentType(greenButtonJson, 'IntervalBlock');
     const usageSummaryEntries = greenButtonHelpers.getEntriesByContentType(greenButtonJson, 'UsageSummary');
     if (intervalBlockEntries.length === 0 && usageSummaryEntries.length === 0) {
         throw new Error('File contains no IntervalBlock or UsageSummary entries.');
     }
-    let emileDB;
+    const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable());
     try {
-        emileDB = sqlite(databasePath);
         for (const intervalBlockEntry of intervalBlockEntries) {
             let assetId = options.assetId;
             if ((assetId ?? '') === '') {
@@ -201,7 +199,7 @@ export async function recordGreenButtonData(greenButtonJson, options) {
         }
     }
     finally {
-        if (emileDB !== undefined) {
+        if (connectedEmileDB === undefined) {
             emileDB.close();
         }
     }

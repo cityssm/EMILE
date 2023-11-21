@@ -1,7 +1,6 @@
-import sqlite from 'better-sqlite3';
-import { databasePath } from '../helpers/functions.database.js';
-export function updateEnergyDataFileAsFailed(energyDataFile, sessionUser) {
-    const emileDB = sqlite(databasePath);
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
+export async function updateEnergyDataFileAsFailed(energyDataFile, sessionUser, connectedEmileDB) {
+    const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable());
     const result = emileDB
         .prepare(`update EnergyDataFiles
         set isFailed = 1,
@@ -12,10 +11,12 @@ export function updateEnergyDataFileAsFailed(energyDataFile, sessionUser) {
         where recordDelete_timeMillis is null
         and fileId = ?`)
         .run(energyDataFile.processedTimeMillis, energyDataFile.processedMessage, sessionUser.userName, Date.now(), energyDataFile.fileId);
-    emileDB.close();
+    if (connectedEmileDB === undefined) {
+        emileDB.close();
+    }
     return result.changes > 0;
 }
-export function updatePendingEnergyDataFile(energyDataFile, sessionUser) {
+export async function updatePendingEnergyDataFile(energyDataFile, sessionUser) {
     let parserClass = energyDataFile.parserClass;
     let parserConfig = '';
     if (parserClass.includes('::')) {
@@ -28,7 +29,7 @@ export function updatePendingEnergyDataFile(energyDataFile, sessionUser) {
             parserClass,
             parserConfig
         });
-    const emileDB = sqlite(databasePath);
+    const emileDB = await getConnectionWhenAvailable();
     const result = emileDB
         .prepare(`update EnergyDataFiles
         set assetId = ?,
@@ -41,8 +42,8 @@ export function updatePendingEnergyDataFile(energyDataFile, sessionUser) {
     emileDB.close();
     return result.changes > 0;
 }
-export function updateEnergyDataFileAsReadyToPending(fileId, sessionUser) {
-    const emileDB = sqlite(databasePath);
+export async function updateEnergyDataFileAsReadyToPending(fileId, sessionUser) {
+    const emileDB = await getConnectionWhenAvailable();
     const result = emileDB
         .prepare(`update EnergyDataFiles
         set isPending = 1,
@@ -57,8 +58,8 @@ export function updateEnergyDataFileAsReadyToPending(fileId, sessionUser) {
     emileDB.close();
     return result.changes > 0;
 }
-export function updateEnergyDataFileAsReadyToProcess(fileId, sessionUser) {
-    const emileDB = sqlite(databasePath);
+export async function updateEnergyDataFileAsReadyToProcess(fileId, sessionUser, connectedEmileDB) {
+    const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable());
     const result = emileDB
         .prepare(`update EnergyDataFiles
         set isPending = 0,
@@ -70,11 +71,13 @@ export function updateEnergyDataFileAsReadyToProcess(fileId, sessionUser) {
         where recordDelete_timeMillis is null
         and fileId = ?`)
         .run(sessionUser.userName, Date.now(), fileId);
-    emileDB.close();
+    if (connectedEmileDB === undefined) {
+        emileDB.close();
+    }
     return result.changes > 0;
 }
-export function updateEnergyDataFileAsProcessed(fileId, sessionUser, connectedEmileDB) {
-    const emileDB = connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB;
+export async function updateEnergyDataFileAsProcessed(fileId, sessionUser, connectedEmileDB) {
+    const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable());
     const rightNow = Date.now();
     const result = emileDB
         .prepare(`update EnergyDataFiles

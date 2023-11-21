@@ -4,7 +4,7 @@ import { getPendingEnergyDataFiles } from '../../database/getEnergyDataFiles.js'
 import { updatePendingEnergyDataFile } from '../../database/updateEnergyDataFile.js'
 
 export async function handler(request: Request, response: Response): Promise<void> {
-  const success = updatePendingEnergyDataFile(
+  const success = await updatePendingEnergyDataFile(
     request.body,
     request.session.user as EmileUser
   )

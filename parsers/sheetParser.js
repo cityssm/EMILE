@@ -10,7 +10,6 @@ import { getAssetCategories } from '../database/getAssetCategories.js';
 import { getEnergyDataTypeByNames } from '../database/getEnergyDataType.js';
 import { updateEnergyDataFileAsProcessed } from '../database/updateEnergyDataFile.js';
 import { getConfigProperty } from '../helpers/functions.config.js';
-import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
 import { BaseParser } from './baseParser.js';
 const debug = Debug('emile:parsers:sheetParser');
 function getDataFieldValue(row, dataField) {
@@ -41,20 +40,19 @@ export class SheetParser extends BaseParser {
         canUpdate: true,
         isAdmin: false
     };
-    async parseFile() {
+    async parseFile(emileDB) {
         const parserConfig = getConfigProperty('parserConfigs')?.[this.energyDataFile.parserProperties?.parserConfig ?? ''];
         if (parserConfig === undefined) {
             throw new Error(`Parser config unavailable: ${this.energyDataFile.parserProperties?.parserConfig ?? ''}`);
         }
         let aliasTypeId = -1;
         if (parserConfig.aliasTypeKey !== undefined) {
-            const aliasType = getAssetAliasTypeByAliasTypeKey(parserConfig.aliasTypeKey);
+            const aliasType = await getAssetAliasTypeByAliasTypeKey(parserConfig.aliasTypeKey, emileDB);
             if (aliasType === undefined) {
                 throw new Error(`aliasType unavailable for aliasTypeKey: ${parserConfig.aliasTypeKey}`);
             }
             aliasTypeId = aliasType.aliasTypeId;
         }
-        let emileDB;
         try {
             const workbook = XLSX.readFile(path.join(this.energyDataFile.systemFolderPath, this.energyDataFile.systemFileName), {});
             if (workbook.SheetNames.length > 0) {
@@ -65,7 +63,6 @@ export class SheetParser extends BaseParser {
                 raw: true,
                 rawNumbers: true
             });
-            emileDB = await getConnectionWhenAvailable();
             for (const row of rows) {
                 let assetId = this.energyDataFile.assetId;
                 if ((assetId ?? '') === '') {
@@ -128,10 +125,10 @@ export class SheetParser extends BaseParser {
                     powerOfTenMultiplier
                 }, SheetParser.parserUser, emileDB);
             }
-            updateEnergyDataFileAsProcessed(this.energyDataFile.fileId, SheetParser.parserUser, emileDB);
+            await updateEnergyDataFileAsProcessed(this.energyDataFile.fileId, SheetParser.parserUser, emileDB);
         }
         catch (error) {
-            this.handleParseFileError(error);
+            await this.handleParseFileError(error, emileDB);
             return false;
         }
         finally {

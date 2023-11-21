@@ -1,3 +1,5 @@
+import type sqlite from 'better-sqlite3'
+
 import { clearCacheByTableName } from '../helpers/functions.cache.js'
 import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 
@@ -37,9 +39,10 @@ export async function deleteEnergyData(
 
 export async function deleteEnergyDataByFileId(
   fileId: number | string,
-  sessionUser: EmileUser
+  sessionUser: EmileUser,
+  connectedEmileDB?: sqlite.Database
 ): Promise<boolean> {
-  const emileDB = await getConnectionWhenAvailable()
+  const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable())
 
   const tableNames = await reloadEnergyDataTableNames(emileDB)
 
@@ -67,7 +70,9 @@ export async function deleteEnergyDataByFileId(
     }
   }
 
-  emileDB.close()
+  if (connectedEmileDB === undefined) {
+    emileDB.close()
+  }
 
   clearCacheByTableName('EnergyData')
 

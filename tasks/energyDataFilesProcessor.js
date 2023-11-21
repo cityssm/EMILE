@@ -5,6 +5,7 @@ import exitHook from 'exit-hook';
 import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async';
 import { getEnergyDataFilesToProcess } from '../database/getEnergyDataFiles.js';
 import { updateEnergyDataFileAsFailed } from '../database/updateEnergyDataFile.js';
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
 import { GreenButtonParser } from '../parsers/greenButtonParser.js';
 import { getParserClasses } from '../parsers/parserHelpers.js';
 import { SheetParser } from '../parsers/sheetParser.js';
@@ -28,7 +29,8 @@ async function processFiles() {
     debug('Process started');
     isRunning = true;
     runAgainOnComplete = false;
-    const dataFiles = await getEnergyDataFilesToProcess();
+    const emileDB = await getConnectionWhenAvailable();
+    const dataFiles = await getEnergyDataFilesToProcess(emileDB);
     if (dataFiles.length > 0) {
         debug(`${dataFiles.length} files to process.`);
     }
@@ -43,19 +45,19 @@ async function processFiles() {
         }
         catch (error) {
             debug(error);
-            updateEnergyDataFileAsFailed({
+            await updateEnergyDataFileAsFailed({
                 fileId: dataFile.fileId,
                 processedTimeMillis: Date.now(),
                 processedMessage: 'File access error.'
-            }, processorUser);
+            }, processorUser, emileDB);
             continue;
         }
         if (!getParserClasses().includes(dataFile.parserProperties?.parserClass ?? '')) {
-            updateEnergyDataFileAsFailed({
+            await updateEnergyDataFileAsFailed({
                 fileId: dataFile.fileId,
                 processedTimeMillis: Date.now(),
                 processedMessage: `Selected parser not found: ${dataFile.parserProperties?.parserClass ?? ''}`
-            }, processorUser);
+            }, processorUser, emileDB);
             continue;
         }
         let parser;
@@ -69,25 +71,26 @@ async function processFiles() {
                 break;
             }
             default: {
-                updateEnergyDataFileAsFailed({
+                await updateEnergyDataFileAsFailed({
                     fileId: dataFile.fileId,
                     processedTimeMillis: Date.now(),
                     processedMessage: `Selected parser not implemented: ${dataFile.parserProperties?.parserClass ?? ''}`
-                }, processorUser);
+                }, processorUser, emileDB);
                 continue;
             }
         }
         try {
-            await parser.parseFile();
+            await parser.parseFile(emileDB);
         }
         catch {
-            updateEnergyDataFileAsFailed({
+            await updateEnergyDataFileAsFailed({
                 fileId: dataFile.fileId,
                 processedTimeMillis: Date.now(),
                 processedMessage: `Error parsing file: ${dataFile.parserProperties?.parserClass ?? ''}`
-            }, processorUser);
+            }, processorUser, emileDB);
         }
     }
+    emileDB.close();
     isRunning = false;
     if (!terminateTask && runAgainOnComplete) {
         runAgainOnComplete = false;

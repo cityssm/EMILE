@@ -5,7 +5,7 @@ import { updateEnergyDataFileAsReadyToProcess } from '../../database/updateEnerg
 import type { RunFileProcessorWorkerMessage } from '../../types/applicationTypes.js'
 
 export async function handler(request: Request, response: Response): Promise<void> {
-  const success = updateEnergyDataFileAsReadyToProcess(
+  const success = await updateEnergyDataFileAsReadyToProcess(
     request.body.fileId,
     request.session.user as EmileUser
   )
