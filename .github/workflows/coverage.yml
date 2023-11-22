@@ -47,7 +47,7 @@ jobs:
           CYPRESS_VERIFY_TIMEOUT: 600000
 
       - name: Run Coverage Testing
-        run: c8 --reporter=lcov --reporter=text --reporter=text-summary mocha --timeout 30000 --exit
+        run: npm run coverage
 
       - name: Code Climate (After)
         if: ${{ github.event_name != 'pull_request' && env.CC_TEST_REPORTER_ID != '' && matrix.node == 20 }}
