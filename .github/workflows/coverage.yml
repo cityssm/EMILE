@@ -46,6 +46,9 @@ jobs:
         env:
           CYPRESS_VERIFY_TIMEOUT: 600000
 
+      - name: Initialize Database
+        run: npm run databaseMaintenance
+
       - name: Run Coverage Testing
         run: npm run coverage
 
