@@ -1,18 +1,19 @@
 import { clearCacheByTableName } from '../helpers/functions.cache.js';
 import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
-import { ensureEnergyDataTableExists, reloadEnergyDataTableNames } from './manageEnergyDataTables.js';
+import { ensureEnergyDataTablesExists, refreshAggregatedEnergyDataTables, reloadEnergyDataTableNames } from './manageEnergyDataTables.js';
 import { updateAssetTimeSeconds } from './updateAsset.js';
 export async function deleteEnergyData(assetId, dataId, sessionUser) {
     const emileDB = await getConnectionWhenAvailable();
-    const tableName = await ensureEnergyDataTableExists(assetId, emileDB);
+    const tableNames = await ensureEnergyDataTablesExists(assetId, emileDB);
     const result = emileDB
-        .prepare(`update ${tableName}
+        .prepare(`update ${tableNames.raw}
         set recordDelete_userName = ?,
         recordDelete_timeMillis = ?
         where recordDelete_timeMillis is null
         and dataId = ?`)
         .run(sessionUser.userName, Date.now(), dataId);
     await updateAssetTimeSeconds(assetId, emileDB);
+    refreshAggregatedEnergyDataTables(assetId, emileDB);
     emileDB.close();
     clearCacheByTableName('EnergyData');
     return result.changes > 0;
@@ -32,6 +33,7 @@ export async function deleteEnergyDataByFileId(fileId, sessionUser, connectedEmi
         if (result.changes > 0) {
             const assetId = tableName.slice(Math.max(0, tableName.lastIndexOf('_') + 1));
             await updateAssetTimeSeconds(assetId, emileDB);
+            refreshAggregatedEnergyDataTables(assetId, emileDB);
             count += result.changes;
         }
     }

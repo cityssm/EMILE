@@ -1,18 +1,22 @@
 import sqlite from 'better-sqlite3';
 import { clearCacheByTableName } from '../helpers/functions.cache.js';
 import { databasePath } from '../helpers/functions.database.js';
-export function updateEnergyDataValue(data, sessionUser, connectedEmileDB) {
+import { ensureEnergyDataTablesExists, refreshAggregatedEnergyDataTables } from './manageEnergyDataTables.js';
+export async function updateEnergyDataValue(data, sessionUser, connectedEmileDB) {
     const emileDB = connectedEmileDB ?? sqlite(databasePath);
+    const tableNames = await ensureEnergyDataTablesExists(data.assetId);
     const rightNowMillis = Date.now();
     const result = emileDB
-        .prepare(`update EnergyData
+        .prepare(`update ${tableNames.raw}
         set fileId = ?,
         dataValue = ?,
         powerOfTenMultiplier = ?,
         recordUpdate_userName = ?,
         recordUpdate_timeMillis = ?
-        where dataId = ?`)
-        .run(data.fileId, data.dataValue, data.powerOfTenMultiplier ?? 0, sessionUser.userName, rightNowMillis, data.dataId);
+        where dataId = ?
+        and assetId = ?`)
+        .run(data.fileId, data.dataValue, data.powerOfTenMultiplier ?? 0, sessionUser.userName, rightNowMillis, data.dataId, data.assetId);
+    refreshAggregatedEnergyDataTables(data.assetId, emileDB);
     if (connectedEmileDB === undefined) {
         emileDB.close();
     }

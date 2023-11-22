@@ -8,6 +8,7 @@ import { hasActiveSession, sessionHandler } from '../helpers/functions.session.j
 export const router = Router();
 const reportKeyReportNames = new Set();
 reportKeyReportNames.add('energyData-fullyJoined');
+reportKeyReportNames.add('energyData-fullyJoined-daily');
 function sessionOrReportKeyHandler(request, response, next) {
     if (hasActiveSession(request)) {
         next();

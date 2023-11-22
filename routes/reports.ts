@@ -20,6 +20,7 @@ export const router = Router()
 
 const reportKeyReportNames = new Set<string>()
 reportKeyReportNames.add('energyData-fullyJoined')
+reportKeyReportNames.add('energyData-fullyJoined-daily')
 
 function sessionOrReportKeyHandler(
   request: Request,

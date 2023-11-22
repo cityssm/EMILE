@@ -13,7 +13,7 @@ import { delay } from '../helpers/functions.utilities.js'
 import type { Asset } from '../types/recordTypes.js'
 
 import { getAssets } from './getAssets.js'
-import { ensureEnergyDataTableExists } from './manageEnergyDataTables.js'
+import { ensureEnergyDataTablesExists } from './manageEnergyDataTables.js'
 
 export function updateAsset(asset: Asset, sessionUser: EmileUser): boolean {
   const emileDB = sqlite(databasePath)
@@ -51,7 +51,7 @@ export async function updateAssetTimeSeconds(
 ): Promise<boolean> {
   const tempTableName = getTempTableName()
 
-  const tableName = await ensureEnergyDataTableExists(assetId)
+  const tableNames = await ensureEnergyDataTablesExists(assetId)
 
   const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable())
 
@@ -60,8 +60,7 @@ export async function updateAssetTimeSeconds(
       `create temp table ${tempTableName} as 
         select min(timeSeconds) as timeSecondsMin,
         max(endTimeSeconds) as endTimeSecondsMax
-        from ${tableName}
-        where recordDelete_timeMillis is null`
+        from ${tableNames.monthly}`
     )
     .run()
 

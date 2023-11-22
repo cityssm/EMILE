@@ -20,7 +20,7 @@ export class BaseParser {
     }
     async handleParseFileError(error, connectedEmileDB) {
         const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable());
-        void deleteEnergyDataByFileId(this.energyDataFile.fileId, BaseParser.parserUser, emileDB);
+        await deleteEnergyDataByFileId(this.energyDataFile.fileId, BaseParser.parserUser, emileDB);
         await updateEnergyDataFileAsFailed({
             fileId: this.energyDataFile.fileId,
             processedMessage: error.message,

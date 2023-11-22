@@ -2,7 +2,7 @@ import { clearCacheByTableName } from '../helpers/functions.cache.js';
 import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
 import { addAsset } from './addAsset.js';
 import { deleteAsset } from './deleteAsset.js';
-import { ensureEnergyDataTableExists } from './manageEnergyDataTables.js';
+import { ensureEnergyDataTablesExists, refreshAggregatedEnergyDataTables } from './manageEnergyDataTables.js';
 export async function mergeAssets(assetForm, sessionUser) {
     const emileDB = await getConnectionWhenAvailable();
     let latitude;
@@ -19,7 +19,7 @@ export async function mergeAssets(assetForm, sessionUser) {
         latitude,
         longitude
     }, sessionUser, emileDB);
-    const newAssetTableName = await ensureEnergyDataTableExists(newAssetId);
+    const newAssetTableNames = await ensureEnergyDataTablesExists(newAssetId);
     const mergeAssetIds = assetForm.assetIds.split(',');
     const rightNowMillis = Date.now();
     for (const mergeAssetId of mergeAssetIds) {
@@ -40,9 +40,9 @@ export async function mergeAssets(assetForm, sessionUser) {
           and assetId = ?
           and groupId not in (select groupId from AssetGroupMembers where assetId = ?)`)
             .run(newAssetId, sessionUser.userName, rightNowMillis, mergeAssetId, newAssetId);
-        const mergeAssetTableName = await ensureEnergyDataTableExists(mergeAssetId, emileDB);
+        const mergeAssetTableNames = await ensureEnergyDataTablesExists(mergeAssetId, emileDB);
         emileDB
-            .prepare(`insert into ${newAssetTableName}
+            .prepare(`insert into ${newAssetTableNames.raw}
           (assetId, dataTypeId, fileId,
             timeSeconds, durationSeconds,
             dataValue, powerOfTenMultiplier,
@@ -57,18 +57,21 @@ export async function mergeAssets(assetForm, sessionUser) {
             recordCreate_userName, recordCreate_timeMillis,
             ? as recordUpdate_userName,
             ? as recordUpdate_timeMillis
-          from ${mergeAssetTableName}
+          from ${mergeAssetTableNames.raw}
           where recordDelete_timeMillis is null`)
             .run(newAssetId, sessionUser.userName, rightNowMillis);
         emileDB
-            .prepare(`update ${mergeAssetTableName}
+            .prepare(`update ${mergeAssetTableNames.raw}
           set recordDelete_userName = ?,
           recordDelete_timeMillis = ?
           where recordDelete_timeMillis is null`)
             .run(sessionUser.userName, rightNowMillis);
+        emileDB.prepare(`delete from ${mergeAssetTableNames.daily}`).run();
+        emileDB.prepare(`delete from ${mergeAssetTableNames.monthly}`).run();
         clearCacheByTableName('EnergyData');
         deleteAsset(mergeAssetId, sessionUser, emileDB);
     }
+    refreshAggregatedEnergyDataTables(newAssetId, emileDB);
     emileDB.pragma('optimize');
     emileDB.close();
     return newAssetId;

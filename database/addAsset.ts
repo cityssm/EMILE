@@ -3,7 +3,7 @@ import sqlite from 'better-sqlite3'
 import { databasePath } from '../helpers/functions.database.js'
 import type { Asset } from '../types/recordTypes.js'
 
-import { ensureEnergyDataTableExists } from './manageEnergyDataTables.js'
+import { ensureEnergyDataTablesExists } from './manageEnergyDataTables.js'
 
 export async function addAsset(
   asset: Partial<Asset>,
@@ -36,7 +36,7 @@ export async function addAsset(
 
   const assetId = result.lastInsertRowid as number
 
-  await ensureEnergyDataTableExists(assetId)
+  await ensureEnergyDataTablesExists(assetId)
 
   if (connectedEmileDB === undefined) {
     emileDB.close()

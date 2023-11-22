@@ -67,7 +67,6 @@ export async function getEnergyDataFiles(filters, options, connectedEmileDB) {
     }
     const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable(true));
     const tempTableName = getTempTableName();
-    console.time('getEnergyDataFiles');
     emileDB
         .prepare(`create temp table ${tempTableName} as ${sql}`)
         .run(sqlParameters);
@@ -84,7 +83,6 @@ export async function getEnergyDataFiles(filters, options, connectedEmileDB) {
         }
         delete dataFile.parserPropertiesJson;
     }
-    console.timeEnd('getEnergyDataFiles');
     return dataFiles;
 }
 export async function getPendingEnergyDataFiles() {

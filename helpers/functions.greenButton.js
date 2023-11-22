@@ -145,8 +145,9 @@ export async function recordGreenButtonData(greenButtonJson, options, connectedE
                         else if (currentDataPoint.dataValue !== intervalReading.value ||
                             currentDataPoint.powerOfTenMultiplier !==
                                 energyDataTypeAndPower.powerOfTenMultiplier) {
-                            updateEnergyDataValue({
+                            await updateEnergyDataValue({
                                 dataId: currentDataPoint.dataId,
+                                assetId: assetId,
                                 fileId: options.fileId,
                                 dataValue: intervalReading.value,
                                 powerOfTenMultiplier: energyDataTypeAndPower.powerOfTenMultiplier
@@ -188,8 +189,9 @@ export async function recordGreenButtonData(greenButtonJson, options, connectedE
             }
             else if (currentDataPoint.dataValue !== dataValue ||
                 currentDataPoint.powerOfTenMultiplier !== powerOfTenMultiplier) {
-                updateEnergyDataValue({
+                await updateEnergyDataValue({
                     dataId: currentDataPoint.dataId,
+                    assetId: assetId,
                     fileId: options.fileId,
                     dataValue,
                     powerOfTenMultiplier

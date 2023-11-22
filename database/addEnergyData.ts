@@ -8,7 +8,10 @@ import {
 import { delay } from '../helpers/functions.utilities.js'
 import type { EnergyData } from '../types/recordTypes.js'
 
-import { ensureEnergyDataTableExists } from './manageEnergyDataTables.js'
+import {
+  ensureEnergyDataTablesExists,
+  refreshAggregatedEnergyDataTables
+} from './manageEnergyDataTables.js'
 import { updateAssetTimeSeconds } from './updateAsset.js'
 
 export async function addEnergyData(
@@ -24,13 +27,13 @@ export async function addEnergyData(
     try {
       const rightNowMillis = Date.now()
 
-      const tableName = await ensureEnergyDataTableExists(
+      const tableNames = await ensureEnergyDataTablesExists(
         data.assetId as number
       )
 
       result = emileDB
         .prepare(
-          `insert into ${tableName} (
+          `insert into ${tableNames.raw} (
             assetId, dataTypeId, fileId,
             timeSeconds, durationSeconds, dataValue, powerOfTenMultiplier,
             recordCreate_userName, recordCreate_timeMillis,
@@ -64,6 +67,8 @@ export async function addEnergyData(
     )
   } else {
     await updateAssetTimeSeconds(data.assetId as number, emileDB)
+
+    refreshAggregatedEnergyDataTables(data.assetId as number, emileDB)
 
     if (connectedEmileDB === undefined) {
       emileDB.close()

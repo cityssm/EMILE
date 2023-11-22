@@ -130,8 +130,6 @@ export async function getEnergyDataFiles(
 
   const tempTableName = getTempTableName()
 
-  console.time('getEnergyDataFiles')
-
   emileDB
     .prepare(`create temp table ${tempTableName} as ${sql}`)
     .run(sqlParameters)
@@ -154,8 +152,6 @@ export async function getEnergyDataFiles(
 
     delete dataFile.parserPropertiesJson
   }
-
-  console.timeEnd('getEnergyDataFiles')
 
   return dataFiles
 }

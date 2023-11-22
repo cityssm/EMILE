@@ -8,16 +8,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
     // Power Query Tab
     const powerQueryTabElement = document.querySelector('#tab--powerQuery');
     const reportKey = (_a = powerQueryTabElement === null || powerQueryTabElement === void 0 ? void 0 : powerQueryTabElement.dataset.reportKey) !== null && _a !== void 0 ? _a : '';
-    const powerQueryReportUrlElement = document.querySelector('#powerQuery--reportUrl');
-    function refreshPowerQueryReportUrl() {
-        const reportUrl = `${window.location.href.slice(0, Math.max(0, window.location.href.indexOf(window.location.pathname)))}${Emile.urlPrefix}/reports/energyData-fullyJoined?reportKey=${reportKey}`;
-        powerQueryReportUrlElement.value = reportUrl;
+    const powerQueryRawReportUrlElement = document.querySelector('#powerQuery--reportUrlRaw');
+    const powerQueryDailyReportUrlElement = document.querySelector('#powerQuery--reportUrlDaily');
+    function refreshPowerQueryReportUrls() {
+        const rawReportUrl = `${window.location.href.slice(0, Math.max(0, window.location.href.indexOf(window.location.pathname)))}${Emile.urlPrefix}/reports/energyData-fullyJoined?reportKey=${reportKey}`;
+        powerQueryRawReportUrlElement.value = rawReportUrl;
+        const dailyReportUrl = `${window.location.href.slice(0, Math.max(0, window.location.href.indexOf(window.location.pathname)))}${Emile.urlPrefix}/reports/energyData-fullyJoined-daily?reportKey=${reportKey}`;
+        powerQueryDailyReportUrlElement.value = dailyReportUrl;
     }
     if (powerQueryTabElement !== null) {
-        refreshPowerQueryReportUrl();
-        powerQueryReportUrlElement.addEventListener('click', () => {
-            powerQueryReportUrlElement.focus();
-            powerQueryReportUrlElement.select();
+        refreshPowerQueryReportUrls();
+        powerQueryRawReportUrlElement.addEventListener('click', () => {
+            powerQueryRawReportUrlElement.focus();
+            powerQueryRawReportUrlElement.select();
+        });
+        powerQueryDailyReportUrlElement.addEventListener('click', () => {
+            powerQueryDailyReportUrlElement.focus();
+            powerQueryDailyReportUrlElement.select();
         });
     }
     // Initialize

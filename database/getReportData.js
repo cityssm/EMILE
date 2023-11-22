@@ -132,6 +132,77 @@ export async function getReportData(reportName, reportParameters = {}) {
           and a.recordDelete_timeMillis is null`;
             break;
         }
+        case 'energyData-fullyJoined-daily': {
+            useTempTable = true;
+            useRaw = true;
+            runOptimizer = true;
+            header = [
+                'dataIdMin',
+                'serviceCategory',
+                'category',
+                'assetName',
+                'startDateTime',
+                'endDateTime',
+                'dataValueSumEvaluated',
+                'dataValueMinEvaluated',
+                'dataValueMaxEvaluated',
+                'preferredPowerOfTenMultiplierName',
+                'unit',
+                'unitLong',
+                'accumulationBehaviour',
+                'commodity',
+                'readingType',
+                'latitude',
+                'longitude',
+                'recordCreate_timeMillisMin',
+                'recordCreate_timeMillisMax',
+                'recordUpdate_timeMillisMin',
+                'recordUpdate_timeMillisMax'
+            ];
+            sql = `select d.dataIdMin,
+        ts.serviceCategory,
+        c.category,
+        a.assetName,
+        
+        datetime(d.timeSeconds, 'unixepoch', 'localtime') as startDateTime,
+        datetime(d.endTimeSeconds, 'unixepoch', 'localtime') as endDateTime,
+          
+        d.dataValueSum / power(10, tu.preferredPowerOfTenMultiplier) as dataValueSumEvaluated,
+        d.dataValueMin / power(10, tu.preferredPowerOfTenMultiplier) as dataValueMinEvaluated,
+        d.dataValueMax / power(10, tu.preferredPowerOfTenMultiplier) as dataValueMaxEvaluated,
+          
+        tu.preferredPowerOfTenMultiplierName,
+        tu.unit, tu.unitLong,
+          
+        ta.accumulationBehaviour, tc.commodity, tr.readingType,
+
+        a.latitude, a.longitude,
+          
+        d.recordCreate_timeMillisMin, recordCreate_timeMillisMax,
+        d.recordUpdate_timeMillisMin, recordUpdate_timeMillisMax
+        
+        from EnergyData_Daily d
+        left join Assets a
+          on d.assetId = a.assetId
+        left join AssetCategories c
+          on a.categoryId = c.categoryId
+        left join EnergyDataTypes t
+          on d.dataTypeId = t.dataTypeId
+        left join EnergyServiceCategories ts
+          on t.serviceCategoryId = ts.serviceCategoryId
+        left join (
+          select unitId, unit, unitLong, preferredPowerOfTenMultiplier,
+          userFunction_getPowerOfTenMultiplierName(preferredPowerOfTenMultiplier) as preferredPowerOfTenMultiplierName
+          from EnergyUnits
+        ) tu on t.unitId = tu.unitId
+        left join EnergyReadingTypes tr
+          on t.readingTypeId = tr.readingTypeId
+        left join EnergyCommodities tc
+          on t.commodityId = tc.commodityId
+        left join EnergyAccumulationBehaviours ta
+          on t.accumulationBehaviourId = ta.accumulationBehaviourId`;
+            break;
+        }
         case 'energyDataFiles-all': {
             sql = 'select * from EnergyDataFiles';
             break;

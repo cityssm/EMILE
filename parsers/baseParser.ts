@@ -35,7 +35,7 @@ export class BaseParser {
   ): Promise<void> {
     const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable())
 
-    void deleteEnergyDataByFileId(
+    await deleteEnergyDataByFileId(
       this.energyDataFile.fileId,
       BaseParser.parserUser,
       emileDB

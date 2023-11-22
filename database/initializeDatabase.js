@@ -10,7 +10,7 @@ import { addEnergyReadingType } from './addEnergyReadingType.js';
 import { addEnergyServiceCategory } from './addEnergyServiceCategory.js';
 import { addEnergyUnit } from './addEnergyUnit.js';
 import { addUser } from './addUser.js';
-import { refreshEnergyDataTableView } from './manageEnergyDataTables.js';
+import { refreshEnergyDataTableViews } from './manageEnergyDataTables.js';
 const debug = Debug('emile:database:initializeDatabase');
 const initializeDatabaseUser = {
     userName: 'system.initialize',
@@ -219,15 +219,17 @@ function initializeAssetAliasTypes(emileDB) {
         }, initializeDatabaseUser);
     }
 }
-export async function initializeDatabase() {
-    const emileDB = sqlite(databasePath);
+export async function initializeDatabase(connectedEmileDB) {
+    const emileDB = connectedEmileDB ?? sqlite(databasePath);
     const row = emileDB
         .prepare(`select name from sqlite_master
         where type = 'table'
         and name = 'UserAccessLog'`)
         .get();
     if (row !== undefined) {
-        emileDB.close();
+        if (connectedEmileDB === undefined) {
+            emileDB.close();
+        }
         return;
     }
     debug(`Creating ${databasePath} ...`);
@@ -303,7 +305,7 @@ export async function initializeDatabase() {
         primary key (groupId, assetId)
       )`)
         .run();
-    await refreshEnergyDataTableView(emileDB);
+    await refreshEnergyDataTableViews(emileDB);
     emileDB
         .prepare(`create table if not exists Users (
         userName varchar(30) primary key,
@@ -334,6 +336,8 @@ export async function initializeDatabase() {
         .prepare('create index idx_UserAccessLog on UserAccessLog (accessTimeMillis, ipAddress, userName)')
         .run();
     emileDB.pragma('optimize');
-    emileDB.close();
+    if (connectedEmileDB === undefined) {
+        emileDB.close();
+    }
     debug('Database created successfully.');
 }

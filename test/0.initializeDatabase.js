@@ -12,7 +12,7 @@ describe('Initialize Database', () => {
         }
         catch {
         }
-        initializeDatabase();
+        await initializeDatabase();
         assert.ok(true);
     });
 });

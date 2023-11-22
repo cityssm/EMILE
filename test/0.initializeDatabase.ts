@@ -19,7 +19,7 @@ describe('Initialize Database', () => {
       // ignore
     }
 
-    initializeDatabase()
+    await initializeDatabase()
 
     assert.ok(true)
   })

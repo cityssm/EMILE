@@ -27,6 +27,7 @@
     "helpers/*",
     "parsers/*",
     "routes/*",
+    "scripts/*",
     "tasks/*",
     "temp/*",
     "test/*",
