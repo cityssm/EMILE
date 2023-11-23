@@ -14,6 +14,7 @@ import handler_notify from './handlers/data-all/notify.js';
 import handler_redirect from './handlers/data-all/redirect.js';
 import { adminGetHandler, updateGetHandler } from './handlers/permissions.js';
 import configFunctions, { getConfigProperty } from './helpers/functions.config.js';
+import { useTestDatabases } from './helpers/functions.database.js';
 import { hasActiveSession, sessionHandler } from './helpers/functions.session.js';
 import routerAdmin from './routes/admin.js';
 import routerAssets from './routes/assets.js';
@@ -48,10 +49,12 @@ app.use(cookieParser());
 app.use(csurf({
     cookie: true
 }));
-app.use(rateLimit({
-    windowMs: 10000,
-    max: 200
-}));
+if (!useTestDatabases) {
+    app.use(rateLimit({
+        windowMs: 10000,
+        max: 200
+    }));
+}
 const abuseCheckHandler = abuseCheck();
 const urlPrefix = getConfigProperty('reverseProxy.urlPrefix');
 if (urlPrefix !== '') {
