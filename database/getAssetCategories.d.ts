@@ -1,2 +1,2 @@
 import type { AssetCategory } from '../types/recordTypes.js';
-export declare function getAssetCategories(): Promise<AssetCategory[]>;
+export declare function getAssetCategories(): AssetCategory[];

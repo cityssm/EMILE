@@ -1,20 +1,23 @@
-import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
+import sqlite from 'better-sqlite3'
+
+import { databasePath } from '../helpers/functions.database.js'
 import type { AssetCategory } from '../types/recordTypes.js'
 
-export async function getAssetCategories(): Promise<AssetCategory[]> {
-  const emileDB = await getConnectionWhenAvailable()
+export function getAssetCategories(): AssetCategory[] {
+  const emileDB = sqlite(databasePath)
 
-  const statement = emileDB.prepare(
-    `select categoryId, category, fontAwesomeIconClasses, orderNumber
-      from AssetCategories
-      where recordDelete_timeMillis is null
-      order by orderNumber, category`
-  )
+  const assetCategories = emileDB
+    .prepare(
+      `select categoryId, category, fontAwesomeIconClasses, orderNumber
+        from AssetCategories
+        where recordDelete_timeMillis is null
+        order by orderNumber, category`
+    )
+    .all() as AssetCategory[]
 
   let expectedOrderNumber = -1
-  const assetCategories: AssetCategory[] = []
 
-  for (const assetCategory of statement.iterate() as IterableIterator<AssetCategory>) {
+  for (const assetCategory of assetCategories) {
     expectedOrderNumber += 1
 
     if (assetCategory.orderNumber !== expectedOrderNumber) {
@@ -25,11 +28,7 @@ export async function getAssetCategories(): Promise<AssetCategory[]> {
             where categoryId = ?`
         )
         .run(expectedOrderNumber, assetCategory.categoryId)
-
-      assetCategory.orderNumber = expectedOrderNumber
     }
-
-    assetCategories.push(assetCategory)
   }
 
   return assetCategories
