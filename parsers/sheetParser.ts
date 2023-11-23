@@ -157,7 +157,7 @@ export class SheetParser extends BaseParser {
               emileDB
             )
 
-            addAssetAlias(
+            await addAssetAlias(
               {
                 assetId,
                 aliasTypeId,
@@ -200,7 +200,7 @@ export class SheetParser extends BaseParser {
           parserConfig.columns.dataType.accumulationBehaviour
         ) ?? '') as string
 
-        const energyDataType = getEnergyDataTypeByNames(
+        const energyDataType = await getEnergyDataTypeByNames(
           {
             serviceCategory: serviceCategoryName,
             unit: unitName,

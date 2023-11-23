@@ -80,7 +80,7 @@ export class SheetParser extends BaseParser {
                             assetName: assetAlias,
                             categoryId: assetCategory.categoryId
                         }, SheetParser.parserUser, emileDB);
-                        addAssetAlias({
+                        await addAssetAlias({
                             assetId,
                             aliasTypeId,
                             assetAlias
@@ -95,7 +95,7 @@ export class SheetParser extends BaseParser {
                 const readingTypeName = (getDataFieldValue(row, parserConfig.columns.dataType.readingType) ?? '');
                 const commodityName = (getDataFieldValue(row, parserConfig.columns.dataType.commodity) ?? '');
                 const accumulationBehaviourName = (getDataFieldValue(row, parserConfig.columns.dataType.accumulationBehaviour) ?? '');
-                const energyDataType = getEnergyDataTypeByNames({
+                const energyDataType = await getEnergyDataTypeByNames({
                     serviceCategory: serviceCategoryName,
                     unit: unitName,
                     readingType: readingTypeName,
