@@ -87,12 +87,12 @@ export async function getAssetByAssetAlias(
     sqlParameters.push(aliasTypeId)
   }
 
-  const assetId = emileDB.prepare(sql).get(sqlParameters) as
-    | { assetId: number }
+  const assetId = emileDB.prepare(sql).pluck().get(sqlParameters) as
+    | number
     | undefined
 
   if (assetId !== undefined) {
-    asset = getAsset(assetId.assetId, emileDB)
+    asset = getAsset(assetId, emileDB)
   }
 
   if (connectedEmileDB === undefined) {

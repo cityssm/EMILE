@@ -15,7 +15,7 @@ export function isValidUserReportKey(
 
   const ipAddress = isLocal(requestIp) ? 'localhost' : requestIp
 
-  const result = emileDB
+  const userName = emileDB
     .prepare(
       `select u.userName
         from UserAccessLog l
@@ -26,11 +26,10 @@ export function isValidUserReportKey(
         and u.canLogin = 1
         and ? - l.accessTimeMillis <= ?`
     )
-    .get(ipAddress, reportKey, Date.now(), accessMillis) as
-    | { userName: string }
-    | undefined
+    .pluck()
+    .get(ipAddress, reportKey, Date.now(), accessMillis) as string | undefined
 
   emileDB.close()
 
-  return (result?.userName ?? '') !== ''
+  return (userName ?? '') !== ''
 }
