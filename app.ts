@@ -21,6 +21,7 @@ import { adminGetHandler, updateGetHandler } from './handlers/permissions.js'
 import configFunctions, {
   getConfigProperty
 } from './helpers/functions.config.js'
+import { useTestDatabases } from './helpers/functions.database.js'
 import {
   hasActiveSession,
   sessionHandler
@@ -83,12 +84,14 @@ app.use(
  * Rate Limiter
  */
 
-app.use(
-  rateLimit({
-    windowMs: 10_000,
-    max: 200
-  })
-)
+if (!useTestDatabases) {
+  app.use(
+    rateLimit({
+      windowMs: 10_000,
+      max: 200
+    })
+  )
+}
 
 /*
  * Abuse Check
