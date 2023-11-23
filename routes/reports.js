@@ -9,14 +9,14 @@ export const router = Router();
 const reportKeyReportNames = new Set();
 reportKeyReportNames.add('energyData-fullyJoined');
 reportKeyReportNames.add('energyData-fullyJoined-daily');
-function sessionOrReportKeyHandler(request, response, next) {
+async function sessionOrReportKeyHandler(request, response, next) {
     if (hasActiveSession(request)) {
         next();
         return;
     }
     const reportName = request.params.reportName;
     if (reportKeyReportNames.has(reportName) &&
-        isValidUserReportKey(request.query.reportKey, request.ip)) {
+        (await isValidUserReportKey(request.query.reportKey, request.ip))) {
         next();
         return;
     }

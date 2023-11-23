@@ -1,8 +1,7 @@
-import sqlite from 'better-sqlite3';
 import { clearCacheByTableName } from '../helpers/functions.cache.js';
-import { databasePath } from '../helpers/functions.database.js';
-export function updateAssetCategory(category, sessionUser) {
-    const emileDB = sqlite(databasePath);
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
+export async function updateAssetCategory(category, sessionUser) {
+    const emileDB = await getConnectionWhenAvailable();
     const rightNowMillis = Date.now();
     const result = emileDB
         .prepare(`update AssetCategories

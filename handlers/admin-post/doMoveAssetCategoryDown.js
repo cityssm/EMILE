@@ -2,8 +2,8 @@ import { moveRecordDown, moveRecordDownToBottom } from '../../database/moveRecor
 import { getAssetCategories } from '../../helpers/functions.cache.js';
 export async function handler(request, response) {
     const success = request.body.moveToEnd === '1'
-        ? moveRecordDownToBottom('AssetCategories', request.body.categoryId)
-        : moveRecordDown('AssetCategories', request.body.categoryId);
+        ? await moveRecordDownToBottom('AssetCategories', request.body.categoryId)
+        : await moveRecordDown('AssetCategories', request.body.categoryId);
     const assetCategories = await getAssetCategories();
     response.json({
         success,

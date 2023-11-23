@@ -1,7 +1,10 @@
 import sqlite from 'better-sqlite3'
 
 import { clearCacheByTableName } from '../helpers/functions.cache.js'
-import { databasePath } from '../helpers/functions.database.js'
+import {
+  databasePath,
+  getConnectionWhenAvailable
+} from '../helpers/functions.database.js'
 
 import { updateRecordOrderNumber } from './updateRecordOrderNumber.js'
 
@@ -28,11 +31,11 @@ function getCurrentOrderNumber(
   return currentOrderNumber
 }
 
-export function moveRecordDown(
+export async function moveRecordDown(
   recordTable: RecordTable,
   recordId: number
-): boolean {
-  const emileDB = sqlite(databasePath)
+): Promise<boolean> {
+  const emileDB = await getConnectionWhenAvailable()
 
   const currentOrderNumber = getCurrentOrderNumber(
     recordTable,
@@ -63,11 +66,11 @@ export function moveRecordDown(
   return success
 }
 
-export function moveRecordDownToBottom(
+export async function moveRecordDownToBottom(
   recordTable: RecordTable,
   recordId: number
-): boolean {
-  const emileDB = sqlite(databasePath)
+): Promise<boolean> {
+  const emileDB = await getConnectionWhenAvailable()
 
   const currentOrderNumber = getCurrentOrderNumber(
     recordTable,
@@ -105,10 +108,10 @@ export function moveRecordDownToBottom(
   return true
 }
 
-export function moveRecordUp(
+export async function moveRecordUp(
   recordTable: RecordTable,
   recordId: number
-): boolean {
+): Promise<boolean> {
   const emileDB = sqlite(databasePath)
 
   const currentOrderNumber = getCurrentOrderNumber(
@@ -145,11 +148,11 @@ export function moveRecordUp(
   return success
 }
 
-export function moveRecordUpToTop(
+export async function moveRecordUpToTop(
   recordTable: RecordTable,
   recordId: number
-): boolean {
-  const emileDB = sqlite(databasePath)
+): Promise<boolean> {
+  const emileDB = await getConnectionWhenAvailable()
 
   const currentOrderNumber = getCurrentOrderNumber(
     recordTable,

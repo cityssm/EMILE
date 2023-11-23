@@ -1,6 +1,6 @@
 import sqlite from 'better-sqlite3';
 import { clearCacheByTableName } from '../helpers/functions.cache.js';
-import { databasePath } from '../helpers/functions.database.js';
+import { databasePath, getConnectionWhenAvailable } from '../helpers/functions.database.js';
 import { updateRecordOrderNumber } from './updateRecordOrderNumber.js';
 const recordIdColumns = new Map();
 recordIdColumns.set('AssetCategories', 'categoryId');
@@ -12,8 +12,8 @@ function getCurrentOrderNumber(recordTable, recordId, database) {
         .get(recordId).orderNumber;
     return currentOrderNumber;
 }
-export function moveRecordDown(recordTable, recordId) {
-    const emileDB = sqlite(databasePath);
+export async function moveRecordDown(recordTable, recordId) {
+    const emileDB = await getConnectionWhenAvailable();
     const currentOrderNumber = getCurrentOrderNumber(recordTable, recordId, emileDB);
     emileDB
         .prepare(`update ${recordTable}
@@ -26,8 +26,8 @@ export function moveRecordDown(recordTable, recordId) {
     clearCacheByTableName(recordTable);
     return success;
 }
-export function moveRecordDownToBottom(recordTable, recordId) {
-    const emileDB = sqlite(databasePath);
+export async function moveRecordDownToBottom(recordTable, recordId) {
+    const emileDB = await getConnectionWhenAvailable();
     const currentOrderNumber = getCurrentOrderNumber(recordTable, recordId, emileDB);
     const maxOrderNumber = emileDB
         .prepare(`select max(orderNumber) as maxOrderNumber
@@ -47,7 +47,7 @@ export function moveRecordDownToBottom(recordTable, recordId) {
     clearCacheByTableName(recordTable);
     return true;
 }
-export function moveRecordUp(recordTable, recordId) {
+export async function moveRecordUp(recordTable, recordId) {
     const emileDB = sqlite(databasePath);
     const currentOrderNumber = getCurrentOrderNumber(recordTable, recordId, emileDB);
     if (currentOrderNumber <= 0) {
@@ -65,8 +65,8 @@ export function moveRecordUp(recordTable, recordId) {
     clearCacheByTableName(recordTable);
     return success;
 }
-export function moveRecordUpToTop(recordTable, recordId) {
-    const emileDB = sqlite(databasePath);
+export async function moveRecordUpToTop(recordTable, recordId) {
+    const emileDB = await getConnectionWhenAvailable();
     const currentOrderNumber = getCurrentOrderNumber(recordTable, recordId, emileDB);
     if (currentOrderNumber > 0) {
         updateRecordOrderNumber(recordTable, recordId, -1, emileDB);

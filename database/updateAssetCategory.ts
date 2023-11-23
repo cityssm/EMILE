@@ -1,14 +1,12 @@
-import sqlite from 'better-sqlite3'
-
 import { clearCacheByTableName } from '../helpers/functions.cache.js'
-import { databasePath } from '../helpers/functions.database.js'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 import type { AssetCategory } from '../types/recordTypes.js'
 
-export function updateAssetCategory(
+export async function updateAssetCategory(
   category: Partial<AssetCategory>,
   sessionUser: EmileUser
-): boolean {
-  const emileDB = sqlite(databasePath)
+): Promise<boolean> {
+  const emileDB = await getConnectionWhenAvailable()
 
   const rightNowMillis = Date.now()
 

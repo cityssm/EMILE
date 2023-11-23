@@ -12,8 +12,8 @@ export async function handler(
 ): Promise<void> {
   const success =
     request.body.moveToEnd === '1'
-      ? moveRecordDownToBottom('AssetCategories', request.body.categoryId)
-      : moveRecordDown('AssetCategories', request.body.categoryId)
+      ? await moveRecordDownToBottom('AssetCategories', request.body.categoryId)
+      : await moveRecordDown('AssetCategories', request.body.categoryId)
 
   const assetCategories = await getAssetCategories()
 

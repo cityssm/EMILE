@@ -1,1 +1,1 @@
-export declare function isValidUserReportKey(reportKey: string, requestIp: string): boolean;
+export declare function isValidUserReportKey(reportKey: string, requestIp: string): Promise<boolean>;

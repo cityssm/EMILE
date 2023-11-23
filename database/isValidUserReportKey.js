@@ -1,10 +1,9 @@
 import { isLocal } from '@cityssm/is-private-network-address';
-import sqlite from 'better-sqlite3';
 import { getConfigProperty } from '../helpers/functions.config.js';
-import { databasePath } from '../helpers/functions.database.js';
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
 const accessMillis = getConfigProperty('settings.reportKeyAccessDays') * 86400 * 1000;
-export function isValidUserReportKey(reportKey, requestIp) {
-    const emileDB = sqlite(databasePath, { readonly: true });
+export async function isValidUserReportKey(reportKey, requestIp) {
+    const emileDB = await getConnectionWhenAvailable(true);
     const ipAddress = isLocal(requestIp) ? 'localhost' : requestIp;
     const userName = emileDB
         .prepare(`select u.userName

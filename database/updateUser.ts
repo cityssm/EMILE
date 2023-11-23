@@ -1,10 +1,6 @@
-import sqlite from 'better-sqlite3'
 import { v4 as uuidV4 } from 'uuid'
 
-import {
-  databasePath,
-  getConnectionWhenAvailable
-} from '../helpers/functions.database.js'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 
 type PermissionValue = 1 | 0 | boolean | '1' | '0'
 

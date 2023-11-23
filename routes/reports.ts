@@ -22,11 +22,11 @@ const reportKeyReportNames = new Set<string>()
 reportKeyReportNames.add('energyData-fullyJoined')
 reportKeyReportNames.add('energyData-fullyJoined-daily')
 
-function sessionOrReportKeyHandler(
+async function sessionOrReportKeyHandler(
   request: Request,
   response: Response,
   next: NextFunction
-): void {
+): Promise<void> {
   if (hasActiveSession(request)) {
     next()
     return
@@ -36,7 +36,7 @@ function sessionOrReportKeyHandler(
 
   if (
     reportKeyReportNames.has(reportName) &&
-    isValidUserReportKey(request.query.reportKey as string, request.ip)
+    (await isValidUserReportKey(request.query.reportKey as string, request.ip))
   ) {
     next()
     return
@@ -55,7 +55,7 @@ router.get('/', sessionHandler, handler_reports as RequestHandler)
 
 router.all(
   '/:reportName',
-  sessionOrReportKeyHandler,
+  sessionOrReportKeyHandler as RequestHandler,
   handler_reportName as RequestHandler
 )
 
