@@ -1,13 +1,11 @@
-import sqlite from 'better-sqlite3'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 
-import { databasePath } from '../helpers/functions.database.js'
-
-export function addAssetGroupMember(
+export async function addAssetGroupMember(
   groupId: number | string,
   assetId: number | string,
   sessionUser: EmileUser
-): boolean {
-  const emileDB = sqlite(databasePath)
+): Promise<boolean> {
+  const emileDB = await getConnectionWhenAvailable()
 
   const rightNowMillis = Date.now()
 

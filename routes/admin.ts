@@ -26,13 +26,13 @@ router.get('/', handler_admin)
  * User Maintenance
  */
 
-router.get('/users', handler_users)
+router.get('/users', handler_users as RequestHandler)
 
-router.post('/doAddUser', handler_doAddUser)
+router.post('/doAddUser', handler_doAddUser as RequestHandler)
 router.post('/doUpdateUserCanLogin', handler_doUpdateUserCanLogin)
 router.post('/doUpdateUserCanUpdate', handler_doUpdateUserCanUpdate)
 router.post('/doUpdateUserIsAdmin', handler_doUpdateUserIsAdmin)
-router.post('/doDeleteUser', handler_doDeleteUser)
+router.post('/doDeleteUser', handler_doDeleteUser as RequestHandler)
 
 /*
  * Database Maintenance
@@ -51,10 +51,22 @@ router.post('/doDeleteBackupFile', handler_doDeleteBackupFile as RequestHandler)
 
 router.get('/tables', handler_tables as RequestHandler)
 
-router.post('/doAddAssetCategory', handler_doAddAssetCategory)
-router.post('/doUpdateAssetCategory', handler_doUpdateAssetCategory)
-router.post('/doMoveAssetCategoryDown', handler_doMoveAssetCategoryDown)
-router.post('/doMoveAssetCategoryUp', handler_doMoveAssetCategoryUp)
-router.post('/doDeleteAssetCategory', handler_doDeleteAssetCategory)
+router.post('/doAddAssetCategory', handler_doAddAssetCategory as RequestHandler)
+router.post(
+  '/doUpdateAssetCategory',
+  handler_doUpdateAssetCategory as RequestHandler
+)
+router.post(
+  '/doMoveAssetCategoryDown',
+  handler_doMoveAssetCategoryDown as RequestHandler
+)
+router.post(
+  '/doMoveAssetCategoryUp',
+  handler_doMoveAssetCategoryUp as RequestHandler
+)
+router.post(
+  '/doDeleteAssetCategory',
+  handler_doDeleteAssetCategory as RequestHandler
+)
 
 export default router

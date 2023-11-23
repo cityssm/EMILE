@@ -2,11 +2,9 @@ import type sqlite from 'better-sqlite3'
 
 import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 
-import { deleteAssetAliases } from './deleteAssetAliases.js'
-import { deleteAssetGroupMembersByAssetId } from './deleteAssetGroupMember.js'
-
-export async function deleteAsset(
-  assetId: number | string,
+export async function deleteAssetAliases(
+  filterField: 'aliasId' | 'assetId',
+  filterValue: number | string,
   sessionUser: EmileUser,
   connectedEmileDB?: sqlite.Database
 ): Promise<boolean> {
@@ -14,18 +12,13 @@ export async function deleteAsset(
 
   const result = emileDB
     .prepare(
-      `update Assets
+      `update AssetAliases
         set recordDelete_userName = ?,
         recordDelete_timeMillis = ?
         where recordDelete_timeMillis is null
-        and assetId = ?`
+        and ${filterField} = ?`
     )
-    .run(sessionUser.userName, Date.now(), assetId)
-
-  if (result.changes > 0) {
-    await deleteAssetAliases('assetId', assetId, sessionUser, emileDB)
-    await deleteAssetGroupMembersByAssetId(assetId, sessionUser, emileDB)
-  }
+    .run(sessionUser.userName, Date.now(), filterValue)
 
   if (connectedEmileDB === undefined) {
     emileDB.close()

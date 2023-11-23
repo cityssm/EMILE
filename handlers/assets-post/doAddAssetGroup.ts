@@ -7,7 +7,7 @@ export async function handler(
   request: Request,
   response: Response
 ): Promise<void> {
-  const groupId = addAssetGroup(request.body, request.session.user as EmileUser)
+  const groupId = await addAssetGroup(request.body, request.session.user as EmileUser)
 
   const assetGroups = await getAssetGroups(request.session.user as EmileUser)
 

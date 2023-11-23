@@ -1,7 +1,6 @@
-import sqlite from 'better-sqlite3';
-import { databasePath } from '../helpers/functions.database.js';
-export function deleteUser(userName, sessionUser) {
-    const emileDB = sqlite(databasePath);
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
+export async function deleteUser(userName, sessionUser) {
+    const emileDB = await getConnectionWhenAvailable();
     const result = emileDB
         .prepare(`update Users
         set recordDelete_userName = ?,

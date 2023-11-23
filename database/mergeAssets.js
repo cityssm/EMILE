@@ -69,7 +69,7 @@ export async function mergeAssets(assetForm, sessionUser) {
         emileDB.prepare(`delete from ${mergeAssetTableNames.daily}`).run();
         emileDB.prepare(`delete from ${mergeAssetTableNames.monthly}`).run();
         clearCacheByTableName('EnergyData');
-        deleteAsset(mergeAssetId, sessionUser, emileDB);
+        await deleteAsset(mergeAssetId, sessionUser, emileDB);
     }
     refreshAggregatedEnergyDataTables(newAssetId, emileDB);
     emileDB.pragma('optimize');

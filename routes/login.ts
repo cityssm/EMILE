@@ -89,7 +89,10 @@ async function postHandler(
     userObject = await getUser(userNameLowerCase)
 
     if (userObject !== undefined && (userObject.reportKey ?? '') === '') {
-      const newReportKey = updateUserReportKey(userObject.userName, userObject)
+      const newReportKey = await updateUserReportKey(
+        userObject.userName,
+        userObject
+      )
       userObject.reportKey =
         typeof newReportKey === 'boolean' ? '' : newReportKey
     }

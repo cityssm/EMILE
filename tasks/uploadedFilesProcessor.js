@@ -58,7 +58,7 @@ async function processUploadedFiles() {
         const systemFileName = `${Date.now()}-${Math.round(Math.random() * 1e9)}.${fileExtension}`;
         await fs.copyFile(path.join(uploadsFolder, fileName), path.join(systemFolderPath, systemFileName));
         const parserProperties = getDefaultParserPropertiesByFileName(originalFileName);
-        addEnergyDataFile({
+        await addEnergyDataFile({
             originalFileName,
             systemFileName,
             systemFolderPath,

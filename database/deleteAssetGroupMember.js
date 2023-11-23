@@ -1,7 +1,6 @@
-import sqlite from 'better-sqlite3';
-import { databasePath } from '../helpers/functions.database.js';
-export function deleteAssetGroupMember(groupId, assetId, sessionUser) {
-    const emileDB = sqlite(databasePath);
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
+export async function deleteAssetGroupMember(groupId, assetId, sessionUser) {
+    const emileDB = await getConnectionWhenAvailable();
     const result = emileDB
         .prepare(`update AssetGroupMembers
         set recordDelete_userName = ?,
@@ -13,8 +12,8 @@ export function deleteAssetGroupMember(groupId, assetId, sessionUser) {
     emileDB.close();
     return result.changes > 0;
 }
-export function deleteAssetGroupMembersByAssetId(assetId, sessionUser, connectedEmileDB) {
-    const emileDB = connectedEmileDB ?? sqlite(databasePath);
+export async function deleteAssetGroupMembersByAssetId(assetId, sessionUser, connectedEmileDB) {
+    const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable());
     const result = emileDB
         .prepare(`update AssetGroupMembers
         set recordDelete_userName = ?,
@@ -27,8 +26,8 @@ export function deleteAssetGroupMembersByAssetId(assetId, sessionUser, connected
     }
     return result.changes > 0;
 }
-export function deleteAssetGroupMembersByGroupId(groupId, sessionUser, connectedEmileDB) {
-    const emileDB = connectedEmileDB ?? sqlite(databasePath);
+export async function deleteAssetGroupMembersByGroupId(groupId, sessionUser, connectedEmileDB) {
+    const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable());
     const result = emileDB
         .prepare(`update AssetGroupMembers
         set recordDelete_userName = ?,

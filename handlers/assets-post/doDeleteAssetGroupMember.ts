@@ -7,7 +7,7 @@ export async function handler(
   request: Request,
   response: Response
 ): Promise<void> {
-  const success = deleteAssetGroupMember(
+  const success = await deleteAssetGroupMember(
     request.body.groupId,
     request.body.assetId,
     request.session.user as EmileUser

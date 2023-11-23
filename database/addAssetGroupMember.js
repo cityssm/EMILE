@@ -1,7 +1,6 @@
-import sqlite from 'better-sqlite3';
-import { databasePath } from '../helpers/functions.database.js';
-export function addAssetGroupMember(groupId, assetId, sessionUser) {
-    const emileDB = sqlite(databasePath);
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
+export async function addAssetGroupMember(groupId, assetId, sessionUser) {
+    const emileDB = await getConnectionWhenAvailable();
     const rightNowMillis = Date.now();
     let result = emileDB
         .prepare(`update AssetGroupMembers

@@ -129,7 +129,7 @@ async function processUploadedFiles(): Promise<void> {
     const parserProperties =
       getDefaultParserPropertiesByFileName(originalFileName)
 
-    addEnergyDataFile(
+    await addEnergyDataFile(
       {
         originalFileName,
         systemFileName,

@@ -1,8 +1,7 @@
-import sqlite from 'better-sqlite3';
-import { databasePath } from '../helpers/functions.database.js';
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
 import { ensureEnergyDataTablesExists } from './manageEnergyDataTables.js';
 export async function addAsset(asset, sessionUser, connectedEmileDB) {
-    const emileDB = connectedEmileDB ?? sqlite(databasePath);
+    const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable());
     const rightNowMillis = Date.now();
     const result = emileDB
         .prepare(`insert into Assets (

@@ -1,1 +1,1 @@
-export declare function deleteUser(userName: string, sessionUser: EmileUser): boolean;
+export declare function deleteUser(userName: string, sessionUser: EmileUser): Promise<boolean>;

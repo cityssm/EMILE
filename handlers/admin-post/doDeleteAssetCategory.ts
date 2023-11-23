@@ -4,7 +4,7 @@ import { deleteAssetCategory } from '../../database/deleteAssetCategory.js'
 import { getAssetCategories } from '../../helpers/functions.cache.js'
 
 export async function handler(request: Request, response: Response): Promise<void> {
-  const success = deleteAssetCategory(
+  const success = await deleteAssetCategory(
     request.body.categoryId,
     request.session.user as EmileUser
   )

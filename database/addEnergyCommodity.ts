@@ -1,14 +1,14 @@
-import sqlite from 'better-sqlite3'
+import type sqlite from 'better-sqlite3'
 
-import { databasePath } from '../helpers/functions.database.js'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 import type { EnergyCommodity } from '../types/recordTypes.js'
 
-export function addEnergyCommodity(
+export async function addEnergyCommodity(
   commodity: Partial<EnergyCommodity>,
   sessionUser: EmileUser,
   connectedEmileDB?: sqlite.Database
-): number {
-  const emileDB = connectedEmileDB ?? sqlite(databasePath)
+): Promise<number> {
+  const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable())
 
   const rightNowMillis = Date.now()
 

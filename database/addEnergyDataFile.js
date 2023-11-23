@@ -1,7 +1,6 @@
-import sqlite from 'better-sqlite3';
-import { databasePath } from '../helpers/functions.database.js';
-export function addEnergyDataFile(dataFile, sessionUser) {
-    const emileDB = sqlite(databasePath);
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
+export async function addEnergyDataFile(dataFile, sessionUser) {
+    const emileDB = await getConnectionWhenAvailable();
     const rightNowMillis = Date.now();
     const parserPropertiesJson = dataFile.parserPropertiesJson ??
         JSON.stringify(dataFile.parserProperties ?? {});

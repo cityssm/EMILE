@@ -62,7 +62,7 @@ async function getEnergyDataTypeRelatedIds(namesOrGreenButtonIds, sessionUser, e
         namesOrGreenButtonIds.unitId.startsWith('currency:')) {
         const currencyGreenButtonId = namesOrGreenButtonIds.unitId.split(':')[1];
         const currencyName = greenButtonLookups.currencies[currencyGreenButtonId];
-        unitId = addEnergyUnit({
+        unitId = await addEnergyUnit({
             unit: currencyName,
             unitLong: currencyName,
             preferredPowerOfTenMultiplier: 0,
@@ -174,7 +174,7 @@ export async function getEnergyDataTypeByGreenButtonIds(greenButtonIds, sessionU
     if (energyDataType === undefined && createIfUnavailable) {
         try {
             const relatedIds = await getEnergyDataTypeRelatedIds(Object.assign({ type: 'greenButtonIds' }, greenButtonIds), sessionUser, emileDB);
-            const dataTypeId = addEnergyDataType({
+            const dataTypeId = await addEnergyDataType({
                 serviceCategoryId: relatedIds.serviceCategoryId,
                 unitId: relatedIds.unitId,
                 readingTypeId: relatedIds.readingTypeId,
@@ -249,7 +249,7 @@ export async function getEnergyDataTypeByNames(names, sessionUser, createIfUnava
     if (energyDataType === undefined && createIfUnavailable) {
         try {
             const relatedIds = await getEnergyDataTypeRelatedIds(Object.assign({ type: 'names' }, names), sessionUser, emileDB);
-            const dataTypeId = addEnergyDataType({
+            const dataTypeId = await addEnergyDataType({
                 serviceCategoryId: relatedIds.serviceCategoryId,
                 unitId: relatedIds.unitId,
                 readingTypeId: relatedIds.readingTypeId,

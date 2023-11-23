@@ -162,7 +162,7 @@ async function getEnergyDataTypeRelatedIds(
     const currencyGreenButtonId = namesOrGreenButtonIds.unitId.split(':')[1]
     const currencyName = greenButtonLookups.currencies[currencyGreenButtonId]
 
-    unitId = addEnergyUnit(
+    unitId = await addEnergyUnit(
       {
         unit: currencyName,
         unitLong: currencyName,
@@ -358,7 +358,7 @@ export async function getEnergyDataTypeByGreenButtonIds(
         emileDB
       )
 
-      const dataTypeId = addEnergyDataType(
+      const dataTypeId = await addEnergyDataType(
         {
           serviceCategoryId: relatedIds.serviceCategoryId,
           unitId: relatedIds.unitId,
@@ -459,7 +459,7 @@ export async function getEnergyDataTypeByNames(
         emileDB
       )
 
-      const dataTypeId = addEnergyDataType(
+      const dataTypeId = await addEnergyDataType(
         {
           serviceCategoryId: relatedIds.serviceCategoryId,
           unitId: relatedIds.unitId,

@@ -1,6 +1,6 @@
-import sqlite from 'better-sqlite3'
+import type sqlite from 'better-sqlite3'
 
-import { databasePath } from '../helpers/functions.database.js'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 import type { Asset } from '../types/recordTypes.js'
 
 import { ensureEnergyDataTablesExists } from './manageEnergyDataTables.js'
@@ -10,7 +10,7 @@ export async function addAsset(
   sessionUser: EmileUser,
   connectedEmileDB?: sqlite.Database
 ): Promise<number> {
-  const emileDB = connectedEmileDB ?? sqlite(databasePath)
+  const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable())
 
   const rightNowMillis = Date.now()
 

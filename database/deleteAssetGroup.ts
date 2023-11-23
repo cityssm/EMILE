@@ -1,14 +1,12 @@
-import sqlite from 'better-sqlite3'
-
-import { databasePath } from '../helpers/functions.database.js'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 
 import { deleteAssetGroupMembersByGroupId } from './deleteAssetGroupMember.js'
 
-export function deleteAssetGroup(
+export async function deleteAssetGroup(
   groupId: number | string,
   sessionUser: EmileUser
-): boolean {
-  const emileDB = sqlite(databasePath)
+): Promise<boolean> {
+  const emileDB = await getConnectionWhenAvailable()
 
   const result = emileDB
     .prepare(
@@ -21,7 +19,7 @@ export function deleteAssetGroup(
     .run(sessionUser.userName, Date.now(), groupId)
 
   if (result.changes > 0) {
-    deleteAssetGroupMembersByGroupId(groupId, sessionUser, emileDB)
+    await deleteAssetGroupMembersByGroupId(groupId, sessionUser, emileDB)
   }
 
   emileDB.close()

@@ -34,7 +34,9 @@ const greenButtonColumns = ' greenButtonId varchar(50)'
 
 const orderNumberColumns = ' orderNumber integer not null default 0'
 
-function initializeEnergyServiceCategories(emileDB: sqlite.Database): void {
+async function initializeEnergyServiceCategories(
+  emileDB: sqlite.Database
+): Promise<void> {
   emileDB
     .prepare(
       `create table if not exists EnergyServiceCategories (
@@ -55,7 +57,7 @@ function initializeEnergyServiceCategories(emileDB: sqlite.Database): void {
     for (const [greenButtonId, serviceCategory] of Object.entries(
       greenButtonLookups.serviceCategoryKinds
     )) {
-      addEnergyServiceCategory(
+      await addEnergyServiceCategory(
         {
           serviceCategory,
           greenButtonId
@@ -67,7 +69,7 @@ function initializeEnergyServiceCategories(emileDB: sqlite.Database): void {
   }
 }
 
-function initializeEnergyUnits(emileDB: sqlite.Database): void {
+async function initializeEnergyUnits(emileDB: sqlite.Database): Promise<void> {
   emileDB
     .prepare(
       `create table if not exists EnergyUnits (
@@ -88,7 +90,7 @@ function initializeEnergyUnits(emileDB: sqlite.Database): void {
     for (const [greenButtonId, unit] of Object.entries(
       greenButtonLookups.unitsOfMeasurement
     )) {
-      addEnergyUnit(
+      await addEnergyUnit(
         {
           unit,
           unitLong: unit,
@@ -102,7 +104,9 @@ function initializeEnergyUnits(emileDB: sqlite.Database): void {
   }
 }
 
-function initializeEnergyReadingTypes(emileDB: sqlite.Database): void {
+async function initializeEnergyReadingTypes(
+  emileDB: sqlite.Database
+): Promise<void> {
   emileDB
     .prepare(
       `create table if not exists EnergyReadingTypes (
@@ -123,7 +127,7 @@ function initializeEnergyReadingTypes(emileDB: sqlite.Database): void {
     for (const [greenButtonId, readingType] of Object.entries(
       greenButtonLookups.readingTypeKinds
     )) {
-      addEnergyReadingType(
+      await addEnergyReadingType(
         {
           readingType,
           greenButtonId
@@ -135,7 +139,9 @@ function initializeEnergyReadingTypes(emileDB: sqlite.Database): void {
   }
 }
 
-function initializeEnergyCommodities(emileDB: sqlite.Database): void {
+async function initializeEnergyCommodities(
+  emileDB: sqlite.Database
+): Promise<void> {
   emileDB
     .prepare(
       `create table if not exists EnergyCommodities (
@@ -156,7 +162,7 @@ function initializeEnergyCommodities(emileDB: sqlite.Database): void {
     for (const [greenButtonId, commodity] of Object.entries(
       greenButtonLookups.commodities
     )) {
-      addEnergyCommodity(
+      await addEnergyCommodity(
         {
           commodity,
           greenButtonId
@@ -168,9 +174,9 @@ function initializeEnergyCommodities(emileDB: sqlite.Database): void {
   }
 }
 
-function initializeEnergyAccumulationBehaviours(
+async function initializeEnergyAccumulationBehaviours(
   emileDB: sqlite.Database
-): void {
+): Promise<void> {
   emileDB
     .prepare(
       `create table if not exists EnergyAccumulationBehaviours (
@@ -193,7 +199,7 @@ function initializeEnergyAccumulationBehaviours(
     for (const [greenButtonId, accumulationBehaviour] of Object.entries(
       greenButtonLookups.accumulationBehaviours
     )) {
-      addEnergyAccumulationBehaviour(
+      await addEnergyAccumulationBehaviour(
         {
           accumulationBehaviour,
           greenButtonId
@@ -205,7 +211,9 @@ function initializeEnergyAccumulationBehaviours(
   }
 }
 
-function initializeAssetCategories(emileDB: sqlite.Database): void {
+async function initializeAssetCategories(
+  emileDB: sqlite.Database
+): Promise<void> {
   emileDB
     .prepare(
       `create table if not exists AssetCategories (
@@ -223,7 +231,7 @@ function initializeAssetCategories(emileDB: sqlite.Database): void {
     .get()
 
   if (result === undefined) {
-    addAssetCategory(
+    await addAssetCategory(
       {
         category: 'Building',
         fontAwesomeIconClasses: 'far fa-building'
@@ -232,7 +240,7 @@ function initializeAssetCategories(emileDB: sqlite.Database): void {
       emileDB
     )
 
-    addAssetCategory(
+    await addAssetCategory(
       {
         category: 'Street Light',
         fontAwesomeIconClasses: 'far fa-lightbulb'
@@ -241,7 +249,7 @@ function initializeAssetCategories(emileDB: sqlite.Database): void {
       emileDB
     )
 
-    addAssetCategory(
+    await addAssetCategory(
       {
         category: 'Traffic Light',
         fontAwesomeIconClasses: 'fas fa-traffic-light'
@@ -250,7 +258,7 @@ function initializeAssetCategories(emileDB: sqlite.Database): void {
       emileDB
     )
 
-    addAssetCategory(
+    await addAssetCategory(
       {
         category: 'Outdoor Lighting',
         fontAwesomeIconClasses: 'fas fa-sun'
@@ -259,7 +267,7 @@ function initializeAssetCategories(emileDB: sqlite.Database): void {
       emileDB
     )
 
-    addAssetCategory(
+    await addAssetCategory(
       {
         category: 'Outdoor Pool',
         fontAwesomeIconClasses: 'fas fa-swimming-pool'
@@ -268,7 +276,7 @@ function initializeAssetCategories(emileDB: sqlite.Database): void {
       emileDB
     )
 
-    addAssetCategory(
+    await addAssetCategory(
       {
         category: 'Parking Lot',
         fontAwesomeIconClasses: 'fas fa-parking'
@@ -277,7 +285,7 @@ function initializeAssetCategories(emileDB: sqlite.Database): void {
       emileDB
     )
 
-    addAssetCategory(
+    await addAssetCategory(
       {
         category: 'Pump Station',
         fontAwesomeIconClasses: 'fas fa-tint'
@@ -288,7 +296,9 @@ function initializeAssetCategories(emileDB: sqlite.Database): void {
   }
 }
 
-function initializeAssetAliasTypes(emileDB: sqlite.Database): void {
+async function initializeAssetAliasTypes(
+  emileDB: sqlite.Database
+): Promise<void> {
   emileDB
     .prepare(
       `create table if not exists AssetAliasTypes (
@@ -307,7 +317,7 @@ function initializeAssetAliasTypes(emileDB: sqlite.Database): void {
     .get()
 
   if (result === undefined) {
-    addAssetAliasType(
+    await addAssetAliasType(
       {
         aliasType: 'Civic Address',
         aliasTypeKey: 'civicAddress',
@@ -316,7 +326,7 @@ function initializeAssetAliasTypes(emileDB: sqlite.Database): void {
       initializeDatabaseUser
     )
 
-    addAssetAliasType(
+    await addAssetAliasType(
       {
         aliasType: 'Electricity Account Number',
         aliasTypeKey: 'accountNumber.electricity',
@@ -325,7 +335,7 @@ function initializeAssetAliasTypes(emileDB: sqlite.Database): void {
       initializeDatabaseUser
     )
 
-    addAssetAliasType(
+    await addAssetAliasType(
       {
         aliasType: 'Gas Account Number',
         aliasTypeKey: 'accountNumber.gas',
@@ -334,7 +344,7 @@ function initializeAssetAliasTypes(emileDB: sqlite.Database): void {
       initializeDatabaseUser
     )
 
-    addAssetAliasType(
+    await addAssetAliasType(
       {
         aliasType: 'Green Button Interval Block Link',
         aliasTypeKey: 'GreenButtonParser.IntervalBlock.link',
@@ -371,11 +381,11 @@ export async function initializeDatabase(
    * Energy Data Types
    */
 
-  initializeEnergyServiceCategories(emileDB)
-  initializeEnergyUnits(emileDB)
-  initializeEnergyReadingTypes(emileDB)
-  initializeEnergyCommodities(emileDB)
-  initializeEnergyAccumulationBehaviours(emileDB)
+  await initializeEnergyServiceCategories(emileDB)
+  await initializeEnergyUnits(emileDB)
+  await initializeEnergyReadingTypes(emileDB)
+  await initializeEnergyCommodities(emileDB)
+  await initializeEnergyAccumulationBehaviours(emileDB)
 
   emileDB
     .prepare(
@@ -417,7 +427,7 @@ export async function initializeDatabase(
    * Assets
    */
 
-  initializeAssetCategories(emileDB)
+  await initializeAssetCategories(emileDB)
 
   emileDB
     .prepare(
@@ -438,7 +448,7 @@ export async function initializeDatabase(
    * Asset Aliases
    */
 
-  initializeAssetAliasTypes(emileDB)
+  await initializeAssetAliasTypes(emileDB)
 
   emileDB
     .prepare(
@@ -512,7 +522,7 @@ export async function initializeDatabase(
   const result = emileDB.prepare('select userName from Users limit 1').get()
 
   if (result === undefined) {
-    addUser(
+    await addUser(
       {
         userName: 'd.gowans',
         canLogin: true,

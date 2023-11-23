@@ -1,8 +1,7 @@
-import sqlite from 'better-sqlite3';
 import { clearCacheByTableName } from '../helpers/functions.cache.js';
-import { databasePath } from '../helpers/functions.database.js';
-export function deleteAssetCategory(categoryId, sessionUser) {
-    const emileDB = sqlite(databasePath);
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
+export async function deleteAssetCategory(categoryId, sessionUser) {
+    const emileDB = await getConnectionWhenAvailable();
     const result = emileDB
         .prepare(`update AssetCategories
         set recordDelete_userName = ?,

@@ -1,7 +1,7 @@
-import { deleteAssetAlias } from '../../database/deleteAssetAlias.js';
+import { deleteAssetAliases } from '../../database/deleteAssetAliases.js';
 import { getAssetAliases } from '../../database/getAssetAliases.js';
 export async function handler(request, response) {
-    const success = deleteAssetAlias(request.body.aliasId, request.session.user);
+    const success = deleteAssetAliases('aliasId', request.body.aliasId, request.session.user);
     const assetAliases = await getAssetAliases({
         assetId: request.body.assetId
     });

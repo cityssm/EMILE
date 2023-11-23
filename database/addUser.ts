@@ -2,22 +2,21 @@ import sqlite from 'better-sqlite3'
 
 import { databasePath } from '../helpers/functions.database.js'
 
-export function addUser(
+export async function addUser(
   user: EmileUser,
   sessionUser: EmileUser,
   connectedEmileDB?: sqlite.Database
-): boolean {
+): Promise<boolean> {
   const emileDB = connectedEmileDB ?? sqlite(databasePath)
 
   const rightNowMillis = Date.now()
 
-  const result = emileDB
+  const recordDeleteTimeMillis = emileDB
     .prepare('select recordDelete_timeMillis from Users where userName = ?')
-    .get(user.userName) as
-    | { recordDelete_timeMillis: null | number }
-    | undefined
+    .pluck()
+    .get(user.userName) as number | null | undefined
 
-  if (result === undefined) {
+  if (recordDeleteTimeMillis === undefined) {
     emileDB
       .prepare(
         `insert into Users (
@@ -36,7 +35,7 @@ export function addUser(
         sessionUser.userName,
         rightNowMillis
       )
-  } else if (result.recordDelete_timeMillis !== null) {
+  } else if (recordDeleteTimeMillis !== null) {
     emileDB
       .prepare(
         `update Users

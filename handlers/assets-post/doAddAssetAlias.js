@@ -1,8 +1,8 @@
 import { addAssetAlias } from '../../database/addAssetAlias.js';
 import { getAssetAliases } from '../../database/getAssetAliases.js';
-export function handler(request, response) {
-    const aliasId = addAssetAlias(request.body, request.session.user);
-    const assetAliases = getAssetAliases({
+export async function handler(request, response) {
+    const aliasId = await addAssetAlias(request.body, request.session.user);
+    const assetAliases = await getAssetAliases({
         assetId: request.body.assetId
     });
     response.json({

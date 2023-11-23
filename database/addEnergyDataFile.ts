@@ -1,13 +1,11 @@
-import sqlite from 'better-sqlite3'
-
-import { databasePath } from '../helpers/functions.database.js'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 import type { EnergyDataFile } from '../types/recordTypes.js'
 
-export function addEnergyDataFile(
+export async function addEnergyDataFile(
   dataFile: Partial<EnergyDataFile>,
   sessionUser: EmileUser
-): number {
-  const emileDB = sqlite(databasePath)
+): Promise<number> {
+  const emileDB = await getConnectionWhenAvailable()
 
   const rightNowMillis = Date.now()
 

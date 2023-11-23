@@ -1,8 +1,7 @@
-import sqlite from 'better-sqlite3';
 import { clearCacheByTableName } from '../helpers/functions.cache.js';
-import { databasePath } from '../helpers/functions.database.js';
-export function addAssetCategory(category, sessionUser, connectedEmileDB) {
-    const emileDB = connectedEmileDB ?? sqlite(databasePath);
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
+export async function addAssetCategory(category, sessionUser, connectedEmileDB) {
+    const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable());
     const rightNowMillis = Date.now();
     const result = emileDB
         .prepare(`insert into AssetCategories (

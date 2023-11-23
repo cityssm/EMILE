@@ -7,7 +7,7 @@ export async function handler(
   request: Request,
   response: Response
 ): Promise<void> {
-  const success = addUser(request.body, request.session.user as EmileUser)
+  const success = await addUser(request.body, request.session.user as EmileUser)
 
   const users = await getUsers()
 

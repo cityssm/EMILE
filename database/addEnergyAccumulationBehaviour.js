@@ -1,7 +1,6 @@
-import sqlite from 'better-sqlite3';
-import { databasePath } from '../helpers/functions.database.js';
-export function addEnergyAccumulationBehaviour(accumulationBehaviour, sessionUser, connectedEmileDB) {
-    const emileDB = connectedEmileDB ?? sqlite(databasePath);
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
+export async function addEnergyAccumulationBehaviour(accumulationBehaviour, sessionUser, connectedEmileDB) {
+    const emileDB = connectedEmileDB ?? await getConnectionWhenAvailable();
     const rightNowMillis = Date.now();
     const result = emileDB
         .prepare(`insert into EnergyAccumulationBehaviours (

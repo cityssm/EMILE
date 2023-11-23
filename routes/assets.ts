@@ -28,7 +28,7 @@ router.post(
   handler_doAddAsset as RequestHandler
 )
 
-router.post('/doGetAsset', handler_doGetAsset)
+router.post('/doGetAsset', handler_doGetAsset as RequestHandler)
 
 router.post(
   '/doUpdateAsset',
@@ -55,19 +55,23 @@ router.post('/doAddAssetAlias', updatePostHandler, handler_doAddAssetAlias)
 router.post(
   '/doDeleteAssetAlias',
   updatePostHandler,
-  handler_doDeleteAssetAlias
+  handler_doDeleteAssetAlias as RequestHandler
 )
 
 // Asset Groups
 
-router.post('/doAddAssetGroup', updatePostHandler, handler_doAddAssetGroup)
+router.post(
+  '/doAddAssetGroup',
+  updatePostHandler,
+  handler_doAddAssetGroup as RequestHandler
+)
 
 router.post('/doGetAssetGroup', handler_doGetAssetGroup as RequestHandler)
 
 router.post(
   '/doUpdateAssetGroup',
   updatePostHandler,
-  handler_doUpdateAssetGroup
+  handler_doUpdateAssetGroup as RequestHandler
 )
 
 router.post(
@@ -85,7 +89,7 @@ router.post(
 router.post(
   '/doDeleteAssetGroup',
   updatePostHandler,
-  handler_doDeleteAssetGroup
+  handler_doDeleteAssetGroup as RequestHandler
 )
 
 export default router

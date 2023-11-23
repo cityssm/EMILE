@@ -1,17 +1,20 @@
 import sqlite from 'better-sqlite3'
 import { v4 as uuidV4 } from 'uuid'
 
-import { databasePath } from '../helpers/functions.database.js'
+import {
+  databasePath,
+  getConnectionWhenAvailable
+} from '../helpers/functions.database.js'
 
 type PermissionValue = 1 | 0 | boolean | '1' | '0'
 
-function updateUserPermission(
+async function updateUserPermission(
   userName: string,
   permission: 'canLogin' | 'canUpdate' | 'isAdmin',
   permissionValue: PermissionValue,
   sessionUser: EmileUser
-): boolean {
-  const emileDB = sqlite(databasePath)
+): Promise<boolean> {
+  const emileDB = await getConnectionWhenAvailable()
 
   const result = emileDB
     .prepare(
@@ -29,37 +32,42 @@ function updateUserPermission(
   return result.changes > 0
 }
 
-export function updateUserCanLogin(
+export async function updateUserCanLogin(
   userName: string,
   canLogin: PermissionValue,
   sessionUser: EmileUser
-): boolean {
-  return updateUserPermission(userName, 'canLogin', canLogin, sessionUser)
+): Promise<boolean> {
+  return await updateUserPermission(userName, 'canLogin', canLogin, sessionUser)
 }
 
-export function updateUserCanUpdate(
+export async function updateUserCanUpdate(
   userName: string,
   canUpdate: PermissionValue,
   sessionUser: EmileUser
-): boolean {
-  return updateUserPermission(userName, 'canUpdate', canUpdate, sessionUser)
+): Promise<boolean> {
+  return await updateUserPermission(
+    userName,
+    'canUpdate',
+    canUpdate,
+    sessionUser
+  )
 }
 
-export function updateUserIsAdmin(
+export async function updateUserIsAdmin(
   userName: string,
   isAdmin: PermissionValue,
   sessionUser: EmileUser
-): boolean {
-  return updateUserPermission(userName, 'isAdmin', isAdmin, sessionUser)
+): Promise<boolean> {
+  return await updateUserPermission(userName, 'isAdmin', isAdmin, sessionUser)
 }
 
-export function updateUserReportKey(
+export async function updateUserReportKey(
   userName: string,
   sessionUser: EmileUser
-): string | false {
+): Promise<string | false> {
   const reportKey = `${userName}-${uuidV4()}`
 
-  const emileDB = sqlite(databasePath)
+  const emileDB = await getConnectionWhenAvailable()
 
   const result = emileDB
     .prepare(

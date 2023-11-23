@@ -26,7 +26,7 @@ export const recordColumns = ` recordCreate_userName varchar(30) not null,
     recordDelete_timeMillis integer`;
 const greenButtonColumns = ' greenButtonId varchar(50)';
 const orderNumberColumns = ' orderNumber integer not null default 0';
-function initializeEnergyServiceCategories(emileDB) {
+async function initializeEnergyServiceCategories(emileDB) {
     emileDB
         .prepare(`create table if not exists EnergyServiceCategories (
         serviceCategoryId integer primary key autoincrement,
@@ -41,14 +41,14 @@ function initializeEnergyServiceCategories(emileDB) {
         .get();
     if (result === undefined) {
         for (const [greenButtonId, serviceCategory] of Object.entries(greenButtonLookups.serviceCategoryKinds)) {
-            addEnergyServiceCategory({
+            await addEnergyServiceCategory({
                 serviceCategory,
                 greenButtonId
             }, initializeDatabaseUser, emileDB);
         }
     }
 }
-function initializeEnergyUnits(emileDB) {
+async function initializeEnergyUnits(emileDB) {
     emileDB
         .prepare(`create table if not exists EnergyUnits (
         unitId integer primary key autoincrement,
@@ -63,7 +63,7 @@ function initializeEnergyUnits(emileDB) {
     const result = emileDB.prepare('select unitId from EnergyUnits limit 1').get();
     if (result === undefined) {
         for (const [greenButtonId, unit] of Object.entries(greenButtonLookups.unitsOfMeasurement)) {
-            addEnergyUnit({
+            await addEnergyUnit({
                 unit,
                 unitLong: unit,
                 preferredPowerOfTenMultiplier: unit === 'Wh' ? 3 : 0,
@@ -72,7 +72,7 @@ function initializeEnergyUnits(emileDB) {
         }
     }
 }
-function initializeEnergyReadingTypes(emileDB) {
+async function initializeEnergyReadingTypes(emileDB) {
     emileDB
         .prepare(`create table if not exists EnergyReadingTypes (
         readingTypeId integer primary key autoincrement,
@@ -87,14 +87,14 @@ function initializeEnergyReadingTypes(emileDB) {
         .get();
     if (result === undefined) {
         for (const [greenButtonId, readingType] of Object.entries(greenButtonLookups.readingTypeKinds)) {
-            addEnergyReadingType({
+            await addEnergyReadingType({
                 readingType,
                 greenButtonId
             }, initializeDatabaseUser, emileDB);
         }
     }
 }
-function initializeEnergyCommodities(emileDB) {
+async function initializeEnergyCommodities(emileDB) {
     emileDB
         .prepare(`create table if not exists EnergyCommodities (
         commodityId integer primary key autoincrement,
@@ -109,14 +109,14 @@ function initializeEnergyCommodities(emileDB) {
         .get();
     if (result === undefined) {
         for (const [greenButtonId, commodity] of Object.entries(greenButtonLookups.commodities)) {
-            addEnergyCommodity({
+            await addEnergyCommodity({
                 commodity,
                 greenButtonId
             }, initializeDatabaseUser, emileDB);
         }
     }
 }
-function initializeEnergyAccumulationBehaviours(emileDB) {
+async function initializeEnergyAccumulationBehaviours(emileDB) {
     emileDB
         .prepare(`create table if not exists EnergyAccumulationBehaviours (
         accumulationBehaviourId integer primary key autoincrement,
@@ -131,14 +131,14 @@ function initializeEnergyAccumulationBehaviours(emileDB) {
         .get();
     if (result === undefined) {
         for (const [greenButtonId, accumulationBehaviour] of Object.entries(greenButtonLookups.accumulationBehaviours)) {
-            addEnergyAccumulationBehaviour({
+            await addEnergyAccumulationBehaviour({
                 accumulationBehaviour,
                 greenButtonId
             }, initializeDatabaseUser, emileDB);
         }
     }
 }
-function initializeAssetCategories(emileDB) {
+async function initializeAssetCategories(emileDB) {
     emileDB
         .prepare(`create table if not exists AssetCategories (
         categoryId integer primary key autoincrement,
@@ -152,37 +152,37 @@ function initializeAssetCategories(emileDB) {
         .prepare('select categoryId from AssetCategories limit 1')
         .get();
     if (result === undefined) {
-        addAssetCategory({
+        await addAssetCategory({
             category: 'Building',
             fontAwesomeIconClasses: 'far fa-building'
         }, initializeDatabaseUser, emileDB);
-        addAssetCategory({
+        await addAssetCategory({
             category: 'Street Light',
             fontAwesomeIconClasses: 'far fa-lightbulb'
         }, initializeDatabaseUser, emileDB);
-        addAssetCategory({
+        await addAssetCategory({
             category: 'Traffic Light',
             fontAwesomeIconClasses: 'fas fa-traffic-light'
         }, initializeDatabaseUser, emileDB);
-        addAssetCategory({
+        await addAssetCategory({
             category: 'Outdoor Lighting',
             fontAwesomeIconClasses: 'fas fa-sun'
         }, initializeDatabaseUser, emileDB);
-        addAssetCategory({
+        await addAssetCategory({
             category: 'Outdoor Pool',
             fontAwesomeIconClasses: 'fas fa-swimming-pool'
         }, initializeDatabaseUser, emileDB);
-        addAssetCategory({
+        await addAssetCategory({
             category: 'Parking Lot',
             fontAwesomeIconClasses: 'fas fa-parking'
         }, initializeDatabaseUser, emileDB);
-        addAssetCategory({
+        await addAssetCategory({
             category: 'Pump Station',
             fontAwesomeIconClasses: 'fas fa-tint'
         }, initializeDatabaseUser, emileDB);
     }
 }
-function initializeAssetAliasTypes(emileDB) {
+async function initializeAssetAliasTypes(emileDB) {
     emileDB
         .prepare(`create table if not exists AssetAliasTypes (
         aliasTypeId integer primary key autoincrement,
@@ -197,22 +197,22 @@ function initializeAssetAliasTypes(emileDB) {
         .prepare('select aliasTypeId from AssetAliasTypes limit 1')
         .get();
     if (result === undefined) {
-        addAssetAliasType({
+        await addAssetAliasType({
             aliasType: 'Civic Address',
             aliasTypeKey: 'civicAddress',
             orderNumber: 1
         }, initializeDatabaseUser);
-        addAssetAliasType({
+        await addAssetAliasType({
             aliasType: 'Electricity Account Number',
             aliasTypeKey: 'accountNumber.electricity',
             orderNumber: 2
         }, initializeDatabaseUser);
-        addAssetAliasType({
+        await addAssetAliasType({
             aliasType: 'Gas Account Number',
             aliasTypeKey: 'accountNumber.gas',
             orderNumber: 3
         }, initializeDatabaseUser);
-        addAssetAliasType({
+        await addAssetAliasType({
             aliasType: 'Green Button Interval Block Link',
             aliasTypeKey: 'GreenButtonParser.IntervalBlock.link',
             orderNumber: 4
@@ -233,11 +233,11 @@ export async function initializeDatabase(connectedEmileDB) {
         return;
     }
     debug(`Creating ${databasePath} ...`);
-    initializeEnergyServiceCategories(emileDB);
-    initializeEnergyUnits(emileDB);
-    initializeEnergyReadingTypes(emileDB);
-    initializeEnergyCommodities(emileDB);
-    initializeEnergyAccumulationBehaviours(emileDB);
+    await initializeEnergyServiceCategories(emileDB);
+    await initializeEnergyUnits(emileDB);
+    await initializeEnergyReadingTypes(emileDB);
+    await initializeEnergyCommodities(emileDB);
+    await initializeEnergyAccumulationBehaviours(emileDB);
     emileDB
         .prepare(`create table if not exists EnergyDataTypes (
         dataTypeId integer primary key autoincrement,
@@ -264,7 +264,7 @@ export async function initializeDatabase(connectedEmileDB) {
         ${recordColumns}
       )`)
         .run();
-    initializeAssetCategories(emileDB);
+    await initializeAssetCategories(emileDB);
     emileDB
         .prepare(`create table if not exists Assets (
         assetId integer primary key autoincrement,
@@ -277,7 +277,7 @@ export async function initializeDatabase(connectedEmileDB) {
         ${recordColumns}
       )`)
         .run();
-    initializeAssetAliasTypes(emileDB);
+    await initializeAssetAliasTypes(emileDB);
     emileDB
         .prepare(`create table if not exists AssetAliases (
         aliasId integer primary key autoincrement,
@@ -318,7 +318,7 @@ export async function initializeDatabase(connectedEmileDB) {
         .run();
     const result = emileDB.prepare('select userName from Users limit 1').get();
     if (result === undefined) {
-        addUser({
+        await addUser({
             userName: 'd.gowans',
             canLogin: true,
             canUpdate: true,

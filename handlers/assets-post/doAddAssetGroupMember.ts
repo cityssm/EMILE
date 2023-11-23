@@ -7,7 +7,7 @@ export async function handler(
   request: Request,
   response: Response
 ): Promise<void> {
-  const success = addAssetGroupMember(
+  const success = await addAssetGroupMember(
     request.body.groupId,
     request.body.assetId,
     request.session.user as EmileUser

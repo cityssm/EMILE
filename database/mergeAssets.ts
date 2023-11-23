@@ -126,7 +126,7 @@ export async function mergeAssets(
     clearCacheByTableName('EnergyData')
 
     // Delete asset
-    deleteAsset(mergeAssetId, sessionUser, emileDB)
+    await deleteAsset(mergeAssetId, sessionUser, emileDB)
   }
 
   refreshAggregatedEnergyDataTables(newAssetId, emileDB)

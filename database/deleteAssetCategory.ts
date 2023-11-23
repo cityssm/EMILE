@@ -1,13 +1,11 @@
-import sqlite from 'better-sqlite3'
-
 import { clearCacheByTableName } from '../helpers/functions.cache.js'
-import { databasePath } from '../helpers/functions.database.js'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 
-export function deleteAssetCategory(
+export async function deleteAssetCategory(
   categoryId: number | string,
   sessionUser: EmileUser
-): boolean {
-  const emileDB = sqlite(databasePath)
+): Promise<boolean> {
+  const emileDB = await getConnectionWhenAvailable()
 
   const result = emileDB
     .prepare(

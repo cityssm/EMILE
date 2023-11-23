@@ -1,9 +1,8 @@
-import sqlite from 'better-sqlite3';
-import { databasePath } from '../helpers/functions.database.js';
-import { deleteAssetAliasesByAssetId } from './deleteAssetAlias.js';
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
+import { deleteAssetAliases } from './deleteAssetAliases.js';
 import { deleteAssetGroupMembersByAssetId } from './deleteAssetGroupMember.js';
-export function deleteAsset(assetId, sessionUser, connectedEmileDB) {
-    const emileDB = connectedEmileDB ?? sqlite(databasePath);
+export async function deleteAsset(assetId, sessionUser, connectedEmileDB) {
+    const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable());
     const result = emileDB
         .prepare(`update Assets
         set recordDelete_userName = ?,
@@ -12,8 +11,8 @@ export function deleteAsset(assetId, sessionUser, connectedEmileDB) {
         and assetId = ?`)
         .run(sessionUser.userName, Date.now(), assetId);
     if (result.changes > 0) {
-        deleteAssetAliasesByAssetId(assetId, sessionUser, emileDB);
-        deleteAssetGroupMembersByAssetId(assetId, sessionUser, emileDB);
+        await deleteAssetAliases('assetId', assetId, sessionUser, emileDB);
+        await deleteAssetGroupMembersByAssetId(assetId, sessionUser, emileDB);
     }
     if (connectedEmileDB === undefined) {
         emileDB.close();
