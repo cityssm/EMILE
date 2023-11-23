@@ -97,6 +97,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
             <p class="message-body">There is no energy data that meets your search criteria.</p>
             </div>`;
             }
+            const panelContainerElement = document.createElement('div');
             for (const dataItem of responseJSON.energyData) {
                 const chartKey = getChartKey(dataItem.assetId, dataItem.dataTypeId);
                 const dataValue = (dataItem.dataValue * Math.pow(10, dataItem.powerOfTenMultiplier)) /
@@ -166,7 +167,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
               </div>`;
                     panelElement.querySelector('[data-field="assetName"]').textContent = (_e = dataItem.assetName) !== null && _e !== void 0 ? _e : '';
                     panelElement.querySelector('[data-field="serviceCategory"]').textContent = (_f = dataItem.serviceCategory) !== null && _f !== void 0 ? _f : '';
-                    dashboardContainer.append(panelElement);
+                    panelContainerElement.append(panelElement);
                     const chart = new Chart(panelElement.querySelector('canvas'), {
                         type: 'bar',
                         data: {
@@ -198,6 +199,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
                     charts[chartKey].timeSecondsMax = Math.max(charts[chartKey].timeSecondsMax, dataItem.timeSeconds);
                 }
             }
+            dashboardContainer.append(panelContainerElement);
             for (const chart of Object.values(charts)) {
                 chart.chart.update();
                 chart.exportLink.href = `${Emile.urlPrefix}/reports/energyData-formatted-filtered/?assetId=${chart.assetId}&dataTypeId=${chart.dataTypeId}&timeSecondsMin=${chart.timeSecondsMin}&timeSecondsMax=${chart.timeSecondsMax}`;

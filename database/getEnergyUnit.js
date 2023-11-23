@@ -1,32 +1,12 @@
-import sqlite from 'better-sqlite3';
-import { databasePath } from '../helpers/functions.database.js';
-export function getEnergyUnitByGreenButtonId(unitGreenButtonId, connectedEmileDB) {
-    const emileDB = connectedEmileDB ??
-        sqlite(databasePath, {
-            readonly: true
-        });
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
+export async function getEnergyUnit(filterField, filterValue, connectedEmileDB) {
+    const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable(true));
     const unit = emileDB
         .prepare(`select unitId, unit, unitLong, greenButtonId
         from EnergyUnits
         where recordDelete_timeMillis is null
-        and greenButtonId = ?`)
-        .get(unitGreenButtonId);
-    if (connectedEmileDB === undefined) {
-        emileDB.close();
-    }
-    return unit;
-}
-export function getEnergyUnitByName(unitName, connectedEmileDB) {
-    const emileDB = connectedEmileDB ??
-        sqlite(databasePath, {
-            readonly: true
-        });
-    const unit = emileDB
-        .prepare(`select unitId, unit, unitLong, greenButtonId
-        from EnergyUnits
-        where recordDelete_timeMillis is null
-        and (unit = ? or unitLong = ?)`)
-        .get(unitName, unitName);
+        and ${filterField} = ?`)
+        .get(filterValue);
     if (connectedEmileDB === undefined) {
         emileDB.close();
     }

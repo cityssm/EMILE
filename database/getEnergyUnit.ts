@@ -1,55 +1,26 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable @typescript-eslint/indent */
 
-import sqlite from 'better-sqlite3'
+import type sqlite from 'better-sqlite3'
 
-import { databasePath } from '../helpers/functions.database.js'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 import type { EnergyUnit } from '../types/recordTypes.js'
 
-export function getEnergyUnitByGreenButtonId(
-  unitGreenButtonId: string,
+export async function getEnergyUnit(
+  filterField: 'unitId' | 'unit' | 'greenButtonId',
+  filterValue: string,
   connectedEmileDB?: sqlite.Database
-): EnergyUnit | undefined {
-  const emileDB =
-    connectedEmileDB ??
-    sqlite(databasePath, {
-      readonly: true
-    })
+): Promise<EnergyUnit | undefined> {
+  const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable(true))
 
   const unit = emileDB
     .prepare(
       `select unitId, unit, unitLong, greenButtonId
         from EnergyUnits
         where recordDelete_timeMillis is null
-        and greenButtonId = ?`
+        and ${filterField} = ?`
     )
-    .get(unitGreenButtonId) as EnergyUnit
-
-  if (connectedEmileDB === undefined) {
-    emileDB.close()
-  }
-
-  return unit
-}
-
-export function getEnergyUnitByName(
-  unitName: string,
-  connectedEmileDB?: sqlite.Database
-): EnergyUnit | undefined {
-  const emileDB =
-    connectedEmileDB ??
-    sqlite(databasePath, {
-      readonly: true
-    })
-
-  const unit = emileDB
-    .prepare(
-      `select unitId, unit, unitLong, greenButtonId
-        from EnergyUnits
-        where recordDelete_timeMillis is null
-        and (unit = ? or unitLong = ?)`
-    )
-    .get(unitName, unitName) as EnergyUnit
+    .get(filterValue) as EnergyUnit | undefined
 
   if (connectedEmileDB === undefined) {
     emileDB.close()

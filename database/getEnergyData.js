@@ -2,7 +2,7 @@ import { powerOfTenMultipliers } from '@cityssm/green-button-parser/lookups.js';
 import { dateStringToDate } from '@cityssm/utils-datetime';
 import sqlite from 'better-sqlite3';
 import { databasePath, getConnectionWhenAvailable, getTempTableName } from '../helpers/functions.database.js';
-import { ensureEnergyDataTableExists } from './manageEnergyDataTables.js';
+import { ensureEnergyDataTablesExists } from './manageEnergyDataTables.js';
 export function userFunction_getPowerOfTenMultiplierName(powerOfTenMultiplier) {
     if (powerOfTenMultiplier === 0) {
         return '';
@@ -58,58 +58,70 @@ function buildWhereClause(filters) {
     };
 }
 export async function getEnergyData(filters, options) {
-    const doGroupByDate = !(options?.formatForExport ?? false) &&
+    const useAggregateTables = !(options?.formatForExport ?? false) &&
         filters.startDateString !== filters.endDateString;
-    const columnNames = options?.formatForExport ?? false
-        ? `d.dataId,
-        c.category, a.assetName,
-        ts.serviceCategory,
-        userFunction_getPowerOfTenMultiplierName(d.powerOfTenMultiplier) as powerOfTenMultiplierName,
-        tu.unit,
-        tr.readingType,
-        tc.commodity,
-        ta.accumulationBehaviour,
-        datetime(d.timeSeconds, 'unixepoch', 'localtime') as startDateTime,
-        d.durationSeconds,
-        d.dataValue, d.powerOfTenMultiplier`
-        : doGroupByDate
-            ? `min(d.dataId) as dataId,
-        d.assetId, a.assetName,
-        c.category, c.fontAwesomeIconClasses,
-        d.dataTypeId,
-        t.serviceCategoryId, ts.serviceCategory,
-        t.unitId, tu.unit, tu.unitLong, tu.preferredPowerOfTenMultiplier,
-        userFunction_getPowerOfTenMultiplierName(d.powerOfTenMultiplier) as powerOfTenMultiplierName,
-        userFunction_getPowerOfTenMultiplierName(tu.preferredPowerOfTenMultiplier) as preferredPowerOfTenMultiplierName,
-        t.readingTypeId, tr.readingType,
-        t.commodityId, tc.commodity,
-        t.accumulationBehaviourId, ta.accumulationBehaviour,
-        min(d.fileId) as fileId,
-        f.originalFileName,
-        min(d.timeSeconds) as timeSeconds,
-        max(d.endTimeSeconds) - min(d.timeSeconds) as durationSeconds,
-        max(d.endTimeSeconds) as endTimeSeconds,
-        sum(d.dataValue) as dataValue,
-        d.powerOfTenMultiplier`
-            : `d.dataId,
-        d.assetId, a.assetName, c.category, c.fontAwesomeIconClasses,
-        d.dataTypeId,
-        t.serviceCategoryId, ts.serviceCategory,
-        t.unitId, tu.unit, tu.unitLong, tu.preferredPowerOfTenMultiplier,
-        userFunction_getPowerOfTenMultiplierName(d.powerOfTenMultiplier) as powerOfTenMultiplierName,
-        userFunction_getPowerOfTenMultiplierName(tu.preferredPowerOfTenMultiplier) as preferredPowerOfTenMultiplierName,
-        t.readingTypeId, tr.readingType,
-        t.commodityId, tc.commodity,
-        t.accumulationBehaviourId, ta.accumulationBehaviour,
-        d.fileId, f.originalFileName,
-        d.timeSeconds, d.durationSeconds, d.endTimeSeconds,
-        d.dataValue, d.powerOfTenMultiplier`;
+    let columnNames = '';
+    if (options?.formatForExport ?? false) {
+        columnNames = `d.dataId,
+      c.category, a.assetName,
+      ts.serviceCategory,
+      userFunction_getPowerOfTenMultiplierName(d.powerOfTenMultiplier) as powerOfTenMultiplierName,
+      tu.unit,
+      tr.readingType,
+      tc.commodity,
+      ta.accumulationBehaviour,
+      datetime(d.timeSeconds, 'unixepoch', 'localtime') as startDateTime,
+      d.durationSeconds,
+      d.dataValue, d.powerOfTenMultiplier`;
+    }
+    else if (useAggregateTables) {
+        columnNames = `d.dataIdMin as dataId,
+      d.assetId, a.assetName,
+      c.category, c.fontAwesomeIconClasses,
+      d.dataTypeId,
+      t.serviceCategoryId, ts.serviceCategory,
+      t.unitId, tu.unit, tu.unitLong, tu.preferredPowerOfTenMultiplier,
+      '' as powerOfTenMultiplierName,
+      userFunction_getPowerOfTenMultiplierName(tu.preferredPowerOfTenMultiplier) as preferredPowerOfTenMultiplierName,
+      t.readingTypeId, tr.readingType,
+      t.commodityId, tc.commodity,
+      t.accumulationBehaviourId, ta.accumulationBehaviour,
+      null as fileId,
+      null as originalFileName,
+      d.timeSeconds,
+      d.durationSeconds,
+      d.endTimeSeconds,
+      dataValueSum as dataValue,
+      0 as powerOfTenMultiplier`;
+    }
+    else {
+        columnNames = `d.dataId,
+      d.assetId, a.assetName, c.category, c.fontAwesomeIconClasses,
+      d.dataTypeId,
+      t.serviceCategoryId, ts.serviceCategory,
+      t.unitId, tu.unit, tu.unitLong, tu.preferredPowerOfTenMultiplier,
+      userFunction_getPowerOfTenMultiplierName(d.powerOfTenMultiplier) as powerOfTenMultiplierName,
+      userFunction_getPowerOfTenMultiplierName(tu.preferredPowerOfTenMultiplier) as preferredPowerOfTenMultiplierName,
+      t.readingTypeId, tr.readingType,
+      t.commodityId, tc.commodity,
+      t.accumulationBehaviourId, ta.accumulationBehaviour,
+      d.fileId, f.originalFileName,
+      d.timeSeconds, d.durationSeconds, d.endTimeSeconds,
+      d.dataValue, d.powerOfTenMultiplier`;
+    }
     const emileDB = await getConnectionWhenAvailable(true);
-    const tableName = (filters.assetId ?? '') === ''
-        ? 'EnergyData'
-        : await ensureEnergyDataTableExists(filters.assetId, emileDB);
+    let tableName = 'EnergyData';
+    if ((filters.assetId ?? '') === '') {
+        if (useAggregateTables) {
+            tableName = 'EnergyData_Daily';
+        }
+    }
+    else {
+        const assetTableNames = await ensureEnergyDataTablesExists(filters.assetId, emileDB);
+        tableName = useAggregateTables ? assetTableNames.daily : assetTableNames.raw;
+    }
     const { sqlParameters, sqlWhereClause } = buildWhereClause(filters);
-    let sql = `select ${columnNames}
+    const sql = `select ${columnNames}
     from ${tableName} d
     left join Assets a
       on d.assetId = a.assetId
@@ -127,15 +139,12 @@ export async function getEnergyData(filters, options) {
       on t.commodityId = tc.commodityId
     left join EnergyAccumulationBehaviours ta
       on t.accumulationBehaviourId = ta.accumulationBehaviourId
-    left join EnergyDataFiles f
-      on d.fileId = f.fileId
-    where d.recordDelete_timeMillis is null
-      and a.recordDelete_timeMillis is null
+    ${useAggregateTables
+        ? ''
+        : 'left join EnergyDataFiles f on d.fileId = f.fileId'}
+    where a.recordDelete_timeMillis is null
+      ${useAggregateTables ? '' : ' and d.recordDelete_timeMillis is null'}
       ${sqlWhereClause}`;
-    if (doGroupByDate) {
-        sql +=
-            " group by d.assetId, d.dataTypeId, substr(datetime(d.timeSeconds, 'unixepoch', 'localtime'), 1, 10), d.powerOfTenMultiplier";
-    }
     const orderBy = options?.formatForExport ?? false
         ? ''
         : ' order by assetId, dataTypeId, timeSeconds';
@@ -155,11 +164,11 @@ export async function getEnergyDataPoint(filters, connectedEmileDB) {
         sqlite(databasePath, {
             readonly: true
         });
-    const tableName = await ensureEnergyDataTableExists(filters.assetId, emileDB);
+    const tableNames = await ensureEnergyDataTablesExists(filters.assetId, emileDB);
     const dataPoint = emileDB
         .prepare(`select dataId, assetId, dataTypeId, fileId,
         timeSeconds, durationSeconds, dataValue, powerOfTenMultiplier
-        from ${tableName}
+        from ${tableNames.raw}
         where recordDelete_timeMillis is null
         and dataTypeId = ?
         and timeSeconds = ?

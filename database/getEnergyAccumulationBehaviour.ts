@@ -1,55 +1,29 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable @typescript-eslint/indent */
 
-import sqlite from 'better-sqlite3'
+import type sqlite from 'better-sqlite3'
 
-import { databasePath } from '../helpers/functions.database.js'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 import type { EnergyAccumulationBehaviour } from '../types/recordTypes.js'
 
-export function getEnergyAccumulationBehaviourByGreenButtonId(
-  accumulationBehaviourGreenButtonId: string,
+export async function getEnergyAccumulationBehaviour(
+  filterField:
+    | 'accumulationBehaviourId'
+    | 'accumulationBehaviour'
+    | 'greenButtonId',
+  filterValue: string,
   connectedEmileDB?: sqlite.Database
-): EnergyAccumulationBehaviour | undefined {
-  const emileDB =
-    connectedEmileDB ??
-    sqlite(databasePath, {
-      readonly: true
-    })
+): Promise<EnergyAccumulationBehaviour | undefined> {
+  const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable(true))
 
   const accumulationBehaviour = emileDB
     .prepare(
       `select accumulationBehaviourId, accumulationBehaviour, greenButtonId
         from EnergyAccumulationBehaviours
         where recordDelete_timeMillis is null
-        and greenButtonId = ?`
+        and ${filterField} = ?`
     )
-    .get(accumulationBehaviourGreenButtonId) as EnergyAccumulationBehaviour
-
-  if (connectedEmileDB === undefined) {
-    emileDB.close()
-  }
-
-  return accumulationBehaviour
-}
-
-export function getEnergyAccumulationBehaviourByName(
-  accumulationBehaviourName: string,
-  connectedEmileDB?: sqlite.Database
-): EnergyAccumulationBehaviour | undefined {
-  const emileDB =
-    connectedEmileDB ??
-    sqlite(databasePath, {
-      readonly: true
-    })
-
-  const accumulationBehaviour = emileDB
-    .prepare(
-      `select accumulationBehaviourId, accumulationBehaviour, greenButtonId
-        from EnergyAccumulationBehaviours
-        where recordDelete_timeMillis is null
-        and accumulationBehaviour = ?`
-    )
-    .get(accumulationBehaviourName) as EnergyAccumulationBehaviour
+    .get(filterValue) as EnergyAccumulationBehaviour | undefined
 
   if (connectedEmileDB === undefined) {
     emileDB.close()

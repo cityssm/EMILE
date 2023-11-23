@@ -1,5 +1,5 @@
 import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
-import { energyDataTablePrefix, refreshEnergyDataTableView, reloadEnergyDataTableNames } from './manageEnergyDataTables.js';
+import { getEnergyDataTableNames, refreshEnergyDataTableViews, reloadEnergyDataTableNames } from './manageEnergyDataTables.js';
 const deleteAgeDays = 14;
 const deleteSql = [
     `delete from AssetAliases
@@ -36,7 +36,7 @@ const postEnergyDataDeleteSql = [
     where recordDelete_timeMillis <= ?
     and fileId not in (select fileId from EnergyData)`
 ];
-export async function cleanupDatabase(_sessionUser) {
+export async function cleanupDatabase() {
     let deleteCount = 0;
     let dropCount = 0;
     const recordDeleteTimeMillis = Date.now() - deleteAgeDays * 86400 * 1000;
@@ -52,18 +52,20 @@ export async function cleanupDatabase(_sessionUser) {
         const energyDataTableNames = await reloadEnergyDataTableNames(emileDB);
         for (const tableName of energyDataTableNames) {
             const assetExists = assets.some((possibleAsset) => {
-                return `${energyDataTablePrefix}${possibleAsset.assetId}` === tableName;
+                const assetTableNames = getEnergyDataTableNames(possibleAsset.assetId);
+                return Object.values(assetTableNames).includes(tableName);
             });
-            if (assetExists) {
+            if (!assetExists) {
+                emileDB.prepare(`drop table if exists ${tableName}`).run();
+                dropCount += 1;
+                await refreshEnergyDataTableViews(emileDB);
+            }
+            else if (!tableName.endsWith('_Daily') &&
+                !tableName.endsWith('_Monthly')) {
                 const result = emileDB
                     .prepare(`delete from ${tableName} where recordDelete_timeMillis <= ?`)
                     .run(recordDeleteTimeMillis);
                 deleteCount += result.changes;
-            }
-            else {
-                emileDB.prepare(`drop table ${tableName}`).run();
-                dropCount += 1;
-                await refreshEnergyDataTableView(emileDB);
             }
         }
         for (const sql of postEnergyDataDeleteSql) {

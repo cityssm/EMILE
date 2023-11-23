@@ -1,6 +1,8 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable @typescript-eslint/indent */
 
+import type sqlite from 'better-sqlite3'
+
 import {
   getConnectionWhenAvailable,
   getTempTableName
@@ -68,7 +70,8 @@ function buildWhereClause(filters: GetEnergyDataFilesFilters): {
 
 export async function getEnergyDataFiles(
   filters: GetEnergyDataFilesFilters,
-  options: GetEnergyDataFilesOptions
+  options: GetEnergyDataFilesOptions,
+  connectedEmileDB?: sqlite.Database
 ): Promise<EnergyDataFile[]> {
   const groupByColumnNames = `f.fileId, f.originalFileName,
     ${
@@ -90,7 +93,7 @@ export async function getEnergyDataFiles(
 
   const sql = `select ${groupByColumnNames},
     ${
-      filters.isProcessed ?? true
+      filters.isProcessed ?? false
         ? `count(d.dataId) as energyDataCount,
             count(distinct d.assetId) as assetIdCount,
             min(d.timeSeconds) as timeSecondsMin,
@@ -105,7 +108,7 @@ export async function getEnergyDataFiles(
         : ''
     }
     ${
-      filters.isProcessed ?? true
+      filters.isProcessed ?? false
         ? ' left join EnergyData d on f.fileId = d.fileId and d.recordDelete_timeMillis is null'
         : ''
     }
@@ -123,7 +126,7 @@ export async function getEnergyDataFiles(
     orderBy += ` limit ${options.limit}`
   }
 
-  const emileDB = await getConnectionWhenAvailable(true)
+  const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable(true))
 
   const tempTableName = getTempTableName()
 
@@ -135,7 +138,9 @@ export async function getEnergyDataFiles(
     .prepare(`select * from ${tempTableName} ${orderBy}`)
     .all() as EnergyDataFile[]
 
-  emileDB.close()
+  if (connectedEmileDB === undefined) {
+    emileDB.close()
+  }
 
   for (const dataFile of dataFiles) {
     if (
@@ -154,7 +159,8 @@ export async function getEnergyDataFiles(
 export async function getPendingEnergyDataFiles(): Promise<EnergyDataFile[]> {
   return await getEnergyDataFiles(
     {
-      isPending: true
+      isPending: true,
+      isProcessed: false
     },
     {
       includeAssetDetails: true,
@@ -193,7 +199,9 @@ export async function getProcessedEnergyDataFiles(
   )
 }
 
-export async function getEnergyDataFilesToProcess(): Promise<EnergyDataFile[]> {
+export async function getEnergyDataFilesToProcess(
+  connectedEmileDB
+): Promise<EnergyDataFile[]> {
   return await getEnergyDataFiles(
     {
       isPending: false,
@@ -203,6 +211,7 @@ export async function getEnergyDataFilesToProcess(): Promise<EnergyDataFile[]> {
       includeAssetDetails: false,
       includeSystemFileAndFolder: true,
       limit: -1
-    }
+    },
+    connectedEmileDB
   )
 }

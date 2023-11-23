@@ -1,8 +1,11 @@
+import type sqlite from 'better-sqlite3'
+
 import { clearCacheByTableName } from '../helpers/functions.cache.js'
 import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 
 import {
-  ensureEnergyDataTableExists,
+  ensureEnergyDataTablesExists,
+  refreshAggregatedEnergyDataTables,
   reloadEnergyDataTableNames
 } from './manageEnergyDataTables.js'
 import { updateAssetTimeSeconds } from './updateAsset.js'
@@ -14,11 +17,11 @@ export async function deleteEnergyData(
 ): Promise<boolean> {
   const emileDB = await getConnectionWhenAvailable()
 
-  const tableName = await ensureEnergyDataTableExists(assetId, emileDB)
+  const tableNames = await ensureEnergyDataTablesExists(assetId, emileDB)
 
   const result = emileDB
     .prepare(
-      `update ${tableName}
+      `update ${tableNames.raw}
         set recordDelete_userName = ?,
         recordDelete_timeMillis = ?
         where recordDelete_timeMillis is null
@@ -27,6 +30,7 @@ export async function deleteEnergyData(
     .run(sessionUser.userName, Date.now(), dataId)
 
   await updateAssetTimeSeconds(assetId, emileDB)
+  refreshAggregatedEnergyDataTables(assetId as number, emileDB)
 
   emileDB.close()
 
@@ -37,9 +41,10 @@ export async function deleteEnergyData(
 
 export async function deleteEnergyDataByFileId(
   fileId: number | string,
-  sessionUser: EmileUser
+  sessionUser: EmileUser,
+  connectedEmileDB?: sqlite.Database
 ): Promise<boolean> {
-  const emileDB = await getConnectionWhenAvailable()
+  const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable())
 
   const tableNames = await reloadEnergyDataTableNames(emileDB)
 
@@ -62,12 +67,15 @@ export async function deleteEnergyDataByFileId(
       )
 
       await updateAssetTimeSeconds(assetId, emileDB)
+      refreshAggregatedEnergyDataTables(assetId, emileDB)
 
       count += result.changes
     }
   }
 
-  emileDB.close()
+  if (connectedEmileDB === undefined) {
+    emileDB.close()
+  }
 
   clearCacheByTableName('EnergyData')
 

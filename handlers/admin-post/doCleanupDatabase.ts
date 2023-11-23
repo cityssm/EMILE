@@ -6,7 +6,7 @@ export async function handler(
   request: Request,
   response: Response
 ): Promise<void> {
-  const deleteCount = await cleanupDatabase(request.session.user as EmileUser)
+  const deleteCount = await cleanupDatabase()
 
   response.json({
     success: true,

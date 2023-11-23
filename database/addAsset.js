@@ -1,6 +1,6 @@
 import sqlite from 'better-sqlite3';
 import { databasePath } from '../helpers/functions.database.js';
-import { ensureEnergyDataTableExists } from './manageEnergyDataTables.js';
+import { ensureEnergyDataTablesExists } from './manageEnergyDataTables.js';
 export async function addAsset(asset, sessionUser, connectedEmileDB) {
     const emileDB = connectedEmileDB ?? sqlite(databasePath);
     const rightNowMillis = Date.now();
@@ -13,7 +13,7 @@ export async function addAsset(asset, sessionUser, connectedEmileDB) {
         values (?, ?, ?, ?, ?, ?, ?, ?)`)
         .run(asset.assetName, asset.categoryId, (asset.latitude ?? '') === '' ? undefined : asset.latitude, (asset.longitude ?? '') === '' ? undefined : asset.longitude, sessionUser.userName, rightNowMillis, sessionUser.userName, rightNowMillis);
     const assetId = result.lastInsertRowid;
-    await ensureEnergyDataTableExists(assetId);
+    await ensureEnergyDataTablesExists(assetId);
     if (connectedEmileDB === undefined) {
         emileDB.close();
     }

@@ -179,6 +179,8 @@ declare const Chart: ChartJS
             </div>`
         }
 
+        const panelContainerElement = document.createElement('div')
+
         for (const dataItem of responseJSON.energyData) {
           const chartKey = getChartKey(
             dataItem.assetId as number,
@@ -269,7 +271,7 @@ declare const Chart: ChartJS
               ) as HTMLElement
             ).textContent = dataItem.serviceCategory ?? ''
 
-            dashboardContainer.append(panelElement)
+            panelContainerElement.append(panelElement)
 
             const chart = new Chart(
               panelElement.querySelector('canvas') as HTMLCanvasElement,
@@ -323,6 +325,8 @@ declare const Chart: ChartJS
             )
           }
         }
+
+        dashboardContainer.append(panelContainerElement)
 
         for (const chart of Object.values(charts)) {
           chart.chart.update()

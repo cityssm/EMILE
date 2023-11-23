@@ -16,5 +16,5 @@ interface EnergyDataTypeNames {
     accumulationBehaviour: string | '';
 }
 export declare function getEnergyDataTypeByGreenButtonIds(greenButtonIds: EnergyDataTypeGreenButtonIds, sessionUser: EmileUser, createIfUnavailable: boolean, connectedEmileDB?: sqlite.Database): Promise<EnergyDataType | undefined>;
-export declare function getEnergyDataTypeByNames(names: EnergyDataTypeNames, sessionUser: EmileUser, createIfUnavailable: boolean, connectedEmileDB?: sqlite.Database): EnergyDataType | undefined;
+export declare function getEnergyDataTypeByNames(names: EnergyDataTypeNames, sessionUser: EmileUser, createIfUnavailable: boolean, connectedEmileDB?: sqlite.Database): Promise<EnergyDataType | undefined>;
 export {};

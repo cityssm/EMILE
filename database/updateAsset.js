@@ -2,7 +2,7 @@ import sqlite from 'better-sqlite3';
 import { databasePath, getConnectionWhenAvailable, getTempTableName, queryMaxRetryCount } from '../helpers/functions.database.js';
 import { delay } from '../helpers/functions.utilities.js';
 import { getAssets } from './getAssets.js';
-import { ensureEnergyDataTableExists } from './manageEnergyDataTables.js';
+import { ensureEnergyDataTablesExists } from './manageEnergyDataTables.js';
 export function updateAsset(asset, sessionUser) {
     const emileDB = sqlite(databasePath);
     const result = emileDB
@@ -21,14 +21,13 @@ export function updateAsset(asset, sessionUser) {
 }
 export async function updateAssetTimeSeconds(assetId, connectedEmileDB) {
     const tempTableName = getTempTableName();
-    const tableName = await ensureEnergyDataTableExists(assetId);
+    const tableNames = await ensureEnergyDataTablesExists(assetId);
     const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable());
     emileDB
         .prepare(`create temp table ${tempTableName} as 
         select min(timeSeconds) as timeSecondsMin,
         max(endTimeSeconds) as endTimeSecondsMax
-        from ${tableName}
-        where recordDelete_timeMillis is null`)
+        from ${tableNames.monthly}`)
         .run();
     const result = emileDB.prepare(`select * from ${tempTableName}`).get();
     for (let retries = 0; retries <= queryMaxRetryCount; retries += 1) {

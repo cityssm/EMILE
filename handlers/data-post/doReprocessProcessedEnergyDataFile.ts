@@ -13,7 +13,7 @@ export async function handler(request: Request, response: Response): Promise<voi
     request.session.user as EmileUser
   )
 
-  const success = updateEnergyDataFileAsReadyToPending(
+  const success = await updateEnergyDataFileAsReadyToPending(
     request.body.fileId,
     request.session.user as EmileUser
   )

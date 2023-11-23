@@ -1,8 +1,8 @@
 import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 
 import {
-  energyDataTablePrefix,
-  refreshEnergyDataTableView,
+  getEnergyDataTableNames,
+  refreshEnergyDataTableViews,
   reloadEnergyDataTableNames
 } from './manageEnergyDataTables.js'
 
@@ -62,9 +62,7 @@ const postEnergyDataDeleteSql = [
     and fileId not in (select fileId from EnergyData)`
 ]
 
-export async function cleanupDatabase(
-  _sessionUser: EmileUser
-): Promise<number> {
+export async function cleanupDatabase(): Promise<number> {
   let deleteCount = 0
   let dropCount = 0
   const recordDeleteTimeMillis = Date.now() - deleteAgeDays * 86_400 * 1000
@@ -95,10 +93,19 @@ export async function cleanupDatabase(
 
     for (const tableName of energyDataTableNames) {
       const assetExists = assets.some((possibleAsset) => {
-        return `${energyDataTablePrefix}${possibleAsset.assetId}` === tableName
+        const assetTableNames = getEnergyDataTableNames(possibleAsset.assetId)
+        return Object.values(assetTableNames).includes(tableName)
       })
 
-      if (assetExists) {
+      if (!assetExists) {
+        emileDB.prepare(`drop table if exists ${tableName}`).run()
+        dropCount += 1
+
+        await refreshEnergyDataTableViews(emileDB)
+      } else if (
+        !tableName.endsWith('_Daily') &&
+        !tableName.endsWith('_Monthly')
+      ) {
         const result = emileDB
           .prepare(
             `delete from ${tableName} where recordDelete_timeMillis <= ?`
@@ -106,11 +113,6 @@ export async function cleanupDatabase(
           .run(recordDeleteTimeMillis)
 
         deleteCount += result.changes
-      } else {
-        emileDB.prepare(`drop table ${tableName}`).run()
-        dropCount += 1
-
-        await refreshEnergyDataTableView(emileDB)
       }
     }
 

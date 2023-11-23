@@ -12,7 +12,7 @@ import { addEnergyReadingType } from './addEnergyReadingType.js'
 import { addEnergyServiceCategory } from './addEnergyServiceCategory.js'
 import { addEnergyUnit } from './addEnergyUnit.js'
 import { addUser } from './addUser.js'
-import { refreshEnergyDataTableView } from './manageEnergyDataTables.js'
+import { refreshEnergyDataTableViews } from './manageEnergyDataTables.js'
 
 const debug = Debug('emile:database:initializeDatabase')
 
@@ -345,8 +345,10 @@ function initializeAssetAliasTypes(emileDB: sqlite.Database): void {
   }
 }
 
-export async function initializeDatabase(): Promise<void> {
-  const emileDB = sqlite(databasePath)
+export async function initializeDatabase(
+  connectedEmileDB?: sqlite.Database
+): Promise<void> {
+  const emileDB = connectedEmileDB ?? sqlite(databasePath)
 
   const row = emileDB
     .prepare(
@@ -357,7 +359,9 @@ export async function initializeDatabase(): Promise<void> {
     .get() as { name: string } | undefined
 
   if (row !== undefined) {
-    emileDB.close()
+    if (connectedEmileDB === undefined) {
+      emileDB.close()
+    }
     return
   }
 
@@ -484,7 +488,7 @@ export async function initializeDatabase(): Promise<void> {
    * Energy Data
    */
 
-  await refreshEnergyDataTableView(emileDB)
+  await refreshEnergyDataTableViews(emileDB)
 
   /*
    * Users
@@ -542,7 +546,9 @@ export async function initializeDatabase(): Promise<void> {
 
   emileDB.pragma('optimize')
 
-  emileDB.close()
+  if (connectedEmileDB === undefined) {
+    emileDB.close()
+  }
 
   debug('Database created successfully.')
 }

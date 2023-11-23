@@ -1,1 +1,1 @@
-export declare function cleanupDatabase(_sessionUser: EmileUser): Promise<number>;
+export declare function cleanupDatabase(): Promise<number>;

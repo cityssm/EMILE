@@ -6,7 +6,7 @@ const accessMillis = getConfigProperty('settings.reportKeyAccessDays') * 86400 *
 export function isValidUserReportKey(reportKey, requestIp) {
     const emileDB = sqlite(databasePath, { readonly: true });
     const ipAddress = isLocal(requestIp) ? 'localhost' : requestIp;
-    const result = emileDB
+    const userName = emileDB
         .prepare(`select u.userName
         from UserAccessLog l
         left join Users u on l.userName = u.userName
@@ -15,7 +15,8 @@ export function isValidUserReportKey(reportKey, requestIp) {
         and u.recordDelete_timeMillis is null
         and u.canLogin = 1
         and ? - l.accessTimeMillis <= ?`)
+        .pluck()
         .get(ipAddress, reportKey, Date.now(), accessMillis);
     emileDB.close();
-    return (result?.userName ?? '') !== '';
+    return (userName ?? '') !== '';
 }

@@ -3,7 +3,7 @@ import { getPendingEnergyDataFiles, getProcessedEnergyDataFiles } from '../../da
 import { updateEnergyDataFileAsReadyToPending } from '../../database/updateEnergyDataFile.js';
 export async function handler(request, response) {
     await deleteEnergyDataByFileId(request.body.fileId, request.session.user);
-    const success = updateEnergyDataFileAsReadyToPending(request.body.fileId, request.session.user);
+    const success = await updateEnergyDataFileAsReadyToPending(request.body.fileId, request.session.user);
     const pendingFiles = await getPendingEnergyDataFiles();
     const processedFiles = await getProcessedEnergyDataFiles('');
     response.json({

@@ -1,5 +1,8 @@
+import type sqlite from 'better-sqlite3'
+
 import { deleteEnergyDataByFileId } from '../database/deleteEnergyData.js'
 import { updateEnergyDataFileAsFailed } from '../database/updateEnergyDataFile.js'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 import type { EnergyDataFile } from '../types/recordTypes.js'
 
 export type StringComparison = 'startsWith' | 'includes' | 'equals' | 'endsWith'
@@ -22,23 +25,34 @@ export class BaseParser {
     this.energyDataFile = energyDataFile
   }
 
-  async parseFile(): Promise<boolean> {
+  async parseFile(connectedEmileDB: sqlite.Database): Promise<boolean> {
     throw new Error('parseFile() must be implemented')
   }
 
-  handleParseFileError(error: Error): void {
-    void deleteEnergyDataByFileId(
+  async handleParseFileError(
+    error: Error,
+    connectedEmileDB?: sqlite.Database
+  ): Promise<void> {
+    const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable())
+
+    await deleteEnergyDataByFileId(
       this.energyDataFile.fileId,
-      BaseParser.parserUser
+      BaseParser.parserUser,
+      emileDB
     )
 
-    updateEnergyDataFileAsFailed(
+    await updateEnergyDataFileAsFailed(
       {
         fileId: this.energyDataFile.fileId,
-        processedMessage: `${error.message}`,
+        processedMessage: error.message,
         processedTimeMillis: Date.now()
       },
-      BaseParser.parserUser
+      BaseParser.parserUser,
+      emileDB
     )
+
+    if (connectedEmileDB === undefined) {
+      emileDB.close()
+    }
   }
 }

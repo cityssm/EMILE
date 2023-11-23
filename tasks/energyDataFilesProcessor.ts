@@ -7,6 +7,7 @@ import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async'
 
 import { getEnergyDataFilesToProcess } from '../database/getEnergyDataFiles.js'
 import { updateEnergyDataFileAsFailed } from '../database/updateEnergyDataFile.js'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 import type { BaseParser } from '../parsers/baseParser.js'
 import { GreenButtonParser } from '../parsers/greenButtonParser.js'
 import { getParserClasses } from '../parsers/parserHelpers.js'
@@ -44,7 +45,9 @@ async function processFiles(): Promise<void> {
   isRunning = true
   runAgainOnComplete = false
 
-  const dataFiles = await getEnergyDataFilesToProcess()
+  const emileDB = await getConnectionWhenAvailable()
+
+  const dataFiles = await getEnergyDataFilesToProcess(emileDB)
 
   if (dataFiles.length > 0) {
     debug(`${dataFiles.length} files to process.`)
@@ -71,13 +74,14 @@ async function processFiles(): Promise<void> {
     } catch (error) {
       debug(error)
 
-      updateEnergyDataFileAsFailed(
+      await updateEnergyDataFileAsFailed(
         {
           fileId: dataFile.fileId,
           processedTimeMillis: Date.now(),
           processedMessage: 'File access error.'
         },
-        processorUser
+        processorUser,
+        emileDB
       )
 
       continue
@@ -90,7 +94,7 @@ async function processFiles(): Promise<void> {
     if (
       !getParserClasses().includes(dataFile.parserProperties?.parserClass ?? '')
     ) {
-      updateEnergyDataFileAsFailed(
+      await updateEnergyDataFileAsFailed(
         {
           fileId: dataFile.fileId,
           processedTimeMillis: Date.now(),
@@ -98,7 +102,8 @@ async function processFiles(): Promise<void> {
             dataFile.parserProperties?.parserClass ?? ''
           }`
         },
-        processorUser
+        processorUser,
+        emileDB
       )
 
       continue
@@ -120,7 +125,7 @@ async function processFiles(): Promise<void> {
         break
       }
       default: {
-        updateEnergyDataFileAsFailed(
+        await updateEnergyDataFileAsFailed(
           {
             fileId: dataFile.fileId,
             processedTimeMillis: Date.now(),
@@ -128,7 +133,8 @@ async function processFiles(): Promise<void> {
               (dataFile.parserProperties?.parserClass as string) ?? ''
             }`
           },
-          processorUser
+          processorUser,
+          emileDB
         )
 
         continue
@@ -140,9 +146,9 @@ async function processFiles(): Promise<void> {
      */
 
     try {
-      await parser.parseFile()
+      await parser.parseFile(emileDB)
     } catch {
-      updateEnergyDataFileAsFailed(
+      await updateEnergyDataFileAsFailed(
         {
           fileId: dataFile.fileId,
           processedTimeMillis: Date.now(),
@@ -150,10 +156,13 @@ async function processFiles(): Promise<void> {
             (dataFile.parserProperties?.parserClass as string) ?? ''
           }`
         },
-        processorUser
+        processorUser,
+        emileDB
       )
     }
   }
+
+  emileDB.close()
 
   isRunning = false
 

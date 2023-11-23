@@ -1,4 +1,3 @@
-import sqlite from 'better-sqlite3';
+import type sqlite from 'better-sqlite3';
 import type { EnergyAccumulationBehaviour } from '../types/recordTypes.js';
-export declare function getEnergyAccumulationBehaviourByGreenButtonId(accumulationBehaviourGreenButtonId: string, connectedEmileDB?: sqlite.Database): EnergyAccumulationBehaviour | undefined;
-export declare function getEnergyAccumulationBehaviourByName(accumulationBehaviourName: string, connectedEmileDB?: sqlite.Database): EnergyAccumulationBehaviour | undefined;
+export declare function getEnergyAccumulationBehaviour(filterField: 'accumulationBehaviourId' | 'accumulationBehaviour' | 'greenButtonId', filterValue: string, connectedEmileDB?: sqlite.Database): Promise<EnergyAccumulationBehaviour | undefined>;

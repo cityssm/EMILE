@@ -10,7 +10,7 @@ const updateUser = {
     canUpdate: true,
     isAdmin: false
 };
-function updateSsmPucAssetNames() {
+async function updateSsmPucAssetNames() {
     const workbook = XLSX.readFile('./temp/assetNames.xlsx', {});
     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
     const assetRows = XLSX.utils.sheet_to_json(worksheet, {
@@ -18,9 +18,9 @@ function updateSsmPucAssetNames() {
         rawNumbers: true
     });
     const assetCategories = getAssetCategories();
-    const addressAlias = getAssetAliasTypeByAliasTypeKey('civicAddress');
-    const gasAccountNumberAlias = getAssetAliasTypeByAliasTypeKey('accountNumber.gas');
-    const electricityAccountNumberAlias = getAssetAliasTypeByAliasTypeKey('accountNumber.electricity');
+    const addressAlias = await getAssetAliasTypeByAliasTypeKey('civicAddress');
+    const gasAccountNumberAlias = await getAssetAliasTypeByAliasTypeKey('accountNumber.gas');
+    const electricityAccountNumberAlias = await getAssetAliasTypeByAliasTypeKey('accountNumber.electricity');
     const emileDB = sqlite(databasePath);
     for (const assetRow of assetRows) {
         const assetCategory = assetCategories.find((possibleCategory) => {
@@ -43,21 +43,21 @@ function updateSsmPucAssetNames() {
               where assetAlias like '${utilityApiUrlLike}'`)
                     .get();
                 if ((assetRow.address ?? '') !== '') {
-                    addAssetAlias({
+                    await addAssetAlias({
                         assetId: asset.assetId,
                         aliasTypeId: addressAlias?.aliasTypeId,
                         assetAlias: assetRow.address
                     }, updateUser, emileDB);
                 }
                 if ((assetRow.accountNumberElectricity ?? '') !== '') {
-                    addAssetAlias({
+                    await addAssetAlias({
                         assetId: asset.assetId,
                         aliasTypeId: electricityAccountNumberAlias?.aliasTypeId,
                         assetAlias: (assetRow.accountNumberElectricity ?? 0).toString()
                     }, updateUser, emileDB);
                 }
                 if ((assetRow.accountNumberGas ?? '') !== '') {
-                    addAssetAlias({
+                    await addAssetAlias({
                         assetId: asset.assetId,
                         aliasTypeId: gasAccountNumberAlias?.aliasTypeId,
                         assetAlias: assetRow.accountNumberGas
@@ -68,4 +68,4 @@ function updateSsmPucAssetNames() {
     }
     emileDB.close();
 }
-updateSsmPucAssetNames();
+await updateSsmPucAssetNames();

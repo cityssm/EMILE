@@ -5,7 +5,7 @@ import {
   helpers as greenButtonHelpers,
   type types as GreenButtonTypes
 } from '@cityssm/green-button-parser'
-import sqlite from 'better-sqlite3'
+import type sqlite from 'better-sqlite3'
 import Debug from 'debug'
 
 import { addAsset } from '../database/addAsset.js'
@@ -19,13 +19,13 @@ import { updateEnergyDataValue } from '../database/updateEnergyData.js'
 import type { EnergyDataType } from '../types/recordTypes.js'
 
 import { getAssetCategories } from './functions.cache.js'
-import { databasePath } from './functions.database.js'
+import { getConnectionWhenAvailable } from './functions.database.js'
 
 const debug = Debug('emile:functions.greenButton')
 
 const greenButtonAliasTypeKey = 'GreenButtonParser.IntervalBlock.link'
 
-export const greenButtonAssetAliasType = getAssetAliasTypeByAliasTypeKey(
+export const greenButtonAssetAliasType = await getAssetAliasTypeByAliasTypeKey(
   greenButtonAliasTypeKey
 )
 
@@ -69,7 +69,7 @@ async function getAssetIdFromAssetAlias(
       connectedEmileDB
     )
 
-    addAssetAlias(
+    await addAssetAlias(
       {
         assetId,
         aliasTypeId: greenButtonAssetAliasType?.aliasTypeId,
@@ -224,7 +224,8 @@ export async function recordGreenButtonData(
   options: {
     assetId?: number
     fileId?: number
-  }
+  },
+  connectedEmileDB?: sqlite.Database
 ): Promise<number> {
   let recordCount = 0
 
@@ -242,11 +243,9 @@ export async function recordGreenButtonData(
     throw new Error('File contains no IntervalBlock or UsageSummary entries.')
   }
 
-  let emileDB: sqlite.Database | undefined
+  const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable())
 
   try {
-    emileDB = sqlite(databasePath)
-
     for (const intervalBlockEntry of intervalBlockEntries) {
       /*
        * Ensure an assetId is available
@@ -316,9 +315,10 @@ export async function recordGreenButtonData(
               currentDataPoint.powerOfTenMultiplier !==
                 energyDataTypeAndPower.powerOfTenMultiplier
             ) {
-              updateEnergyDataValue(
+              await updateEnergyDataValue(
                 {
                   dataId: currentDataPoint.dataId,
+                  assetId: assetId as number,
                   fileId: options.fileId,
                   dataValue: intervalReading.value,
                   powerOfTenMultiplier:
@@ -398,9 +398,10 @@ export async function recordGreenButtonData(
         currentDataPoint.dataValue !== dataValue ||
         currentDataPoint.powerOfTenMultiplier !== powerOfTenMultiplier
       ) {
-        updateEnergyDataValue(
+        await updateEnergyDataValue(
           {
             dataId: currentDataPoint.dataId,
+            assetId: assetId as number,
             fileId: options.fileId,
             dataValue,
             powerOfTenMultiplier
@@ -413,7 +414,7 @@ export async function recordGreenButtonData(
       }
     }
   } finally {
-    if (emileDB !== undefined) {
+    if (connectedEmileDB === undefined) {
       emileDB.close()
     }
   }

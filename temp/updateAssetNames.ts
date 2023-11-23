@@ -25,7 +25,8 @@ const updateUser = {
   isAdmin: false
 }
 
-function updateSsmPucAssetNames(): void {
+// eslint-disable-next-line sonarjs/cognitive-complexity
+async function updateSsmPucAssetNames(): Promise<void> {
   const workbook = XLSX.readFile('./temp/assetNames.xlsx', {})
 
   const worksheet = workbook.Sheets[workbook.SheetNames[0]]
@@ -38,12 +39,13 @@ function updateSsmPucAssetNames(): void {
 
   const assetCategories = getAssetCategories()
 
-  const addressAlias = getAssetAliasTypeByAliasTypeKey('civicAddress')
+  const addressAlias = await getAssetAliasTypeByAliasTypeKey('civicAddress')
 
-  const gasAccountNumberAlias =
-    getAssetAliasTypeByAliasTypeKey('accountNumber.gas')
+  const gasAccountNumberAlias = await getAssetAliasTypeByAliasTypeKey(
+    'accountNumber.gas'
+  )
 
-  const electricityAccountNumberAlias = getAssetAliasTypeByAliasTypeKey(
+  const electricityAccountNumberAlias = await getAssetAliasTypeByAliasTypeKey(
     'accountNumber.electricity'
   )
 
@@ -55,7 +57,9 @@ function updateSsmPucAssetNames(): void {
     })
 
     if ((assetRow.utilityApiAuthorizationNumber ?? '') !== '') {
-      const utilityApiUrlLike = `https://utilityapi.com/DataCustodian/espi/1_1/resource/Subscription/${assetRow.utilityApiAuthorizationNumber ?? ''}/%`
+      const utilityApiUrlLike = `https://utilityapi.com/DataCustodian/espi/1_1/resource/Subscription/${
+        assetRow.utilityApiAuthorizationNumber ?? ''
+      }/%`
 
       const result = emileDB
         .prepare(
@@ -83,7 +87,7 @@ function updateSsmPucAssetNames(): void {
           .get() as { assetId: number }
 
         if ((assetRow.address ?? '') !== '') {
-          addAssetAlias(
+          await addAssetAlias(
             {
               assetId: asset.assetId,
               aliasTypeId: addressAlias?.aliasTypeId,
@@ -95,7 +99,7 @@ function updateSsmPucAssetNames(): void {
         }
 
         if ((assetRow.accountNumberElectricity ?? '') !== '') {
-          addAssetAlias(
+          await addAssetAlias(
             {
               assetId: asset.assetId,
               aliasTypeId: electricityAccountNumberAlias?.aliasTypeId,
@@ -107,7 +111,7 @@ function updateSsmPucAssetNames(): void {
         }
 
         if ((assetRow.accountNumberGas ?? '') !== '') {
-          addAssetAlias(
+          await addAssetAlias(
             {
               assetId: asset.assetId,
               aliasTypeId: gasAccountNumberAlias?.aliasTypeId,
@@ -168,4 +172,4 @@ function updateSsmPucAssetNames(): void {
   emileDB.close()
 }
 
-updateSsmPucAssetNames()
+await updateSsmPucAssetNames()

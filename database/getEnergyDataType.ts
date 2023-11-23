@@ -13,26 +13,11 @@ import type { EnergyDataType } from '../types/recordTypes.js'
 
 import { addEnergyDataType } from './addEnergyDataType.js'
 import { addEnergyUnit } from './addEnergyUnit.js'
-import {
-  getEnergyAccumulationBehaviourByGreenButtonId,
-  getEnergyAccumulationBehaviourByName
-} from './getEnergyAccumulationBehaviour.js'
-import {
-  getEnergyCommodityByGreenButtonId,
-  getEnergyCommodityByName
-} from './getEnergyCommodity.js'
-import {
-  getEnergyReadingTypeByGreenButtonId,
-  getEnergyReadingTypeByName
-} from './getEnergyReadingType.js'
-import {
-  getEnergyServiceCategoryByGreenButtonId,
-  getEnergyServiceCategoryByName
-} from './getEnergyServiceCategory.js'
-import {
-  getEnergyUnitByGreenButtonId,
-  getEnergyUnitByName
-} from './getEnergyUnit.js'
+import { getEnergyAccumulationBehaviour } from './getEnergyAccumulationBehaviour.js'
+import { getEnergyCommodity } from './getEnergyCommodity.js'
+import { getEnergyReadingType } from './getEnergyReadingType.js'
+import { getEnergyServiceCategory } from './getEnergyServiceCategory.js'
+import { getEnergyUnit } from './getEnergyUnit.js'
 
 export function getEnergyDataType(
   dataTypeId: number | string,
@@ -122,24 +107,26 @@ interface GetEnergyDataTypeRelatedIdsReturn {
   accumulationBehaviourId?: number
 }
 
-function getEnergyDataTypeRelatedIds(
+async function getEnergyDataTypeRelatedIds(
   namesOrGreenButtonIds:
     | EnergyDataTypeGreenButtonIdsWithType
     | EnergyDataTypeNamesWithType,
   sessionUser: EmileUser,
   emileDB: sqlite.Database
-): GetEnergyDataTypeRelatedIdsReturn {
+): Promise<GetEnergyDataTypeRelatedIdsReturn> {
   /*
    * Service Category - required
    */
 
   const serviceCategory =
     namesOrGreenButtonIds.type === 'greenButtonIds'
-      ? getEnergyServiceCategoryByGreenButtonId(
+      ? await getEnergyServiceCategory(
+          'greenButtonId',
           namesOrGreenButtonIds.serviceCategoryId,
           emileDB
         )
-      : getEnergyServiceCategoryByName(
+      : await getEnergyServiceCategory(
+          'serviceCategory',
           namesOrGreenButtonIds.serviceCategory,
           emileDB
         )
@@ -156,11 +143,13 @@ function getEnergyDataTypeRelatedIds(
 
   const unit =
     namesOrGreenButtonIds.type === 'greenButtonIds'
-      ? getEnergyUnitByGreenButtonId(
+      ? await getEnergyUnit(
+          'greenButtonId',
           (namesOrGreenButtonIds as EnergyDataTypeGreenButtonIds).unitId,
           emileDB
         )
-      : getEnergyUnitByName(
+      : await getEnergyUnit(
+          'unit',
           (namesOrGreenButtonIds as EnergyDataTypeNames).unit,
           emileDB
         )
@@ -206,11 +195,16 @@ function getEnergyDataTypeRelatedIds(
   ) {
     const readingType =
       namesOrGreenButtonIds.type === 'greenButtonIds'
-        ? getEnergyReadingTypeByGreenButtonId(
+        ? await getEnergyReadingType(
+            'greenButtonId',
             namesOrGreenButtonIds.readingTypeId ?? '',
             emileDB
           )
-        : getEnergyReadingTypeByName(namesOrGreenButtonIds.readingType, emileDB)
+        : await getEnergyReadingType(
+            'readingType',
+            namesOrGreenButtonIds.readingType,
+            emileDB
+          )
 
     if (readingType === undefined) {
       throw new Error('EnergyReadingType unavailable')
@@ -231,11 +225,16 @@ function getEnergyDataTypeRelatedIds(
   ) {
     const commodity =
       namesOrGreenButtonIds.type === 'greenButtonIds'
-        ? getEnergyCommodityByGreenButtonId(
+        ? await getEnergyCommodity(
+            'greenButtonId',
             namesOrGreenButtonIds.commodityId ?? '',
             emileDB
           )
-        : getEnergyCommodityByName(namesOrGreenButtonIds.commodity, emileDB)
+        : await getEnergyCommodity(
+            'commodity',
+            namesOrGreenButtonIds.commodity,
+            emileDB
+          )
 
     if (commodity === undefined) {
       throw new Error('EnergyCommodity unavailable')
@@ -256,11 +255,15 @@ function getEnergyDataTypeRelatedIds(
   ) {
     const accumulationBehaviour =
       namesOrGreenButtonIds.type === 'greenButtonIds'
-        ? getEnergyAccumulationBehaviourByGreenButtonId(
-            namesOrGreenButtonIds.accumulationBehaviourId ?? ''
+        ? await getEnergyAccumulationBehaviour(
+            'greenButtonId',
+            namesOrGreenButtonIds.accumulationBehaviourId ?? '',
+            emileDB
           )
-        : getEnergyAccumulationBehaviourByName(
-            namesOrGreenButtonIds.accumulationBehaviour
+        : await getEnergyAccumulationBehaviour(
+            'accumulationBehaviour',
+            namesOrGreenButtonIds.accumulationBehaviour,
+            emileDB
           )
 
     if (accumulationBehaviour === undefined) {
@@ -346,7 +349,7 @@ export async function getEnergyDataTypeByGreenButtonIds(
 
   if (energyDataType === undefined && createIfUnavailable) {
     try {
-      const relatedIds = getEnergyDataTypeRelatedIds(
+      const relatedIds = await getEnergyDataTypeRelatedIds(
         Object.assign(
           { type: 'greenButtonIds' },
           greenButtonIds
@@ -387,13 +390,13 @@ export async function getEnergyDataTypeByGreenButtonIds(
   return energyDataType
 }
 
-export function getEnergyDataTypeByNames(
+export async function getEnergyDataTypeByNames(
   names: EnergyDataTypeNames,
   sessionUser: EmileUser,
   createIfUnavailable: boolean,
   connectedEmileDB?: sqlite.Database
-): EnergyDataType | undefined {
-  const emileDB = connectedEmileDB ?? sqlite(databasePath)
+): Promise<EnergyDataType | undefined> {
+  const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable())
 
   let sql = `select t.dataTypeId,
       t.serviceCategoryId, s.serviceCategory,
@@ -450,7 +453,7 @@ export function getEnergyDataTypeByNames(
 
   if (energyDataType === undefined && createIfUnavailable) {
     try {
-      const relatedIds = getEnergyDataTypeRelatedIds(
+      const relatedIds = await getEnergyDataTypeRelatedIds(
         Object.assign({ type: 'names' }, names) as EnergyDataTypeNamesWithType,
         sessionUser,
         emileDB

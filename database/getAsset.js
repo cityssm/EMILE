@@ -47,9 +47,9 @@ export async function getAssetByAssetAlias(assetAlias, aliasTypeId, connectedEmi
         sql += ' and aliasTypeId = ?';
         sqlParameters.push(aliasTypeId);
     }
-    const assetId = emileDB.prepare(sql).get(sqlParameters);
+    const assetId = emileDB.prepare(sql).pluck().get(sqlParameters);
     if (assetId !== undefined) {
-        asset = getAsset(assetId.assetId, emileDB);
+        asset = getAsset(assetId, emileDB);
     }
     if (connectedEmileDB === undefined) {
         emileDB.close();

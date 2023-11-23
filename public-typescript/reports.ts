@@ -17,25 +17,43 @@ declare const bulmaJS: BulmaJS
   const reportKey =
     (powerQueryTabElement as HTMLElement)?.dataset.reportKey ?? ''
 
-  const powerQueryReportUrlElement = document.querySelector(
-    '#powerQuery--reportUrl'
+  const powerQueryRawReportUrlElement = document.querySelector(
+    '#powerQuery--reportUrlRaw'
   ) as HTMLTextAreaElement
 
-  function refreshPowerQueryReportUrl(): void {
-    const reportUrl = `${window.location.href.slice(
+  const powerQueryDailyReportUrlElement = document.querySelector(
+    '#powerQuery--reportUrlDaily'
+  ) as HTMLTextAreaElement
+
+  function refreshPowerQueryReportUrls(): void {
+    const rawReportUrl = `${window.location.href.slice(
       0,
       Math.max(0, window.location.href.indexOf(window.location.pathname))
     )}${Emile.urlPrefix}/reports/energyData-fullyJoined?reportKey=${reportKey}`
 
-    powerQueryReportUrlElement.value = reportUrl
+    powerQueryRawReportUrlElement.value = rawReportUrl
+
+    const dailyReportUrl = `${window.location.href.slice(
+      0,
+      Math.max(0, window.location.href.indexOf(window.location.pathname))
+    )}${
+      Emile.urlPrefix
+    }/reports/energyData-fullyJoined-daily?reportKey=${reportKey}`
+
+    powerQueryDailyReportUrlElement.value = dailyReportUrl
   }
 
   if (powerQueryTabElement !== null) {
-    refreshPowerQueryReportUrl()
+    refreshPowerQueryReportUrls()
 
-    powerQueryReportUrlElement.addEventListener('click', () => {
-      powerQueryReportUrlElement.focus()
-      powerQueryReportUrlElement.select()
+    powerQueryRawReportUrlElement.addEventListener('click', () => {
+      powerQueryRawReportUrlElement.focus()
+      powerQueryRawReportUrlElement.select()
+    })
+
+    powerQueryDailyReportUrlElement.addEventListener('click', () => {
+      powerQueryDailyReportUrlElement.focus()
+      powerQueryDailyReportUrlElement.select()
     })
   }
 

@@ -1,9 +1,9 @@
 /* eslint-disable eslint-comments/disable-enable-pair */
 /* eslint-disable @typescript-eslint/indent */
 
-import sqlite from 'better-sqlite3'
+import type sqlite from 'better-sqlite3'
 
-import { databasePath } from '../helpers/functions.database.js'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 
 interface FailedEnergyDataFile {
   fileId: number
@@ -11,11 +11,12 @@ interface FailedEnergyDataFile {
   processedTimeMillis: number
 }
 
-export function updateEnergyDataFileAsFailed(
+export async function updateEnergyDataFileAsFailed(
   energyDataFile: FailedEnergyDataFile,
-  sessionUser: EmileUser
-): boolean {
-  const emileDB = sqlite(databasePath)
+  sessionUser: EmileUser,
+  connectedEmileDB?: sqlite.Database
+): Promise<boolean> {
+  const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable())
 
   const result = emileDB
     .prepare(
@@ -36,7 +37,9 @@ export function updateEnergyDataFileAsFailed(
       energyDataFile.fileId
     )
 
-  emileDB.close()
+  if (connectedEmileDB === undefined) {
+    emileDB.close()
+  }
 
   return result.changes > 0
 }
@@ -47,10 +50,10 @@ interface PendingEnergyDataFile {
   parserClass: string
 }
 
-export function updatePendingEnergyDataFile(
+export async function updatePendingEnergyDataFile(
   energyDataFile: PendingEnergyDataFile,
   sessionUser: EmileUser
-): boolean {
+): Promise<boolean> {
   let parserClass = energyDataFile.parserClass
   let parserConfig = ''
 
@@ -67,7 +70,7 @@ export function updatePendingEnergyDataFile(
           parserConfig
         })
 
-  const emileDB = sqlite(databasePath)
+  const emileDB = await getConnectionWhenAvailable()
 
   const result = emileDB
     .prepare(
@@ -92,11 +95,11 @@ export function updatePendingEnergyDataFile(
   return result.changes > 0
 }
 
-export function updateEnergyDataFileAsReadyToPending(
+export async function updateEnergyDataFileAsReadyToPending(
   fileId: string | number,
   sessionUser: EmileUser
-): boolean {
-  const emileDB = sqlite(databasePath)
+): Promise<boolean> {
+  const emileDB = await getConnectionWhenAvailable()
 
   const result = emileDB
     .prepare(
@@ -117,11 +120,12 @@ export function updateEnergyDataFileAsReadyToPending(
   return result.changes > 0
 }
 
-export function updateEnergyDataFileAsReadyToProcess(
+export async function updateEnergyDataFileAsReadyToProcess(
   fileId: string | number,
-  sessionUser: EmileUser
-): boolean {
-  const emileDB = sqlite(databasePath)
+  sessionUser: EmileUser,
+  connectedEmileDB?: sqlite.Database
+): Promise<boolean> {
+  const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable())
 
   const result = emileDB
     .prepare(
@@ -137,18 +141,19 @@ export function updateEnergyDataFileAsReadyToProcess(
     )
     .run(sessionUser.userName, Date.now(), fileId)
 
-  emileDB.close()
+  if (connectedEmileDB === undefined) {
+    emileDB.close()
+  }
 
   return result.changes > 0
 }
 
-export function updateEnergyDataFileAsProcessed(
+export async function updateEnergyDataFileAsProcessed(
   fileId: number,
   sessionUser: EmileUser,
   connectedEmileDB?: sqlite.Database
-): boolean {
-  const emileDB =
-    connectedEmileDB === undefined ? sqlite(databasePath) : connectedEmileDB
+): Promise<boolean> {
+  const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable())
 
   const rightNow = Date.now()
 

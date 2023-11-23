@@ -21,7 +21,8 @@
     "test": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true mocha --timeout 30000 --exit",
     "test:startup": "cross-env NODE_ENV=dev DEBUG=emile:* STARTUP_TEST=true node ./bin/www.js",
     "coverage": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true c8 --reporter=lcov --reporter=text --reporter=text-summary mocha --timeout 30000 --exit",
-    "temp:updateAssetNames": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true node ./temp/updateAssetNames.js"
+    "temp:updateAssetNames": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true node ./temp/updateAssetNames.js",
+    "databaseMaintenance": "node ./scripts/databaseMaintenance.js"
   },
   "repository": {
     "type": "git",

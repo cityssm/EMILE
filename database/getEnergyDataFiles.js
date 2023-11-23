@@ -28,7 +28,7 @@ function buildWhereClause(filters) {
         sqlParameters
     };
 }
-export async function getEnergyDataFiles(filters, options) {
+export async function getEnergyDataFiles(filters, options, connectedEmileDB) {
     const groupByColumnNames = `f.fileId, f.originalFileName,
     ${options.includeSystemFileAndFolder
         ? ' f.systemFileName, f.systemFolderPath,'
@@ -42,7 +42,7 @@ export async function getEnergyDataFiles(filters, options) {
     f.recordCreate_timeMillis, f.recordUpdate_timeMillis`;
     const { sqlParameters, sqlWhereClause } = buildWhereClause(filters);
     const sql = `select ${groupByColumnNames},
-    ${filters.isProcessed ?? true
+    ${filters.isProcessed ?? false
         ? `count(d.dataId) as energyDataCount,
             count(distinct d.assetId) as assetIdCount,
             min(d.timeSeconds) as timeSecondsMin,
@@ -53,7 +53,7 @@ export async function getEnergyDataFiles(filters, options) {
         ? ` left join Assets a on f.assetId = a.assetId
             left join AssetCategories c on a.categoryId = c.categoryId`
         : ''}
-    ${filters.isProcessed ?? true
+    ${filters.isProcessed ?? false
         ? ' left join EnergyData d on f.fileId = d.fileId and d.recordDelete_timeMillis is null'
         : ''}
     where ${options.includeDeletedRecords ?? false
@@ -65,7 +65,7 @@ export async function getEnergyDataFiles(filters, options) {
     if (options.limit !== -1) {
         orderBy += ` limit ${options.limit}`;
     }
-    const emileDB = await getConnectionWhenAvailable(true);
+    const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable(true));
     const tempTableName = getTempTableName();
     emileDB
         .prepare(`create temp table ${tempTableName} as ${sql}`)
@@ -73,7 +73,9 @@ export async function getEnergyDataFiles(filters, options) {
     const dataFiles = emileDB
         .prepare(`select * from ${tempTableName} ${orderBy}`)
         .all();
-    emileDB.close();
+    if (connectedEmileDB === undefined) {
+        emileDB.close();
+    }
     for (const dataFile of dataFiles) {
         if (dataFile.parserPropertiesJson !== undefined &&
             dataFile.parserPropertiesJson !== null) {
@@ -85,7 +87,8 @@ export async function getEnergyDataFiles(filters, options) {
 }
 export async function getPendingEnergyDataFiles() {
     return await getEnergyDataFiles({
-        isPending: true
+        isPending: true,
+        isProcessed: false
     }, {
         includeAssetDetails: true,
         includeSystemFileAndFolder: false,
@@ -111,7 +114,7 @@ export async function getProcessedEnergyDataFiles(searchString) {
         limit: 100
     });
 }
-export async function getEnergyDataFilesToProcess() {
+export async function getEnergyDataFilesToProcess(connectedEmileDB) {
     return await getEnergyDataFiles({
         isPending: false,
         isProcessed: false
@@ -119,5 +122,5 @@ export async function getEnergyDataFilesToProcess() {
         includeAssetDetails: false,
         includeSystemFileAndFolder: true,
         limit: -1
-    });
+    }, connectedEmileDB);
 }

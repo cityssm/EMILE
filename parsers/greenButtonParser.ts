@@ -2,6 +2,7 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 
 import { atomToGreenButtonJson } from '@cityssm/green-button-parser'
+import type sqlite from 'better-sqlite3'
 
 import { updateEnergyDataFileAsProcessed } from '../database/updateEnergyDataFile.js'
 import { recordGreenButtonData } from '../helpers/functions.greenButton.js'
@@ -16,7 +17,7 @@ export interface GreenButtonParserProperties {
 export class GreenButtonParser extends BaseParser {
   static fileExtensions = ['xml']
 
-  async parseFile(): Promise<boolean> {
+  async parseFile(emileDB: sqlite.Database): Promise<boolean> {
     try {
       const atomXml = (await fs.readFile(
         path.join(
@@ -30,14 +31,15 @@ export class GreenButtonParser extends BaseParser {
       await recordGreenButtonData(greenButtonJson, {
         assetId: this.energyDataFile.assetId ?? undefined,
         fileId: this.energyDataFile.fileId
-      })
+      }, emileDB)
 
-      updateEnergyDataFileAsProcessed(
+      await updateEnergyDataFileAsProcessed(
         this.energyDataFile.fileId,
-        GreenButtonParser.parserUser
+        GreenButtonParser.parserUser,
+        emileDB
       )
     } catch (error) {
-      this.handleParseFileError(error)
+      await this.handleParseFileError(error, emileDB)
       return false
     }
 

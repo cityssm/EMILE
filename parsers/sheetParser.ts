@@ -13,7 +13,6 @@ import { getAssetCategories } from '../database/getAssetCategories.js'
 import { getEnergyDataTypeByNames } from '../database/getEnergyDataType.js'
 import { updateEnergyDataFileAsProcessed } from '../database/updateEnergyDataFile.js'
 import { getConfigProperty } from '../helpers/functions.config.js'
-import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 import type { ConfigParserDataField } from '../types/configTypes.js'
 
 import { BaseParser } from './baseParser.js'
@@ -62,7 +61,7 @@ export class SheetParser extends BaseParser {
     isAdmin: false
   }
 
-  async parseFile(): Promise<boolean> {
+  async parseFile(emileDB: sqlite.Database): Promise<boolean> {
     const parserConfig =
       getConfigProperty('parserConfigs')?.[
         this.energyDataFile.parserProperties?.parserConfig ?? ''
@@ -79,8 +78,9 @@ export class SheetParser extends BaseParser {
     let aliasTypeId = -1
 
     if (parserConfig.aliasTypeKey !== undefined) {
-      const aliasType = getAssetAliasTypeByAliasTypeKey(
-        parserConfig.aliasTypeKey
+      const aliasType = await getAssetAliasTypeByAliasTypeKey(
+        parserConfig.aliasTypeKey,
+        emileDB
       )
 
       if (aliasType === undefined) {
@@ -91,8 +91,6 @@ export class SheetParser extends BaseParser {
 
       aliasTypeId = aliasType.aliasTypeId
     }
-
-    let emileDB: sqlite.Database | undefined
 
     try {
       const workbook = XLSX.readFile(
@@ -117,8 +115,6 @@ export class SheetParser extends BaseParser {
         rawNumbers: true
       }) as Array<Record<string, string | number>>
 
-      emileDB = await getConnectionWhenAvailable()
-
       for (const row of rows) {
         /*
          * Ensure an assetId is available
@@ -136,7 +132,11 @@ export class SheetParser extends BaseParser {
             throw new Error('No asset alias available.')
           }
 
-          const asset = await getAssetByAssetAlias(assetAlias, aliasTypeId, emileDB)
+          const asset = await getAssetByAssetAlias(
+            assetAlias,
+            aliasTypeId,
+            emileDB
+          )
 
           // Create asset
           if (asset === undefined) {
@@ -157,7 +157,7 @@ export class SheetParser extends BaseParser {
               emileDB
             )
 
-            addAssetAlias(
+            await addAssetAlias(
               {
                 assetId,
                 aliasTypeId,
@@ -200,7 +200,7 @@ export class SheetParser extends BaseParser {
           parserConfig.columns.dataType.accumulationBehaviour
         ) ?? '') as string
 
-        const energyDataType = getEnergyDataTypeByNames(
+        const energyDataType = await getEnergyDataTypeByNames(
           {
             serviceCategory: serviceCategoryName,
             unit: unitName,
@@ -263,13 +263,13 @@ export class SheetParser extends BaseParser {
         )
       }
 
-      updateEnergyDataFileAsProcessed(
+      await updateEnergyDataFileAsProcessed(
         this.energyDataFile.fileId,
         SheetParser.parserUser,
         emileDB
       )
     } catch (error) {
-      this.handleParseFileError(error)
+      await this.handleParseFileError(error, emileDB)
       return false
     } finally {
       if (emileDB !== undefined) {

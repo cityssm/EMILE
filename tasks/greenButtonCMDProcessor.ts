@@ -236,7 +236,10 @@ async function processGreenButtonSubscriptions(): Promise<void> {
          */
 
         try {
-          await recordGreenButtonData(usageData.json as GreenButtonJson, {})
+          await recordGreenButtonData(
+            usageData.json as GreenButtonJson,
+            {}
+          )
         } catch (error) {
           debug(`Error recording data: ${subscriptionKey}, ${authorizationId}`)
           debug(error)
