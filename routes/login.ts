@@ -86,7 +86,7 @@ async function postHandler(
 
   if (isAuthenticated && !isTemporaryUser) {
     const userNameLowerCase = userName.toLowerCase()
-    userObject = getUser(userNameLowerCase)
+    userObject = await getUser(userNameLowerCase)
 
     if (userObject !== undefined && (userObject.reportKey ?? '') === '') {
       const newReportKey = updateUserReportKey(userObject.userName, userObject)

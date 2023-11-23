@@ -4,7 +4,7 @@ import { deleteEnergyDataFile } from '../../database/deleteEnergyDataFile.js'
 import { getPendingEnergyDataFiles } from '../../database/getEnergyDataFiles.js'
 
 export async function handler(request: Request, response: Response): Promise<void> {
-  const success = deleteEnergyDataFile(
+  const success = await deleteEnergyDataFile(
     request.body.fileId,
     request.session.user as EmileUser
   )

@@ -1,26 +1,21 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable @typescript-eslint/indent */
 
-import sqlite from 'better-sqlite3'
+import type sqlite from 'better-sqlite3'
 import NodeCache from 'node-cache'
 
 import {
-  databasePath,
   getConnectionWhenAvailable
 } from '../helpers/functions.database.js'
 import type { Asset } from '../types/recordTypes.js'
 
 import { getAssetAliases } from './getAssetAliases.js'
 
-export function getAsset(
+export async function getAsset(
   assetId: string | number,
   connectedEmileDB?: sqlite.Database
-): Asset | undefined {
-  const emileDB =
-    connectedEmileDB ??
-    sqlite(databasePath, {
-      readonly: true
-    })
+): Promise<Asset | undefined> {
+  const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable(true))
 
   const asset = emileDB
     .prepare(
@@ -34,7 +29,7 @@ export function getAsset(
     .get(assetId) as Asset | undefined
 
   if (asset !== undefined) {
-    asset.assetAliases = getAssetAliases(
+    asset.assetAliases = await getAssetAliases(
       {
         assetId: asset.assetId as number
       },
@@ -92,7 +87,7 @@ export async function getAssetByAssetAlias(
     | undefined
 
   if (assetId !== undefined) {
-    asset = getAsset(assetId, emileDB)
+    asset = await getAsset(assetId, emileDB)
   }
 
   if (connectedEmileDB === undefined) {

@@ -1,6 +1,5 @@
-import sqlite from 'better-sqlite3';
-import { databasePath } from '../helpers/functions.database.js';
-export function getAssetAliases(filters, connectedEmileDB) {
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
+export async function getAssetAliases(filters, connectedEmileDB) {
     let sql = `select a.aliasId, a.assetId, a.assetAlias,
     a.aliasTypeId, t.aliasType
     from AssetAliases a
@@ -16,10 +15,7 @@ export function getAssetAliases(filters, connectedEmileDB) {
         sqlParameters.push(filters.assetId ?? '');
     }
     sql += ' order by t.orderNumber, t.aliasType, a.assetId, a.assetAlias';
-    const emileDB = connectedEmileDB ??
-        sqlite(databasePath, {
-            readonly: true
-        });
+    const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable(true));
     const assetAliases = emileDB.prepare(sql).all(sqlParameters);
     if (connectedEmileDB === undefined) {
         emileDB.close();

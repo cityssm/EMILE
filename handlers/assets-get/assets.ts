@@ -12,11 +12,11 @@ export async function handler(
   response: Response
 ): Promise<void> {
   const assets = await getAssets({})
-  const assetGroups = getAssetGroups(request.session.user as EmileUser)
-  const assetCategories = getAssetCategories()
+  const assetGroups = await getAssetGroups(request.session.user as EmileUser)
+  const assetCategories = await getAssetCategories()
 
   const assetAliasTypes =
-    request.session.user?.canUpdate ?? false ? getAssetAliasTypes() : []
+    request.session.user?.canUpdate ?? false ? await getAssetAliasTypes() : []
 
   response.render('assets', {
     headTitle: 'Assets',

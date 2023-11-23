@@ -37,7 +37,7 @@ async function updateSsmPucAssetNames(): Promise<void> {
     rawNumbers: true
   }) as AssetRow[]
 
-  const assetCategories = getAssetCategories()
+  const assetCategories = await getAssetCategories()
 
   const addressAlias = await getAssetAliasTypeByAliasTypeKey('civicAddress')
 

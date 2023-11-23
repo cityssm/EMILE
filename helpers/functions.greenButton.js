@@ -24,13 +24,13 @@ async function getAssetIdFromAssetAlias(assetAlias, connectedEmileDB) {
     debug(`assetAlias: ${assetAlias}`);
     const asset = await getAssetByAssetAlias(assetAlias, greenButtonAssetAliasType?.aliasTypeId, connectedEmileDB);
     if (asset === undefined) {
-        const assetCategory = getAssetCategories()[0];
-        if (assetCategory === undefined) {
+        const assetCategories = await getAssetCategories();
+        if (assetCategories.length === 0) {
             throw new Error(`Cannot create asset ${assetAlias} with no asset categories available.`);
         }
         assetId = await addAsset({
             assetName: assetAlias,
-            categoryId: assetCategory.categoryId
+            categoryId: assetCategories[0].categoryId
         }, greenButtonUser, connectedEmileDB);
         await addAssetAlias({
             assetId,

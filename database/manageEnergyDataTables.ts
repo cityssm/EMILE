@@ -7,18 +7,30 @@ import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 
 import { recordColumns } from './initializeDatabase.js'
 
-let energyDataTableNames = new Set<string>()
-
 export const energyDataTablePrefix = 'EnergyData_AssetId_'
 
+type RawEnergyTableNameFormat = `${typeof energyDataTablePrefix}${number}`
+type DailyEnergyTableNameFormat =
+  `${typeof energyDataTablePrefix}${number}_Daily`
+type MonthlyEnergyTableNameFormat =
+  `${typeof energyDataTablePrefix}${number}_Monthly`
+
+type EnergyDataTableNameFormat =
+  | RawEnergyTableNameFormat
+  | DailyEnergyTableNameFormat
+  | MonthlyEnergyTableNameFormat
+
+let energyDataTableNames = new Set<EnergyDataTableNameFormat>()
+
 interface TableNames {
-  raw: string
-  daily: string
-  monthly: string
+  raw: RawEnergyTableNameFormat
+  daily: DailyEnergyTableNameFormat
+  monthly: MonthlyEnergyTableNameFormat
 }
 
 export function getEnergyDataTableNames(assetId: number | string): TableNames {
-  const tableName = `${energyDataTablePrefix}${assetId}`
+  const tableName =
+    `${energyDataTablePrefix}${assetId}` as RawEnergyTableNameFormat
 
   return {
     raw: tableName,
@@ -98,28 +110,23 @@ export function refreshAggregatedEnergyDataTables(
  */
 export async function reloadEnergyDataTableNames(
   connectedEmileDB?: sqlite.Database
-): Promise<Set<string>> {
+): Promise<Set<EnergyDataTableNameFormat>> {
   const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable())
 
-  const result = emileDB
+  const energyDataTableNamesResult = emileDB
     .prepare(
       `select name from sqlite_master
         where type = 'table'
         and name like '${energyDataTablePrefix}%'`
     )
-    .all() as Array<{ name: string }>
+    .pluck()
+    .all() as EnergyDataTableNameFormat[]
 
   if (connectedEmileDB === undefined) {
     emileDB.close()
   }
 
-  const newEnergyDataTableNames = new Set<string>()
-
-  for (const tableName of result) {
-    newEnergyDataTableNames.add(tableName.name)
-  }
-
-  energyDataTableNames = newEnergyDataTableNames
+  energyDataTableNames = new Set(energyDataTableNamesResult)
 
   return energyDataTableNames
 }
@@ -174,7 +181,7 @@ export async function refreshEnergyDataTableViews(
       0 as recordUpdate_timeMillisMax
     `
 
-    createMonthlyViewSql = `create view if not exists EnergyData_Daily as
+    createMonthlyViewSql = `create view if not exists EnergyData_Monthly as
       select 0 as dataIdMin,
       0 as dataCount,
       0 as assetId,

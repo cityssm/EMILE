@@ -22,10 +22,10 @@ const debug = Debug(`emile:functions.cache:${process.pid}`)
 
 let assetCategories: AssetCategory[] = []
 
-export function getAssetCategories(): AssetCategory[] {
+export async function getAssetCategories(): Promise<AssetCategory[]> {
   if (assetCategories.length === 0) {
     debug('Cache miss: AssetCategories')
-    assetCategories = getAssetCategoriesFromDatabase()
+    assetCategories = await getAssetCategoriesFromDatabase()
   }
 
   return assetCategories
@@ -37,10 +37,10 @@ export function getAssetCategories(): AssetCategory[] {
 
 let assetAliasTypes: AssetAliasType[] = []
 
-export function getAssetAliasTypes(): AssetAliasType[] {
+export async function getAssetAliasTypes(): Promise<AssetAliasType[]> {
   if (assetAliasTypes.length === 0) {
     debug('Cache miss: AssetAliasTypes')
-    assetAliasTypes = getAssetAliasTypesFromDatabase()
+    assetAliasTypes = await getAssetAliasTypesFromDatabase()
   }
 
   return assetAliasTypes

@@ -1,2 +1,2 @@
 import type { AssetAliasType } from '../types/recordTypes.js';
-export declare function getAssetAliasTypes(): AssetAliasType[];
+export declare function getAssetAliasTypes(): Promise<AssetAliasType[]>;

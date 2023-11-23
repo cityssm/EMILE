@@ -1,19 +1,19 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable @typescript-eslint/indent */
 
-import sqlite from 'better-sqlite3'
+import type sqlite from 'better-sqlite3'
 
-import { databasePath } from '../helpers/functions.database.js'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 import type { AssetAlias } from '../types/recordTypes.js'
 
 interface GetAssetAliasesFilters {
   assetId?: string | number
 }
 
-export function getAssetAliases(
+export async function getAssetAliases(
   filters: GetAssetAliasesFilters,
   connectedEmileDB?: sqlite.Database
-): AssetAlias[] {
+): Promise<AssetAlias[]> {
   let sql = `select a.aliasId, a.assetId, a.assetAlias,
     a.aliasTypeId, t.aliasType
     from AssetAliases a
@@ -32,11 +32,7 @@ export function getAssetAliases(
 
   sql += ' order by t.orderNumber, t.aliasType, a.assetId, a.assetAlias'
 
-  const emileDB =
-    connectedEmileDB ??
-    sqlite(databasePath, {
-      readonly: true
-    })
+  const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable(true))
 
   const assetAliases = emileDB.prepare(sql).all(sqlParameters) as AssetAlias[]
 

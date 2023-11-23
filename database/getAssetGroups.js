@@ -1,9 +1,6 @@
-import sqlite from 'better-sqlite3';
-import { databasePath } from '../helpers/functions.database.js';
-export function getAssetGroups(sessionUser) {
-    const emileDB = sqlite(databasePath, {
-        readonly: true
-    });
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
+export async function getAssetGroups(sessionUser) {
+    const emileDB = await getConnectionWhenAvailable(true);
     const assetGroups = emileDB
         .prepare(`select g.groupId, g.groupName, g.groupDescription, g.isShared, g.recordCreate_userName,
         count(m.assetId) as groupMemberCount

@@ -9,8 +9,7 @@ export function addAssetGroupMember(groupId, assetId, sessionUser) {
         recordDelete_timeMillis = null,
         recordUpdate_userName = ?,
         recordUpdate_timeMillis = ?
-        where recordDelete_timeMillis is not null
-        and groupId = ?
+        where groupId = ?
         and assetId = ?`)
         .run(sessionUser.userName, rightNowMillis, groupId, assetId);
     if (result.changes === 0) {

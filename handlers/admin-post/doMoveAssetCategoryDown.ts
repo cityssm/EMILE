@@ -6,13 +6,16 @@ import {
 } from '../../database/moveRecord.js'
 import { getAssetCategories } from '../../helpers/functions.cache.js'
 
-export function handler(request: Request, response: Response): void {
+export async function handler(
+  request: Request,
+  response: Response
+): Promise<void> {
   const success =
     request.body.moveToEnd === '1'
       ? moveRecordDownToBottom('AssetCategories', request.body.categoryId)
       : moveRecordDown('AssetCategories', request.body.categoryId)
 
-  const assetCategories = getAssetCategories()
+  const assetCategories = await getAssetCategories()
 
   response.json({
     success,

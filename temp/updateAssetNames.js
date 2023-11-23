@@ -17,7 +17,7 @@ async function updateSsmPucAssetNames() {
         raw: true,
         rawNumbers: true
     });
-    const assetCategories = getAssetCategories();
+    const assetCategories = await getAssetCategories();
     const addressAlias = await getAssetAliasTypeByAliasTypeKey('civicAddress');
     const gasAccountNumberAlias = await getAssetAliasTypeByAliasTypeKey('accountNumber.gas');
     const electricityAccountNumberAlias = await getAssetAliasTypeByAliasTypeKey('accountNumber.electricity');

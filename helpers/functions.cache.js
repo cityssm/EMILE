@@ -5,18 +5,18 @@ import { getAssetCategories as getAssetCategoriesFromDatabase } from '../databas
 import { getEnergyDataStatistics as getEnergyDataStatisticsFromDatabase } from '../database/getEnergyDataStatistics.js';
 const debug = Debug(`emile:functions.cache:${process.pid}`);
 let assetCategories = [];
-export function getAssetCategories() {
+export async function getAssetCategories() {
     if (assetCategories.length === 0) {
         debug('Cache miss: AssetCategories');
-        assetCategories = getAssetCategoriesFromDatabase();
+        assetCategories = await getAssetCategoriesFromDatabase();
     }
     return assetCategories;
 }
 let assetAliasTypes = [];
-export function getAssetAliasTypes() {
+export async function getAssetAliasTypes() {
     if (assetAliasTypes.length === 0) {
         debug('Cache miss: AssetAliasTypes');
-        assetAliasTypes = getAssetAliasTypesFromDatabase();
+        assetAliasTypes = await getAssetAliasTypesFromDatabase();
     }
     return assetAliasTypes;
 }

@@ -1,7 +1,7 @@
 import { getRegularIconClasses, getSolidIconClasses } from '@cityssm/font-awesome-v5-iconclasses';
 import { getAssetCategories } from '../../helpers/functions.cache.js';
 export async function handler(request, response) {
-    const assetCategories = getAssetCategories();
+    const assetCategories = await getAssetCategories();
     const faSolidClassNames = await getSolidIconClasses();
     const faRegularClassNames = await getRegularIconClasses();
     response.render('admin-tables', {

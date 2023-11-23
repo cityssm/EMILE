@@ -1,11 +1,9 @@
-import sqlite from 'better-sqlite3'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 
-import { databasePath } from '../helpers/functions.database.js'
-
-export function getUser(userName: string): EmileUser | undefined {
-  const emileDB = sqlite(databasePath, {
-    readonly: true
-  })
+export async function getUser(
+  userName: string
+): Promise<EmileUser | undefined> {
+  const emileDB = await getConnectionWhenAvailable(true)
 
   const user = emileDB
     .prepare(

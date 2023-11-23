@@ -1,12 +1,8 @@
-import sqlite from 'better-sqlite3';
 import NodeCache from 'node-cache';
-import { databasePath, getConnectionWhenAvailable } from '../helpers/functions.database.js';
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
 import { getAssetAliases } from './getAssetAliases.js';
-export function getAsset(assetId, connectedEmileDB) {
-    const emileDB = connectedEmileDB ??
-        sqlite(databasePath, {
-            readonly: true
-        });
+export async function getAsset(assetId, connectedEmileDB) {
+    const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable(true));
     const asset = emileDB
         .prepare(`select a.assetId, a.assetName, a.latitude, a.longitude,
         a.categoryId, c.category, c.fontAwesomeIconClasses
@@ -16,7 +12,7 @@ export function getAsset(assetId, connectedEmileDB) {
         and a.assetId = ?`)
         .get(assetId);
     if (asset !== undefined) {
-        asset.assetAliases = getAssetAliases({
+        asset.assetAliases = await getAssetAliases({
             assetId: asset.assetId
         }, emileDB);
     }
@@ -49,7 +45,7 @@ export async function getAssetByAssetAlias(assetAlias, aliasTypeId, connectedEmi
     }
     const assetId = emileDB.prepare(sql).pluck().get(sqlParameters);
     if (assetId !== undefined) {
-        asset = getAsset(assetId, emileDB);
+        asset = await getAsset(assetId, emileDB);
     }
     if (connectedEmileDB === undefined) {
         emileDB.close();

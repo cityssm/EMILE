@@ -1,12 +1,10 @@
-import sqlite from 'better-sqlite3'
-
-import { databasePath } from '../helpers/functions.database.js'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 import type { AssetGroup } from '../types/recordTypes.js'
 
-export function getAssetGroups(sessionUser: EmileUser): AssetGroup[] {
-  const emileDB = sqlite(databasePath, {
-    readonly: true
-  })
+export async function getAssetGroups(
+  sessionUser: EmileUser
+): Promise<AssetGroup[]> {
+  const emileDB = await getConnectionWhenAvailable(true)
 
   const assetGroups = emileDB
     .prepare(

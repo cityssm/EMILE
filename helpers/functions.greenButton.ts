@@ -52,9 +52,9 @@ async function getAssetIdFromAssetAlias(
 
   // Create asset
   if (asset === undefined) {
-    const assetCategory = getAssetCategories()[0]
+    const assetCategories = await getAssetCategories()
 
-    if (assetCategory === undefined) {
+    if (assetCategories.length === 0) {
       throw new Error(
         `Cannot create asset ${assetAlias} with no asset categories available.`
       )
@@ -63,7 +63,7 @@ async function getAssetIdFromAssetAlias(
     assetId = await addAsset(
       {
         assetName: assetAlias,
-        categoryId: assetCategory.categoryId
+        categoryId: assetCategories[0].categoryId
       },
       greenButtonUser,
       connectedEmileDB

@@ -51,6 +51,10 @@ export async function deleteEnergyDataByFileId(
   let count = 0
 
   for (const tableName of tableNames) {
+    if (tableName.endsWith('_Daily') || tableName.endsWith('_Monthly')) {
+      continue
+    }
+
     const result = emileDB
       .prepare(
         `update ${tableName}

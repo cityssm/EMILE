@@ -1,9 +1,6 @@
-import sqlite from 'better-sqlite3';
-import { databasePath } from '../helpers/functions.database.js';
-export function getAssetAliasTypes() {
-    const emileDB = sqlite(databasePath, {
-        readonly: true
-    });
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
+export async function getAssetAliasTypes() {
+    const emileDB = await getConnectionWhenAvailable(true);
     const assetAliasTypes = emileDB
         .prepare(`select aliasTypeId, aliasType, regularExpression, aliasTypeKey
         from AssetAliasTypes

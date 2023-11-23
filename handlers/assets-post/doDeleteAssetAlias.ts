@@ -3,13 +3,16 @@ import type { Request, Response } from 'express'
 import { deleteAssetAlias } from '../../database/deleteAssetAlias.js'
 import { getAssetAliases } from '../../database/getAssetAliases.js'
 
-export function handler(request: Request, response: Response): void {
+export async function handler(
+  request: Request,
+  response: Response
+): Promise<void> {
   const success = deleteAssetAlias(
     request.body.aliasId,
     request.session.user as EmileUser
   )
 
-  const assetAliases = getAssetAliases({
+  const assetAliases = await getAssetAliases({
     assetId: request.body.assetId
   })
 

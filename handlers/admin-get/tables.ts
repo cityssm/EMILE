@@ -10,7 +10,7 @@ export async function handler(
   request: Request,
   response: Response
 ): Promise<void> {
-  const assetCategories = getAssetCategories()
+  const assetCategories = await getAssetCategories()
 
   const faSolidClassNames = await getSolidIconClasses()
   const faRegularClassNames = await getRegularIconClasses()

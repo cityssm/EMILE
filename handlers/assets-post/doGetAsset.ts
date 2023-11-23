@@ -2,8 +2,11 @@ import type { Request, Response } from 'express'
 
 import { getAsset } from '../../database/getAsset.js'
 
-export function handler(request: Request, response: Response): void {
-  const asset = getAsset(request.body.assetId)
+export async function handler(
+  request: Request,
+  response: Response
+): Promise<void> {
+  const asset = await getAsset(request.body.assetId)
 
   response.json({
     success: asset !== undefined,

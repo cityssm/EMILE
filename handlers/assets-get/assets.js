@@ -3,9 +3,9 @@ import { getAssets } from '../../database/getAssets.js';
 import { getAssetAliasTypes, getAssetCategories } from '../../helpers/functions.cache.js';
 export async function handler(request, response) {
     const assets = await getAssets({});
-    const assetGroups = getAssetGroups(request.session.user);
-    const assetCategories = getAssetCategories();
-    const assetAliasTypes = request.session.user?.canUpdate ?? false ? getAssetAliasTypes() : [];
+    const assetGroups = await getAssetGroups(request.session.user);
+    const assetCategories = await getAssetCategories();
+    const assetAliasTypes = request.session.user?.canUpdate ?? false ? await getAssetAliasTypes() : [];
     response.render('assets', {
         headTitle: 'Assets',
         menuItem: 'Assets',

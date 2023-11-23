@@ -1,7 +1,7 @@
 import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
 import { recordColumns } from './initializeDatabase.js';
-let energyDataTableNames = new Set();
 export const energyDataTablePrefix = 'EnergyData_AssetId_';
+let energyDataTableNames = new Set();
 export function getEnergyDataTableNames(assetId) {
     const tableName = `${energyDataTablePrefix}${assetId}`;
     return {
@@ -62,19 +62,16 @@ export function refreshAggregatedEnergyDataTables(assetId, emileDB) {
 }
 export async function reloadEnergyDataTableNames(connectedEmileDB) {
     const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable());
-    const result = emileDB
+    const energyDataTableNamesResult = emileDB
         .prepare(`select name from sqlite_master
         where type = 'table'
         and name like '${energyDataTablePrefix}%'`)
+        .pluck()
         .all();
     if (connectedEmileDB === undefined) {
         emileDB.close();
     }
-    const newEnergyDataTableNames = new Set();
-    for (const tableName of result) {
-        newEnergyDataTableNames.add(tableName.name);
-    }
-    energyDataTableNames = newEnergyDataTableNames;
+    energyDataTableNames = new Set(energyDataTableNamesResult);
     return energyDataTableNames;
 }
 export async function refreshEnergyDataTableViews(emileDB) {
@@ -120,7 +117,7 @@ export async function refreshEnergyDataTableViews(emileDB) {
       0 as recordUpdate_timeMillisMin,
       0 as recordUpdate_timeMillisMax
     `;
-        createMonthlyViewSql = `create view if not exists EnergyData_Daily as
+        createMonthlyViewSql = `create view if not exists EnergyData_Monthly as
       select 0 as dataIdMin,
       0 as dataCount,
       0 as assetId,

@@ -23,6 +23,9 @@ export async function deleteEnergyDataByFileId(fileId, sessionUser, connectedEmi
     const tableNames = await reloadEnergyDataTableNames(emileDB);
     let count = 0;
     for (const tableName of tableNames) {
+        if (tableName.endsWith('_Daily') || tableName.endsWith('_Monthly')) {
+            continue;
+        }
         const result = emileDB
             .prepare(`update ${tableName}
           set recordDelete_userName = ?,

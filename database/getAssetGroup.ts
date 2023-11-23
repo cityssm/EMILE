@@ -7,7 +7,7 @@ export async function getAssetGroup(
   groupId: number | string,
   sessionUser: EmileUser
 ): Promise<AssetGroup | undefined> {
-  const emileDB = await getConnectionWhenAvailable()
+  const emileDB = await getConnectionWhenAvailable(true)
 
   const assetGroup = emileDB
     .prepare(

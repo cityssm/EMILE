@@ -1,7 +1,7 @@
 import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
 import { getAssets } from './getAssets.js';
 export async function getAssetGroup(groupId, sessionUser) {
-    const emileDB = await getConnectionWhenAvailable();
+    const emileDB = await getConnectionWhenAvailable(true);
     const assetGroup = emileDB
         .prepare(`select g.groupId, g.groupName, g.groupDescription, g.isShared, g.recordCreate_userName
         from AssetGroups g
