@@ -104,7 +104,7 @@
     "@types/mocha": "^10.0.6",
     "@types/multer": "^1.4.11",
     "@types/node-windows": "^0.1.6",
-    "@types/papaparse": "^5.3.13",
+    "@types/papaparse": "^5.3.14",
     "@types/session-file-store": "^1.2.5",
     "@types/uuid": "^9.0.7",
     "bulma": "^0.9.4",
