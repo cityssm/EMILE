@@ -48,7 +48,7 @@
   "homepage": "https://github.com/cityssm/EMILE#readme",
   "private": true,
   "dependencies": {
-    "@cityssm/ad-web-auth-connector": "^0.4.0",
+    "@cityssm/ad-web-auth-connector": "^1.0.0",
     "@cityssm/bulma-js": "^0.4.0",
     "@cityssm/bulma-webapp-js": "^1.5.0",
     "@cityssm/express-abuse-points": "^2.0.0",
