@@ -1,10 +1,8 @@
-import sqlite from 'better-sqlite3'
-
-import { databasePath } from '../helpers/functions.database.js'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 import type { AssetCategory } from '../types/recordTypes.js'
 
-export function getAssetCategories(): AssetCategory[] {
-  const emileDB = sqlite(databasePath)
+export async function getAssetCategories(): Promise<AssetCategory[]> {
+  const emileDB = await getConnectionWhenAvailable()
 
   const assetCategories = emileDB
     .prepare(

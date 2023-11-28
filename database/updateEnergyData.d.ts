@@ -1,4 +1,4 @@
-import sqlite from 'better-sqlite3';
+import type sqlite from 'better-sqlite3';
 export declare function updateEnergyDataValue(data: {
     dataId: number;
     assetId: number;

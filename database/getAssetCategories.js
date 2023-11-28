@@ -1,7 +1,6 @@
-import sqlite from 'better-sqlite3';
-import { databasePath } from '../helpers/functions.database.js';
-export function getAssetCategories() {
-    const emileDB = sqlite(databasePath);
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
+export async function getAssetCategories() {
+    const emileDB = await getConnectionWhenAvailable();
     const assetCategories = emileDB
         .prepare(`select categoryId, category, fontAwesomeIconClasses, orderNumber
         from AssetCategories

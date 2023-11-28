@@ -1,7 +1,6 @@
 import { lookups as greenButtonLookups } from '@cityssm/green-button-parser';
-import sqlite from 'better-sqlite3';
 import NodeCache from 'node-cache';
-import { databasePath, getConnectionWhenAvailable } from '../helpers/functions.database.js';
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
 import { addEnergyDataType } from './addEnergyDataType.js';
 import { addEnergyUnit } from './addEnergyUnit.js';
 import { getEnergyAccumulationBehaviour } from './getEnergyAccumulationBehaviour.js';
@@ -9,11 +8,8 @@ import { getEnergyCommodity } from './getEnergyCommodity.js';
 import { getEnergyReadingType } from './getEnergyReadingType.js';
 import { getEnergyServiceCategory } from './getEnergyServiceCategory.js';
 import { getEnergyUnit } from './getEnergyUnit.js';
-export function getEnergyDataType(dataTypeId, connectedEmileDB) {
-    const emileDB = connectedEmileDB ??
-        sqlite(databasePath, {
-            readonly: true
-        });
+export async function getEnergyDataType(dataTypeId, connectedEmileDB) {
+    const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable(true));
     const energyDataType = emileDB
         .prepare(`select t.dataTypeId,
           t.serviceCategoryId, s.serviceCategory,
@@ -181,7 +177,7 @@ export async function getEnergyDataTypeByGreenButtonIds(greenButtonIds, sessionU
                 commodityId: relatedIds.commodityId,
                 accumulationBehaviourId: relatedIds.accumulationBehaviourId
             }, sessionUser, emileDB);
-            energyDataType = getEnergyDataType(dataTypeId, emileDB);
+            energyDataType = await getEnergyDataType(dataTypeId, emileDB);
         }
         catch {
             return undefined;
@@ -256,7 +252,7 @@ export async function getEnergyDataTypeByNames(names, sessionUser, createIfUnava
                 commodityId: relatedIds.commodityId,
                 accumulationBehaviourId: relatedIds.accumulationBehaviourId
             }, sessionUser, emileDB);
-            energyDataType = getEnergyDataType(dataTypeId, emileDB);
+            energyDataType = await getEnergyDataType(dataTypeId, emileDB);
         }
         catch {
             return undefined;

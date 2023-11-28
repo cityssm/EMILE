@@ -1,4 +1,4 @@
-import sqlite from 'better-sqlite3';
+import type sqlite from 'better-sqlite3';
 import type { EnergyData } from '../types/recordTypes.js';
 interface GetEnergyDataFilters {
     assetId?: number | string;

@@ -7,7 +7,7 @@ export async function handler(
   request: Request,
   response: Response
 ): Promise<void> {
-  const success = updateAsset(request.body, request.session.user as EmileUser)
+  const success = await updateAsset(request.body, request.session.user as EmileUser)
 
   const assets = await getAssets({})
 

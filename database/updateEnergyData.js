@@ -1,9 +1,8 @@
-import sqlite from 'better-sqlite3';
 import { clearCacheByTableName } from '../helpers/functions.cache.js';
-import { databasePath } from '../helpers/functions.database.js';
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
 import { ensureEnergyDataTablesExists, refreshAggregatedEnergyDataTables } from './manageEnergyDataTables.js';
 export async function updateEnergyDataValue(data, sessionUser, connectedEmileDB) {
-    const emileDB = connectedEmileDB ?? sqlite(databasePath);
+    const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable());
     const tableNames = await ensureEnergyDataTablesExists(data.assetId);
     const rightNowMillis = Date.now();
     const result = emileDB

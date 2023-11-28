@@ -1,10 +1,9 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable @typescript-eslint/indent */
 
-import sqlite from 'better-sqlite3'
+import type sqlite from 'better-sqlite3'
 
 import {
-  databasePath,
   getConnectionWhenAvailable,
   getTempTableName,
   queryMaxRetryCount
@@ -15,8 +14,11 @@ import type { Asset } from '../types/recordTypes.js'
 import { getAssets } from './getAssets.js'
 import { ensureEnergyDataTablesExists } from './manageEnergyDataTables.js'
 
-export function updateAsset(asset: Asset, sessionUser: EmileUser): boolean {
-  const emileDB = sqlite(databasePath)
+export async function updateAsset(
+  asset: Asset,
+  sessionUser: EmileUser
+): Promise<boolean> {
+  const emileDB = await getConnectionWhenAvailable()
 
   const result = emileDB
     .prepare(

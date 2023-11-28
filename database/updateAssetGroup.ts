@@ -1,10 +1,11 @@
-import sqlite from 'better-sqlite3'
-
-import { databasePath } from '../helpers/functions.database.js'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 import type { AssetGroup } from '../types/recordTypes.js'
 
-export function updateAssetGroup(group: AssetGroup, sessionUser: EmileUser): boolean {
-  const emileDB = sqlite(databasePath)
+export async function updateAssetGroup(
+  group: AssetGroup,
+  sessionUser: EmileUser
+): Promise<boolean> {
+  const emileDB = await getConnectionWhenAvailable()
 
   const result = emileDB
     .prepare(

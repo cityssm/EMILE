@@ -1,8 +1,8 @@
 import { lookups as greenButtonLookups } from '@cityssm/green-button-parser'
-import sqlite from 'better-sqlite3'
+import type sqlite from 'better-sqlite3'
 import Debug from 'debug'
 
-import { databasePath } from '../helpers/functions.database.js'
+import { databasePath, getConnectionWhenAvailable } from '../helpers/functions.database.js'
 
 import { addAssetAliasType } from './addAssetAliasType.js'
 import { addAssetCategory } from './addAssetCategory.js'
@@ -358,7 +358,7 @@ async function initializeAssetAliasTypes(
 export async function initializeDatabase(
   connectedEmileDB?: sqlite.Database
 ): Promise<void> {
-  const emileDB = connectedEmileDB ?? sqlite(databasePath)
+  const emileDB = connectedEmileDB ?? await getConnectionWhenAvailable()
 
   const row = emileDB
     .prepare(

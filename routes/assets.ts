@@ -50,7 +50,11 @@ router.post(
 
 // Asset Aliases
 
-router.post('/doAddAssetAlias', updatePostHandler, handler_doAddAssetAlias)
+router.post(
+  '/doAddAssetAlias',
+  updatePostHandler,
+  handler_doAddAssetAlias as RequestHandler
+)
 
 router.post(
   '/doDeleteAssetAlias',

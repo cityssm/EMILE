@@ -1,16 +1,15 @@
-import sqlite from 'better-sqlite3';
 import { clearCacheByTableName } from '../helpers/functions.cache.js';
-import { databasePath, getConnectionWhenAvailable } from '../helpers/functions.database.js';
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
 import { updateRecordOrderNumber } from './updateRecordOrderNumber.js';
 const recordIdColumns = new Map();
 recordIdColumns.set('AssetCategories', 'categoryId');
 function getCurrentOrderNumber(recordTable, recordId, database) {
-    const currentOrderNumber = database
+    return database
         .prepare(`select orderNumber
-          from ${recordTable}
-          where ${recordIdColumns.get(recordTable)} = ?`)
-        .get(recordId).orderNumber;
-    return currentOrderNumber;
+        from ${recordTable}
+        where ${recordIdColumns.get(recordTable)} = ?`)
+        .pluck()
+        .get(recordId);
 }
 export async function moveRecordDown(recordTable, recordId) {
     const emileDB = await getConnectionWhenAvailable();
@@ -48,7 +47,7 @@ export async function moveRecordDownToBottom(recordTable, recordId) {
     return true;
 }
 export async function moveRecordUp(recordTable, recordId) {
-    const emileDB = sqlite(databasePath);
+    const emileDB = await getConnectionWhenAvailable();
     const currentOrderNumber = getCurrentOrderNumber(recordTable, recordId, emileDB);
     if (currentOrderNumber <= 0) {
         emileDB.close();

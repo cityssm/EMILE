@@ -1,4 +1,4 @@
-import * as adWebAuth from '@cityssm/ad-web-auth-connector'
+import { AdWebAuthConnector } from '@cityssm/ad-web-auth-connector'
 import ActiveDirectory from 'activedirectory2'
 
 import { getConfigProperty } from './functions.config.js'
@@ -35,15 +35,18 @@ async function authenticateViaActiveDirectory(
 }
 
 const adWebAuthConfig = getConfigProperty('adWebAuthConfig')
+const adWebAuth =
+  adWebAuthConfig === undefined
+    ? undefined
+    : new AdWebAuthConnector(adWebAuthConfig)
 
 async function authenticateViaADWebAuth(
   userName: string,
   password: string
 ): Promise<boolean> {
-  return await adWebAuth.authenticate(
-    `${userDomain}\\${userName}`,
-    password,
-    adWebAuthConfig
+  return (
+    (await adWebAuth?.authenticate(`${userDomain}\\${userName}`, password)) ??
+    false
   )
 }
 

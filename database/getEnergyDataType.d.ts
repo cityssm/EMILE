@@ -1,6 +1,6 @@
-import sqlite from 'better-sqlite3';
+import type sqlite from 'better-sqlite3';
 import type { EnergyDataType } from '../types/recordTypes.js';
-export declare function getEnergyDataType(dataTypeId: number | string, connectedEmileDB?: sqlite.Database): EnergyDataType | undefined;
+export declare function getEnergyDataType(dataTypeId: number | string, connectedEmileDB?: sqlite.Database): Promise<EnergyDataType | undefined>;
 interface EnergyDataTypeGreenButtonIds {
     serviceCategoryId: string;
     unitId: string;

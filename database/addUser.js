@@ -1,7 +1,6 @@
-import sqlite from 'better-sqlite3';
-import { databasePath } from '../helpers/functions.database.js';
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
 export async function addUser(user, sessionUser, connectedEmileDB) {
-    const emileDB = connectedEmileDB ?? sqlite(databasePath);
+    const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable());
     const rightNowMillis = Date.now();
     const recordDeleteTimeMillis = emileDB
         .prepare('select recordDelete_timeMillis from Users where userName = ?')

@@ -29,9 +29,9 @@ router.get('/', handler_admin)
 router.get('/users', handler_users as RequestHandler)
 
 router.post('/doAddUser', handler_doAddUser as RequestHandler)
-router.post('/doUpdateUserCanLogin', handler_doUpdateUserCanLogin)
-router.post('/doUpdateUserCanUpdate', handler_doUpdateUserCanUpdate)
-router.post('/doUpdateUserIsAdmin', handler_doUpdateUserIsAdmin)
+router.post('/doUpdateUserCanLogin', handler_doUpdateUserCanLogin as RequestHandler)
+router.post('/doUpdateUserCanUpdate', handler_doUpdateUserCanUpdate as RequestHandler)
+router.post('/doUpdateUserIsAdmin', handler_doUpdateUserIsAdmin as RequestHandler)
 router.post('/doDeleteUser', handler_doDeleteUser as RequestHandler)
 
 /*

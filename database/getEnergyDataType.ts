@@ -2,13 +2,10 @@
 /* eslint-disable @typescript-eslint/indent */
 
 import { lookups as greenButtonLookups } from '@cityssm/green-button-parser'
-import sqlite from 'better-sqlite3'
+import type sqlite from 'better-sqlite3'
 import NodeCache from 'node-cache'
 
-import {
-  databasePath,
-  getConnectionWhenAvailable
-} from '../helpers/functions.database.js'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 import type { EnergyDataType } from '../types/recordTypes.js'
 
 import { addEnergyDataType } from './addEnergyDataType.js'
@@ -19,15 +16,11 @@ import { getEnergyReadingType } from './getEnergyReadingType.js'
 import { getEnergyServiceCategory } from './getEnergyServiceCategory.js'
 import { getEnergyUnit } from './getEnergyUnit.js'
 
-export function getEnergyDataType(
+export async function getEnergyDataType(
   dataTypeId: number | string,
   connectedEmileDB?: sqlite.Database
-): EnergyDataType | undefined {
-  const emileDB =
-    connectedEmileDB ??
-    sqlite(databasePath, {
-      readonly: true
-    })
+): Promise<EnergyDataType | undefined> {
+  const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable(true))
 
   const energyDataType = emileDB
     .prepare(
@@ -370,7 +363,7 @@ export async function getEnergyDataTypeByGreenButtonIds(
         emileDB
       )
 
-      energyDataType = getEnergyDataType(dataTypeId, emileDB)
+      energyDataType = await getEnergyDataType(dataTypeId, emileDB)
     } catch {
       return undefined
     } finally {
@@ -471,7 +464,7 @@ export async function getEnergyDataTypeByNames(
         emileDB
       )
 
-      energyDataType = getEnergyDataType(dataTypeId, emileDB)
+      energyDataType = await getEnergyDataType(dataTypeId, emileDB)
     } catch {
       return undefined
     } finally {

@@ -6,10 +6,9 @@
 
 import { powerOfTenMultipliers } from '@cityssm/green-button-parser/lookups.js'
 import { dateStringToDate } from '@cityssm/utils-datetime'
-import sqlite from 'better-sqlite3'
+import type sqlite from 'better-sqlite3'
 
 import {
-  databasePath,
   getConnectionWhenAvailable,
   getTempTableName
 } from '../helpers/functions.database.js'
@@ -252,11 +251,7 @@ export async function getEnergyDataPoint(
   },
   connectedEmileDB?: sqlite.Database
 ): Promise<EnergyData | undefined> {
-  const emileDB =
-    connectedEmileDB ??
-    sqlite(databasePath, {
-      readonly: true
-    })
+  const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable(true))
 
   const tableNames = await ensureEnergyDataTablesExists(
     filters.assetId,

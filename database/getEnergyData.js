@@ -1,7 +1,6 @@
 import { powerOfTenMultipliers } from '@cityssm/green-button-parser/lookups.js';
 import { dateStringToDate } from '@cityssm/utils-datetime';
-import sqlite from 'better-sqlite3';
-import { databasePath, getConnectionWhenAvailable, getTempTableName } from '../helpers/functions.database.js';
+import { getConnectionWhenAvailable, getTempTableName } from '../helpers/functions.database.js';
 import { ensureEnergyDataTablesExists } from './manageEnergyDataTables.js';
 export function userFunction_getPowerOfTenMultiplierName(powerOfTenMultiplier) {
     if (powerOfTenMultiplier === 0) {
@@ -160,10 +159,7 @@ export async function getEnergyData(filters, options) {
     return data;
 }
 export async function getEnergyDataPoint(filters, connectedEmileDB) {
-    const emileDB = connectedEmileDB ??
-        sqlite(databasePath, {
-            readonly: true
-        });
+    const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable(true));
     const tableNames = await ensureEnergyDataTablesExists(filters.assetId, emileDB);
     const dataPoint = emileDB
         .prepare(`select dataId, assetId, dataTypeId, fileId,

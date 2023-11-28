@@ -1,13 +1,13 @@
-import sqlite from 'better-sqlite3'
+import type sqlite from 'better-sqlite3'
 
-import { databasePath } from '../helpers/functions.database.js'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 
 export async function addUser(
   user: EmileUser,
   sessionUser: EmileUser,
   connectedEmileDB?: sqlite.Database
 ): Promise<boolean> {
-  const emileDB = connectedEmileDB ?? sqlite(databasePath)
+  const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable())
 
   const rightNowMillis = Date.now()
 

@@ -1,10 +1,7 @@
-import sqlite from 'better-sqlite3'
+import type sqlite from 'better-sqlite3'
 
 import { clearCacheByTableName } from '../helpers/functions.cache.js'
-import {
-  databasePath,
-  getConnectionWhenAvailable
-} from '../helpers/functions.database.js'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 
 import { updateRecordOrderNumber } from './updateRecordOrderNumber.js'
 
@@ -18,17 +15,14 @@ function getCurrentOrderNumber(
   recordId: number | string,
   database: sqlite.Database
 ): number {
-  const currentOrderNumber: number = (
-    database
-      .prepare(
-        `select orderNumber
-          from ${recordTable}
-          where ${recordIdColumns.get(recordTable) as string} = ?`
-      )
-      .get(recordId) as { orderNumber: number }
-  ).orderNumber
-
-  return currentOrderNumber
+  return database
+    .prepare(
+      `select orderNumber
+        from ${recordTable}
+        where ${recordIdColumns.get(recordTable) as string} = ?`
+    )
+    .pluck()
+    .get(recordId) as number
 }
 
 export async function moveRecordDown(
@@ -112,7 +106,7 @@ export async function moveRecordUp(
   recordTable: RecordTable,
   recordId: number
 ): Promise<boolean> {
-  const emileDB = sqlite(databasePath)
+  const emileDB = await getConnectionWhenAvailable()
 
   const currentOrderNumber = getCurrentOrderNumber(
     recordTable,

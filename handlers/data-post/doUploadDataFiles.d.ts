@@ -1,7 +1,8 @@
 import type { Request, Response } from 'express';
-export declare const storage: any;
+import multer from 'multer';
+export declare const storage: multer.StorageEngine;
 export declare function successHandler(request: Request, response: Response): Promise<void>;
 export declare const handlers: {
-    uploadHander: any;
+    uploadHander: multer.Multer;
     successHandler: typeof successHandler;
 };

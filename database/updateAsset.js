@@ -1,10 +1,9 @@
-import sqlite from 'better-sqlite3';
-import { databasePath, getConnectionWhenAvailable, getTempTableName, queryMaxRetryCount } from '../helpers/functions.database.js';
+import { getConnectionWhenAvailable, getTempTableName, queryMaxRetryCount } from '../helpers/functions.database.js';
 import { delay } from '../helpers/functions.utilities.js';
 import { getAssets } from './getAssets.js';
 import { ensureEnergyDataTablesExists } from './manageEnergyDataTables.js';
-export function updateAsset(asset, sessionUser) {
-    const emileDB = sqlite(databasePath);
+export async function updateAsset(asset, sessionUser) {
+    const emileDB = await getConnectionWhenAvailable();
     const result = emileDB
         .prepare(`update Assets
         set assetName = ?,

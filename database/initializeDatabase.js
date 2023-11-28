@@ -1,7 +1,6 @@
 import { lookups as greenButtonLookups } from '@cityssm/green-button-parser';
-import sqlite from 'better-sqlite3';
 import Debug from 'debug';
-import { databasePath } from '../helpers/functions.database.js';
+import { databasePath, getConnectionWhenAvailable } from '../helpers/functions.database.js';
 import { addAssetAliasType } from './addAssetAliasType.js';
 import { addAssetCategory } from './addAssetCategory.js';
 import { addEnergyAccumulationBehaviour } from './addEnergyAccumulationBehaviour.js';
@@ -220,7 +219,7 @@ async function initializeAssetAliasTypes(emileDB) {
     }
 }
 export async function initializeDatabase(connectedEmileDB) {
-    const emileDB = connectedEmileDB ?? sqlite(databasePath);
+    const emileDB = connectedEmileDB ?? await getConnectionWhenAvailable();
     const row = emileDB
         .prepare(`select name from sqlite_master
         where type = 'table'

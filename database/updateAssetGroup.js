@@ -1,7 +1,6 @@
-import sqlite from 'better-sqlite3';
-import { databasePath } from '../helpers/functions.database.js';
-export function updateAssetGroup(group, sessionUser) {
-    const emileDB = sqlite(databasePath);
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
+export async function updateAssetGroup(group, sessionUser) {
+    const emileDB = await getConnectionWhenAvailable();
     const result = emileDB
         .prepare(`update AssetGroups
         set groupName = ?,

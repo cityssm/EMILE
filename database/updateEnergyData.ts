@@ -1,7 +1,7 @@
-import sqlite from 'better-sqlite3'
+import type sqlite from 'better-sqlite3'
 
 import { clearCacheByTableName } from '../helpers/functions.cache.js'
-import { databasePath } from '../helpers/functions.database.js'
+import { getConnectionWhenAvailable } from '../helpers/functions.database.js'
 
 import {
   ensureEnergyDataTablesExists,
@@ -19,7 +19,7 @@ export async function updateEnergyDataValue(
   sessionUser: EmileUser,
   connectedEmileDB?: sqlite.Database
 ): Promise<boolean> {
-  const emileDB = connectedEmileDB ?? sqlite(databasePath)
+  const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable())
 
   const tableNames = await ensureEnergyDataTablesExists(data.assetId)
 

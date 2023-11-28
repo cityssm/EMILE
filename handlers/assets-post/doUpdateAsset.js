@@ -1,7 +1,7 @@
 import { getAssets } from '../../database/getAssets.js';
 import { updateAsset } from '../../database/updateAsset.js';
 export async function handler(request, response) {
-    const success = updateAsset(request.body, request.session.user);
+    const success = await updateAsset(request.body, request.session.user);
     const assets = await getAssets({});
     response.json({
         success,
