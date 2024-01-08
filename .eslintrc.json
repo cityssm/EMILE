@@ -6,5 +6,8 @@
     "ecmaVersion": 2022,
     "sourceType": "module"
   },
-  "extends": ["eslint-config-cityssm"]
+  "extends": ["eslint-config-cityssm"],
+  "rules": {
+    "jsdoc/require-jsdoc": "off"
+  }
 }
