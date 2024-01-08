@@ -200,7 +200,7 @@ export async function getProcessedEnergyDataFiles(
 }
 
 export async function getEnergyDataFilesToProcess(
-  connectedEmileDB
+  connectedEmileDB: sqlite.Database
 ): Promise<EnergyDataFile[]> {
   return await getEnergyDataFiles(
     {

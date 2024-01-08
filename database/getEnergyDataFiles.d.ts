@@ -17,5 +17,5 @@ export declare function getEnergyDataFiles(filters: GetEnergyDataFilesFilters, o
 export declare function getPendingEnergyDataFiles(): Promise<EnergyDataFile[]>;
 export declare function getFailedEnergyDataFiles(): Promise<EnergyDataFile[]>;
 export declare function getProcessedEnergyDataFiles(searchString?: ''): Promise<EnergyDataFile[]>;
-export declare function getEnergyDataFilesToProcess(connectedEmileDB: any): Promise<EnergyDataFile[]>;
+export declare function getEnergyDataFilesToProcess(connectedEmileDB: sqlite.Database): Promise<EnergyDataFile[]>;
 export {};
