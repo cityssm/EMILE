@@ -329,5 +329,9 @@ export async function getEnergyDataFullyJoined(): Promise<unknown[]> {
 
   emileDB.prepare(`create temp table ${tempTableName} as ${sql}`).run()
 
-  return emileDB.prepare(`select * from ${tempTableName}`).raw().all()
+  const data = emileDB.prepare(`select * from ${tempTableName}`).raw().all()
+
+  emileDB.close()
+
+  return data
 }

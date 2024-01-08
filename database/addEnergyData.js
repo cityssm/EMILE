@@ -25,6 +25,9 @@ export async function addEnergyData(data, sessionUser, connectedEmileDB) {
         }
     }
     if (result === undefined) {
+        if (connectedEmileDB === undefined) {
+            emileDB.close();
+        }
         throw new Error(`Database still locked after ${queryMaxRetryCount} retries.`);
     }
     else {

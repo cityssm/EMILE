@@ -62,6 +62,10 @@ export async function addEnergyData(
   }
 
   if (result === undefined) {
+    if (connectedEmileDB === undefined) {
+      emileDB.close()
+    }
+
     throw new Error(
       `Database still locked after ${queryMaxRetryCount} retries.`
     )
