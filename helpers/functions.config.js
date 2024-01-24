@@ -16,6 +16,7 @@ configFallbackValues.set('session.cookieName', 'emile-user-sid');
 configFallbackValues.set('session.secret', 'cityssm/emile');
 configFallbackValues.set(property_session_maxAgeMillis, 60 * 60 * 1000);
 configFallbackValues.set('session.doKeepAlive', false);
+configFallbackValues.set('settings.greenButton.usageProperty', 'intervalReading');
 configFallbackValues.set('parserConfigs', {});
 configFallbackValues.set('settings.reportKeyAccessDays', 5);
 configFallbackValues.set('subscriptions.greenButton', {});

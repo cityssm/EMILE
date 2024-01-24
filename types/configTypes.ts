@@ -34,6 +34,9 @@ export interface Config {
 
   settings?: {
     reportKeyAccessDays?: number
+    greenButton?: {
+      usageProperty?: ConfigGreenButtonUsageProperty
+    }
   }
 
   subscriptions?: {
@@ -107,3 +110,7 @@ export interface ConfigGreenButtonSubscription {
   authorizationIdsToInclude?: string[]
   pollingHoursToExclude?: number[]
 }
+
+export type ConfigGreenButtonUsageProperty =
+  | 'currentBillingPeriodOverAllConsumption'
+  | 'intervalReading'

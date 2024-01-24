@@ -8,6 +8,7 @@ import { config } from '../data/config.js'
 import type {
   ConfigActiveDirectory,
   ConfigGreenButtonSubscription,
+  ConfigGreenButtonUsageProperty,
   ConfigParserConfiguration,
   ConfigTemporaryUserCredentials
 } from '../types/configTypes.js'
@@ -39,6 +40,11 @@ configFallbackValues.set('session.cookieName', 'emile-user-sid')
 configFallbackValues.set('session.secret', 'cityssm/emile')
 configFallbackValues.set(property_session_maxAgeMillis, 60 * 60 * 1000)
 configFallbackValues.set('session.doKeepAlive', false)
+
+configFallbackValues.set(
+  'settings.greenButton.usageProperty',
+  'intervalReading'
+)
 
 configFallbackValues.set('parserConfigs', {})
 
@@ -97,6 +103,10 @@ export function getConfigProperty(
 export function getConfigProperty(
   propertyName: 'subscriptions.greenButton'
 ): Record<string, ConfigGreenButtonSubscription>
+
+export function getConfigProperty(
+  propertyName: 'settings.greenButton.usageProperty'
+): ConfigGreenButtonUsageProperty
 
 export function getConfigProperty(propertyName: string): unknown {
   const propertyNameSplit = propertyName.split('.')

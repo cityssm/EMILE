@@ -28,6 +28,9 @@ export interface Config {
     tempUsers?: ConfigTemporaryUserCredentials[];
     settings?: {
         reportKeyAccessDays?: number;
+        greenButton?: {
+            usageProperty?: ConfigGreenButtonUsageProperty;
+        };
     };
     subscriptions?: {
         greenButton?: Record<string, ConfigGreenButtonSubscription>;
@@ -84,3 +87,4 @@ export interface ConfigGreenButtonSubscription {
     authorizationIdsToInclude?: string[];
     pollingHoursToExclude?: number[];
 }
+export type ConfigGreenButtonUsageProperty = 'currentBillingPeriodOverAllConsumption' | 'intervalReading';

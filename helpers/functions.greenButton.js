@@ -9,6 +9,7 @@ import { getEnergyDataPoint } from '../database/getEnergyData.js';
 import { getEnergyDataTypeByGreenButtonIds } from '../database/getEnergyDataType.js';
 import { updateEnergyDataValue } from '../database/updateEnergyData.js';
 import { getAssetCategories } from './functions.cache.js';
+import { getConfigProperty } from './functions.config.js';
 import { getConnectionWhenAvailable } from './functions.database.js';
 const debug = Debug('emile:functions.greenButton');
 const greenButtonAliasTypeKey = 'GreenButtonParser.IntervalBlock.link';
@@ -90,7 +91,7 @@ async function getEnergyDataTypeAndPowerOfTenMultiplier(greenButtonJson, interva
             : powerOfTenMultiplier
     };
 }
-async function getEnergyDataType(greenButtonJson, usageSummaryEntry, connectedEmileDB) {
+async function getCurrencyDataType(greenButtonJson, usageSummaryEntry, connectedEmileDB) {
     const usagePoint = greenButtonHelpers.getUsagePointEntryFromEntry(greenButtonJson, usageSummaryEntry);
     if (usagePoint === undefined) {
         throw new Error('Unable to find related UsagePoint entry.');
@@ -101,58 +102,76 @@ async function getEnergyDataType(greenButtonJson, usageSummaryEntry, connectedEm
         commodityId: usageSummaryEntry.content.UsageSummary.commodity?.toString()
     }, greenButtonUser, true, connectedEmileDB);
 }
+async function getUsageDataType(greenButtonJson, usageSummaryEntry, connectedEmileDB) {
+    const usagePoint = greenButtonHelpers.getUsagePointEntryFromEntry(greenButtonJson, usageSummaryEntry);
+    if (usagePoint === undefined) {
+        throw new Error('Unable to find related UsagePoint entry.');
+    }
+    return await getEnergyDataTypeByGreenButtonIds({
+        serviceCategoryId: usagePoint.content.UsagePoint.ServiceCategory?.kind.toString() ?? '',
+        unitId: usageSummaryEntry.content.UsageSummary.currentBillingPeriodOverAllConsumption?.uom?.toString() ??
+            '',
+        commodityId: usageSummaryEntry.content.UsageSummary.commodity?.toString()
+    }, greenButtonUser, true, connectedEmileDB);
+}
 export async function recordGreenButtonData(greenButtonJson, options, connectedEmileDB) {
     let recordCount = 0;
-    const intervalBlockEntries = greenButtonHelpers.getEntriesByContentType(greenButtonJson, 'IntervalBlock');
+    const intervalBlockEntries = getConfigProperty('settings.greenButton.usageProperty') ===
+        'intervalReading'
+        ? greenButtonHelpers.getEntriesByContentType(greenButtonJson, 'IntervalBlock')
+        : [];
     const usageSummaryEntries = greenButtonHelpers.getEntriesByContentType(greenButtonJson, 'UsageSummary');
     if (intervalBlockEntries.length === 0 && usageSummaryEntries.length === 0) {
         throw new Error('File contains no IntervalBlock or UsageSummary entries.');
     }
     const emileDB = connectedEmileDB ?? (await getConnectionWhenAvailable());
     try {
-        for (const intervalBlockEntry of intervalBlockEntries) {
-            let assetId = options.assetId;
-            if ((assetId ?? '') === '') {
-                assetId = await getAssetIdFromIntervalBlock(intervalBlockEntry, emileDB);
-            }
-            const energyDataTypeAndPower = await getEnergyDataTypeAndPowerOfTenMultiplier(greenButtonJson, intervalBlockEntry, emileDB);
-            if (energyDataTypeAndPower?.energyDataType === undefined) {
-                throw new Error('Unable to retrieve EnergyDataType.');
-            }
-            for (const intervalBlock of intervalBlockEntry.content.IntervalBlock) {
-                for (const intervalReading of intervalBlock.IntervalReading ?? []) {
-                    if (intervalReading.timePeriod !== undefined &&
-                        intervalReading.value !== undefined) {
-                        const currentDataPoint = await getEnergyDataPoint({
-                            assetId: assetId,
-                            dataTypeId: energyDataTypeAndPower.energyDataType
-                                .dataTypeId,
-                            timeSeconds: intervalReading.timePeriod.start,
-                            durationSeconds: intervalReading.timePeriod.duration
-                        }, emileDB);
-                        if (currentDataPoint === undefined) {
-                            await addEnergyData({
-                                assetId,
-                                dataTypeId: energyDataTypeAndPower.energyDataType.dataTypeId,
-                                fileId: options.fileId,
-                                timeSeconds: intervalReading.timePeriod?.start,
-                                durationSeconds: intervalReading.timePeriod?.duration,
-                                dataValue: intervalReading.value,
-                                powerOfTenMultiplier: energyDataTypeAndPower.powerOfTenMultiplier
-                            }, greenButtonUser, emileDB);
-                            recordCount += 1;
-                        }
-                        else if (currentDataPoint.dataValue !== intervalReading.value ||
-                            currentDataPoint.powerOfTenMultiplier !==
-                                energyDataTypeAndPower.powerOfTenMultiplier) {
-                            await updateEnergyDataValue({
-                                dataId: currentDataPoint.dataId,
+        if (getConfigProperty('settings.greenButton.usageProperty') ===
+            'intervalReading') {
+            for (const intervalBlockEntry of intervalBlockEntries) {
+                let assetId = options.assetId;
+                if ((assetId ?? '') === '') {
+                    assetId = await getAssetIdFromIntervalBlock(intervalBlockEntry, emileDB);
+                }
+                const energyDataTypeAndPower = await getEnergyDataTypeAndPowerOfTenMultiplier(greenButtonJson, intervalBlockEntry, emileDB);
+                if (energyDataTypeAndPower?.energyDataType === undefined) {
+                    throw new Error('Unable to retrieve EnergyDataType.');
+                }
+                for (const intervalBlock of intervalBlockEntry.content.IntervalBlock) {
+                    for (const intervalReading of intervalBlock.IntervalReading ?? []) {
+                        if (intervalReading.timePeriod !== undefined &&
+                            intervalReading.value !== undefined) {
+                            const currentDataPoint = await getEnergyDataPoint({
                                 assetId: assetId,
-                                fileId: options.fileId,
-                                dataValue: intervalReading.value,
-                                powerOfTenMultiplier: energyDataTypeAndPower.powerOfTenMultiplier
-                            }, greenButtonUser, emileDB);
-                            recordCount += 1;
+                                dataTypeId: energyDataTypeAndPower.energyDataType
+                                    .dataTypeId,
+                                timeSeconds: intervalReading.timePeriod.start,
+                                durationSeconds: intervalReading.timePeriod.duration
+                            }, emileDB);
+                            if (currentDataPoint === undefined) {
+                                await addEnergyData({
+                                    assetId,
+                                    dataTypeId: energyDataTypeAndPower.energyDataType.dataTypeId,
+                                    fileId: options.fileId,
+                                    timeSeconds: intervalReading.timePeriod?.start,
+                                    durationSeconds: intervalReading.timePeriod?.duration,
+                                    dataValue: intervalReading.value,
+                                    powerOfTenMultiplier: energyDataTypeAndPower.powerOfTenMultiplier
+                                }, greenButtonUser, emileDB);
+                                recordCount += 1;
+                            }
+                            else if (currentDataPoint.dataValue !== intervalReading.value ||
+                                currentDataPoint.powerOfTenMultiplier !==
+                                    energyDataTypeAndPower.powerOfTenMultiplier) {
+                                await updateEnergyDataValue({
+                                    dataId: currentDataPoint.dataId,
+                                    assetId: assetId,
+                                    fileId: options.fileId,
+                                    dataValue: intervalReading.value,
+                                    powerOfTenMultiplier: energyDataTypeAndPower.powerOfTenMultiplier
+                                }, greenButtonUser, emileDB);
+                                recordCount += 1;
+                            }
                         }
                     }
                 }
@@ -163,13 +182,13 @@ export async function recordGreenButtonData(greenButtonJson, options, connectedE
             if ((assetId ?? '') === '') {
                 assetId = await getAssetIdFromUsageSummary(usageSummaryEntry, emileDB);
             }
-            const energyDataType = await getEnergyDataType(greenButtonJson, usageSummaryEntry, emileDB);
-            if (energyDataType === undefined) {
-                throw new Error('Unable to retrieve EnergyDataType.');
+            const currencyDataType = await getCurrencyDataType(greenButtonJson, usageSummaryEntry, emileDB);
+            if (currencyDataType === undefined) {
+                throw new Error('Unable to retrieve EnergyDataType for currency.');
             }
             const currentDataPoint = await getEnergyDataPoint({
                 assetId: assetId,
-                dataTypeId: energyDataType.dataTypeId,
+                dataTypeId: currencyDataType.dataTypeId,
                 timeSeconds: usageSummaryEntry.content.UsageSummary.billingPeriod.start,
                 durationSeconds: usageSummaryEntry.content.UsageSummary.billingPeriod.duration
             }, emileDB);
@@ -178,7 +197,7 @@ export async function recordGreenButtonData(greenButtonJson, options, connectedE
             if (currentDataPoint === undefined) {
                 await addEnergyData({
                     assetId,
-                    dataTypeId: energyDataType.dataTypeId,
+                    dataTypeId: currencyDataType.dataTypeId,
                     fileId: options.fileId,
                     timeSeconds: usageSummaryEntry.content.UsageSummary.billingPeriod.start,
                     durationSeconds: usageSummaryEntry.content.UsageSummary.billingPeriod.duration,
@@ -197,6 +216,48 @@ export async function recordGreenButtonData(greenButtonJson, options, connectedE
                     powerOfTenMultiplier
                 }, greenButtonUser, emileDB);
                 recordCount += 1;
+            }
+            if (getConfigProperty('settings.greenButton.usageProperty') ===
+                'currentBillingPeriodOverAllConsumption') {
+                const usageDataType = await getUsageDataType(greenButtonJson, usageSummaryEntry, emileDB);
+                if (usageDataType === undefined) {
+                    throw new Error('Unable to retrieve EnergyDataType for usage.');
+                }
+                const currentDataPoint = await getEnergyDataPoint({
+                    assetId: assetId,
+                    dataTypeId: usageDataType.dataTypeId,
+                    timeSeconds: usageSummaryEntry.content.UsageSummary.billingPeriod.start,
+                    durationSeconds: usageSummaryEntry.content.UsageSummary.billingPeriod.duration
+                }, emileDB);
+                const usageDataValue = usageSummaryEntry.content.UsageSummary
+                    .currentBillingPeriodOverAllConsumption?.value ?? 0;
+                const usagePowerOfTenMultiplier = usageSummaryEntry.content.UsageSummary
+                    .currentBillingPeriodOverAllConsumption?.powerOfTenMultiplier ?? '0';
+                if (currentDataPoint === undefined) {
+                    await addEnergyData({
+                        assetId,
+                        dataTypeId: usageDataType.dataTypeId,
+                        fileId: options.fileId,
+                        timeSeconds: usageSummaryEntry.content.UsageSummary.billingPeriod.start,
+                        durationSeconds: usageSummaryEntry.content.UsageSummary.billingPeriod.duration,
+                        dataValue: usageDataValue,
+                        powerOfTenMultiplier: typeof usagePowerOfTenMultiplier === 'string'
+                            ? Number.parseInt(usagePowerOfTenMultiplier)
+                            : usagePowerOfTenMultiplier
+                    }, greenButtonUser, emileDB);
+                    recordCount += 1;
+                }
+                else if (currentDataPoint.dataValue !== dataValue ||
+                    currentDataPoint.powerOfTenMultiplier !== powerOfTenMultiplier) {
+                    await updateEnergyDataValue({
+                        dataId: currentDataPoint.dataId,
+                        assetId: assetId,
+                        fileId: options.fileId,
+                        dataValue,
+                        powerOfTenMultiplier
+                    }, greenButtonUser, emileDB);
+                    recordCount += 1;
+                }
             }
         }
     }
