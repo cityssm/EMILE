@@ -64,14 +64,19 @@ export async function getEnergyData(filters, options) {
         columnNames = `d.dataId,
       c.category, a.assetName,
       ts.serviceCategory,
-      userFunction_getPowerOfTenMultiplierName(d.powerOfTenMultiplier) as powerOfTenMultiplierName,
-      tu.unit,
+
       tr.readingType,
       tc.commodity,
       ta.accumulationBehaviour,
       datetime(d.timeSeconds, 'unixepoch', 'localtime') as startDateTime,
       d.durationSeconds,
-      d.dataValue, d.powerOfTenMultiplier`;
+      
+      d.dataValue
+      * power(10, d.powerOfTenMultiplier)
+      / power(10, tu.preferredPowerOfTenMultiplier) as dataValueEvaluated,
+      
+      userFunction_getPowerOfTenMultiplierName(tu.preferredPowerOfTenMultiplier) as preferredPowerOfTenMultiplierName,
+      tu.unit`;
     }
     else if (useAggregateTables) {
         columnNames = `d.dataIdMin as dataId,
