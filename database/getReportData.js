@@ -235,7 +235,7 @@ export async function getReportData(reportName, reportParameters = {}) {
             return undefined;
         }
     }
-    const emileDB = await getConnectionWhenAvailable(true);
+    const emileDB = await getConnectionWhenAvailable();
     emileDB.function('userFunction_getPowerOfTenMultiplierName', userFunction_getPowerOfTenMultiplierName);
     let resultRows = [];
     if (useTempTable) {

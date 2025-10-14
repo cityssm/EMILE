@@ -327,7 +327,7 @@ export async function getReportData(
     }
   }
 
-  const emileDB = await getConnectionWhenAvailable(true)
+  const emileDB = await getConnectionWhenAvailable()
 
   emileDB.function(
     'userFunction_getPowerOfTenMultiplierName',
