@@ -11,7 +11,7 @@ config.parserConfigs.enbridgeUsageHistory = enbridgeUsageHistory
 
 config.settings = config.settings ?? {}
 config.settings.greenButton = {
-  usageProperty: 'currentBillingPeriodOverAllConsumption'
+  usageProperty: 'intervalReading'
 }
 
 config.subscriptions = config.subscriptions ?? {}

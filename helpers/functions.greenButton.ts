@@ -249,6 +249,7 @@ async function getUsageDataType(
   )
 }
 
+// eslint-disable-next-line complexity
 export async function recordGreenButtonData(
   greenButtonJson: GreenButtonTypes.GreenButtonJson,
   options: {
@@ -260,13 +261,14 @@ export async function recordGreenButtonData(
   let recordCount = 0
 
   const intervalBlockEntries =
-    getConfigProperty('settings.greenButton.usageProperty') ===
-    'intervalReading'
-      ? greenButtonHelpers.getEntriesByContentType(
-          greenButtonJson,
-          'IntervalBlock'
-        )
-      : []
+  getConfigProperty('settings.greenButton.usageProperty') ===
+  'intervalReading'
+  ? greenButtonHelpers.getEntriesByContentType(
+    greenButtonJson,
+    'IntervalBlock'
+  )
+  : []
+
 
   const usageSummaryEntries = greenButtonHelpers.getEntriesByContentType(
     greenButtonJson,

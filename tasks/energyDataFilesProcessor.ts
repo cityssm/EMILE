@@ -33,6 +33,7 @@ let terminateTask = false
 let isRunning = false
 let runAgainOnComplete = false
 
+// eslint-disable-next-line complexity
 async function processFiles(): Promise<void> {
   if (isRunning) {
     debug('Already running')
