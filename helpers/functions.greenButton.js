@@ -192,7 +192,7 @@ export async function recordGreenButtonData(greenButtonJson, options, connectedE
                 timeSeconds: usageSummaryEntry.content.UsageSummary.billingPeriod.start,
                 durationSeconds: usageSummaryEntry.content.UsageSummary.billingPeriod.duration
             }, emileDB);
-            const dataValue = (usageSummaryEntry.content.UsageSummary.billToDate ?? 0) / 100000;
+            const dataValue = (usageSummaryEntry.content.UsageSummary.billToDate ?? 0) / 100_000;
             const powerOfTenMultiplier = 0;
             if (currentDataPoint === undefined) {
                 await addEnergyData({

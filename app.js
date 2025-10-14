@@ -51,7 +51,7 @@ app.use(csurf({
 }));
 if (!useTestDatabases) {
     app.use(rateLimit({
-        windowMs: 10000,
+        windowMs: 10_000,
         max: 200
     }));
 }

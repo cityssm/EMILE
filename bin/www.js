@@ -70,7 +70,7 @@ if (process.env.STARTUP_TEST === 'true') {
     setTimeout(() => {
         debug('Killing processes');
         process.exit(0);
-    }, 10000);
+    }, 10_000);
 }
 else {
     const lowPriority = 19;

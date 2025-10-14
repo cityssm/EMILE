@@ -73,6 +73,6 @@ export async function getConnectionWhenAvailable(readOnly = false) {
     }
 }
 export function getTempTableName() {
-    return `tmp_${Date.now()}_${Math.round(Math.random() * 10000)}`;
+    return `tmp_${Date.now()}_${Math.round(Math.random() * 10_000)}`;
 }
 export const queryMaxRetryCount = 20;

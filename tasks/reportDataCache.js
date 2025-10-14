@@ -8,7 +8,7 @@ import { getReportData } from '../database/getReportData.js';
 import { reportCacheFolder, reportsToCache } from '../helpers/functions.reports.js';
 const debug = Debug('emile:tasks:reportDataCache');
 process.title = 'EMILE - reportDataCache';
-const pollingIntervalMillis = 3600 * 1000 + 60000;
+const pollingIntervalMillis = 3600 * 1000 + 60_000;
 let terminateTask = false;
 async function refreshReportDataCaches() {
     debug('Process started');
@@ -32,7 +32,7 @@ async function refreshReportDataCaches() {
             }
         }
         else {
-            const sliceSize = 50000;
+            const sliceSize = 50_000;
             const dataWithHeader = [data.header, ...data.data];
             for (let sliceStart = 0; sliceStart < dataWithHeader.length; sliceStart += sliceSize) {
                 const csv = papaparse.unparse(dataWithHeader.slice(sliceStart, sliceStart + sliceSize));

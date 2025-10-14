@@ -59,7 +59,7 @@ async function deleteUnrecordedFiles() {
         }
     }
 }
-const intervalID = setIntervalAsync(deleteUnrecordedFiles, 2 * 86400 * 1000);
+const intervalID = setIntervalAsync(deleteUnrecordedFiles, 2 * 86_400 * 1000);
 exitHook(() => {
     terminateTask = true;
     try {

@@ -88,7 +88,7 @@ export const enbridgeUsageHistory = {
         durationSeconds: {
             dataType: 'function',
             dataFunction(dataObject) {
-                return dataObject['Billing Days'] * 86400;
+                return dataObject['Billing Days'] * 86_400;
             }
         },
         dataValue: {

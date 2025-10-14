@@ -39,7 +39,7 @@ const postEnergyDataDeleteSql = [
 export async function cleanupDatabase() {
     let deleteCount = 0;
     let dropCount = 0;
-    const recordDeleteTimeMillis = Date.now() - deleteAgeDays * 86400 * 1000;
+    const recordDeleteTimeMillis = Date.now() - deleteAgeDays * 86_400 * 1000;
     const emileDB = await getConnectionWhenAvailable();
     try {
         for (const sql of deleteSql) {

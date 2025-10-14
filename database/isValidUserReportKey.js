@@ -1,7 +1,7 @@
 import { isLocal } from '@cityssm/is-private-network-address';
 import { getConfigProperty } from '../helpers/functions.config.js';
 import { getConnectionWhenAvailable } from '../helpers/functions.database.js';
-const accessMillis = getConfigProperty('settings.reportKeyAccessDays') * 86400 * 1000;
+const accessMillis = getConfigProperty('settings.reportKeyAccessDays') * 86_400 * 1000;
 export async function isValidUserReportKey(reportKey, requestIp) {
     const emileDB = await getConnectionWhenAvailable(true);
     const ipAddress = isLocal(requestIp) ? 'localhost' : requestIp;

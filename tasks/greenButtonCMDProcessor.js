@@ -9,7 +9,7 @@ import { recordGreenButtonData } from '../helpers/functions.greenButton.js';
 const debug = Debug('emile:tasks:greenButtonCMDProcessor');
 process.title = 'EMILE - greenButtonCMDProcessor';
 const taskIntervalMillis = 3600 * 1000;
-const pollingIntervalMillis = 86400 * 1000 + 60000;
+const pollingIntervalMillis = 86_400 * 1000 + 60_000;
 const lastUpdatedMinsCacheFile = 'data/caches/greenButtonCMDProcessor.json';
 const greenButtonSubscriptions = getConfigProperty('subscriptions.greenButton');
 let lastUpdatedMins = {};
