@@ -1,33 +1,8 @@
 {
   "name": "@cityssm/emile",
-  "version": "1.0.0-alpha.3",
-  "type": "module",
+  "version": "1.0.0-alpha.4",
+  "private": true,
   "description": "EMILE (Energy Monitoring in Less Effort) - An application to aggregate energy consumption data across several municipal assets and report usage to monitor and manage emissions. Makes bringing together Green Button and CSV data sources a breeze!",
-  "exports": "./app.js",
-  "engines": {
-    "node": ">=18.0.0"
-  },
-  "scripts": {
-    "start": "cross-env NODE_ENV=production node ./bin/www.js",
-    "dev:live": "cross-env NODE_ENV=dev DEBUG=emile:* nodemon --inspect ./bin/www.js",
-    "dev:test": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true nodemon --inspect ./bin/www.js",
-    "dev:test:noGreenButtonCMD": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true GREENBUTTON_CMD=false nodemon --inspect ./bin/www.js",
-    "dev:test:deletedFilesProcessor": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true nodemon --inspect ./tasks/deletedFilesProcessor.js",
-    "dev:test:greenButtonCMDProcessor": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true nodemon --inspect ./tasks/greenButtonCMDProcessor.js",
-    "dev:test:reportDataCache": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true nodemon --inspect ./tasks/reportDataCache.js",
-    "cy:open": "cypress open --config-file cypress.config.js",
-    "cy:run": "cypress run --config-file cypress.config.js",
-    "cy:run:firefox": "cypress run --config-file cypress.config.js --browser firefox",
-    "test": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true mocha --timeout 30000 --exit",
-    "test:startup": "cross-env NODE_ENV=dev DEBUG=emile:* STARTUP_TEST=true node ./bin/www.js",
-    "coverage": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true c8 --reporter=lcov --reporter=text --reporter=text-summary mocha --timeout 30000 --exit",
-    "temp:updateAssetNames": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true node ./temp/updateAssetNames.js",
-    "databaseMaintenance": "node ./scripts/databaseMaintenance.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/cityssm/EMILE.git"
-  },
   "keywords": [
     "energy-data",
     "energy-monitoring",
@@ -40,13 +15,35 @@
     "connect-my-data",
     "download-my-data"
   ],
-  "author": "The Corporation of the City of Sault Ste. Marie",
-  "license": "MIT",
+  "homepage": "https://github.com/cityssm/EMILE#readme",
   "bugs": {
     "url": "https://github.com/cityssm/EMILE/issues"
   },
-  "homepage": "https://github.com/cityssm/EMILE#readme",
-  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cityssm/EMILE.git"
+  },
+  "license": "MIT",
+  "author": "The Corporation of the City of Sault Ste. Marie",
+  "type": "module",
+  "exports": "./app.js",
+  "scripts": {
+    "coverage": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true c8 --reporter=lcov --reporter=text --reporter=text-summary mocha --timeout 30000 --exit",
+    "cy:open": "cypress open --config-file cypress.config.js",
+    "cy:run": "cypress run --config-file cypress.config.js",
+    "cy:run:firefox": "cypress run --config-file cypress.config.js --browser firefox",
+    "databaseMaintenance": "node ./scripts/databaseMaintenance.js",
+    "dev:live": "cross-env NODE_ENV=dev DEBUG=emile:* nodemon --inspect ./bin/www.js",
+    "dev:test": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true nodemon --inspect ./bin/www.js",
+    "dev:test:deletedFilesProcessor": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true nodemon --inspect ./tasks/deletedFilesProcessor.js",
+    "dev:test:greenButtonCMDProcessor": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true nodemon --inspect ./tasks/greenButtonCMDProcessor.js",
+    "dev:test:noGreenButtonCMD": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true GREENBUTTON_CMD=false nodemon --inspect ./bin/www.js",
+    "dev:test:reportDataCache": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true nodemon --inspect ./tasks/reportDataCache.js",
+    "start": "cross-env NODE_ENV=production node ./bin/www.js",
+    "temp:updateAssetNames": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true node ./temp/updateAssetNames.js",
+    "test": "cross-env NODE_ENV=dev DEBUG=emile:* TEST_DATABASES=true mocha --timeout 30000 --exit",
+    "test:startup": "cross-env NODE_ENV=dev DEBUG=emile:* STARTUP_TEST=true node ./bin/www.js"
+  },
   "dependencies": {
     "@cityssm/ad-web-auth-connector": "^1.2.0",
     "@cityssm/bulma-js": "^0.4.0",
@@ -118,5 +115,8 @@
     "prettier-config-cityssm": "^1.0.0",
     "sass": "^1.70.0",
     "webpack": "^5.102.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
