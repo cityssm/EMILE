@@ -6,22 +6,21 @@ permissions: read-all
 
 jobs:
   Coverage:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        node: [ 18, 20, 21 ]
+        node: [ 18, 20, 22 ]
     env:
-      CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
       DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
     name: Node ${{ matrix.node }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v5
         with:
           node-version: ${{ matrix.node }}
           cache: 'npm'
@@ -29,18 +28,11 @@ jobs:
       - name: Install Package
         run: |
           npm ci
-          npm install -g mocha c8 cypress@13
+          npm install -g mocha c8 cypress@15
 
       - name: Copy Test Config
         run: cp ./data/config.githubActions.js ./data/config.js
-        
-      - name: Code Climate (Before)
-        if: ${{ github.event_name != 'pull_request' && env.CC_TEST_REPORTER_ID != '' && matrix.node == 20 }}
-        run: |
-          curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./codeclimate-test-reporter
-          chmod +x codeclimate-test-reporter
-          ./codeclimate-test-reporter before-build
-      
+
       - name: Verify Cypress
         run: cypress verify
         env:
@@ -51,11 +43,6 @@ jobs:
 
       - name: Run Coverage Testing
         run: npm run coverage
-
-      - name: Code Climate (After)
-        if: ${{ github.event_name != 'pull_request' && env.CC_TEST_REPORTER_ID != '' && matrix.node == 20 }}
-        run: |
-          ./codeclimate-test-reporter after-build -t lcov --exit-code $?
 
       - name: Codecov
         if: ${{ github.event_name != 'pull_request' && env.CODECOV_TOKEN != '' && matrix.node == 20 }}
