@@ -220,6 +220,7 @@ async function initializeAssetAliasTypes(emileDB) {
 }
 export async function initializeDatabase(connectedEmileDB) {
     const emileDB = connectedEmileDB ?? await getConnectionWhenAvailable();
+    emileDB.pragma('journal_mode = WAL');
     const row = emileDB
         .prepare(`select name from sqlite_master
         where type = 'table'

@@ -359,6 +359,7 @@ export async function initializeDatabase(
   connectedEmileDB?: sqlite.Database
 ): Promise<void> {
   const emileDB = connectedEmileDB ?? await getConnectionWhenAvailable()
+  emileDB.pragma('journal_mode = WAL')
 
   const row = emileDB
     .prepare(

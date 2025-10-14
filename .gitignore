@@ -10,6 +10,8 @@ data/sessions/
 
 data/**/*.db
 data/**/*.db-journal
+data/**/*.db-shm
+data/**/*.db-wal
 
 data/config.d.ts
 data/config.js

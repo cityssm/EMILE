@@ -74,8 +74,9 @@ if (process.env.STARTUP_TEST === 'true') {
 }
 else {
     const lowPriority = 19;
-    fileProcessorChildProcess = fork('./tasks/energyDataFilesProcessor.js');
-    os.setPriority(fileProcessorChildProcess.pid, lowPriority);
+    fileProcessorChildProcess = fork('./tasks/energyDataFilesProcessor.js', {
+        execArgv: ['--max-old-space-size=4096']
+    });
     let childProcess = fork('./tasks/uploadedFilesProcessor.js');
     os.setPriority(childProcess.pid, lowPriority);
     childProcess = fork('./tasks/deletedFilesProcessor.js');
