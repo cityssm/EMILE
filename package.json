@@ -113,7 +113,7 @@
     "gulp-sass": "^5.1.0",
     "nodemon": "^3.1.10",
     "prettier-config-cityssm": "^1.0.0",
-    "sass": "^1.70.0",
+    "sass": "^1.93.2",
     "webpack": "^5.102.1"
   },
   "engines": {
