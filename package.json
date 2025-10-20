@@ -108,7 +108,7 @@
     "cypress-axe": "^1.7.0",
     "eslint-config-cityssm": "^33.1.1",
     "gulp": "^4.0.2",
-    "gulp-changed": "^5.0.2",
+    "gulp-changed": "^5.0.4",
     "gulp-minify": "^3.1.0",
     "gulp-sass": "^5.1.0",
     "nodemon": "^3.1.10",
