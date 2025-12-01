@@ -67,7 +67,7 @@
     "ejs": "^3.1.10",
     "excel-date-to-js": "^1.1.5",
     "exit-hook": "^5.0.0",
-    "express": "^5.1.0",
+    "express": "^5.2.1",
     "express-rate-limit": "^8.1.0",
     "express-session": "^1.18.2",
     "http-errors": "^2.0.0",
